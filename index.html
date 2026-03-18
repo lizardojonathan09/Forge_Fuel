@@ -1,0 +1,790 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Forge Oats – Fuel The Work</title>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Oswald:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --black:  #080808; --dark: #111111; --card: #181818;
+      --orange: #FF6B1A; --fire: #FF3D00; --gold: #C9A04A;
+      --cream:  #EDE8DC; --muted: #888888; --border: #2A2A2A;
+    }
+    html { scroll-behavior: smooth; }
+    body { background: var(--black); color: var(--cream); font-family: 'Inter', sans-serif; overflow-x: hidden; }
+
+    /* ── NAV ── */
+    nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 14px 48px;
+      background: rgba(8,8,8,0.92); backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+    }
+    .nav-logo { display: flex; align-items: center; gap: 12px; text-decoration: none; }
+    .nav-logo img { height: 46px; width: auto; }
+    .nav-logo-text { font-family: 'Bebas Neue', sans-serif; font-size: 22px; letter-spacing: 2px; color: var(--cream); line-height: 1; }
+    .nav-logo-text span { display: block; font-family: 'Oswald', sans-serif; font-size: 10px; letter-spacing: 4px; color: var(--orange); font-weight: 500; }
+    .nav-links { display: flex; align-items: center; gap: 32px; }
+    .nav-links a { color: var(--cream); text-decoration: none; font-family: 'Oswald', sans-serif; font-size: 14px; letter-spacing: 1.5px; text-transform: uppercase; opacity: 0.8; transition: opacity 0.2s; }
+    .nav-links a:hover { opacity: 1; color: var(--orange); }
+    .btn-nav { background: var(--orange); color: #fff; font-family: 'Oswald', sans-serif; font-size: 13px; font-weight: 600; letter-spacing: 2px; text-transform: uppercase; padding: 10px 24px; border-radius: 4px; text-decoration: none; transition: background 0.2s, transform 0.1s; border: none; cursor: pointer; }
+    .btn-nav:hover { background: var(--fire); transform: translateY(-1px); }
+
+    /* ── HERO ── */
+    .hero {
+      min-height: 100vh; display: flex; align-items: center; justify-content: center;
+      position: relative; overflow: hidden;
+      background: radial-gradient(ellipse 80% 60% at 50% 100%, rgba(255,107,26,0.18) 0%, transparent 70%), var(--black);
+      padding: 120px 48px 80px; text-align: center;
+    }
+    .embers { position: absolute; inset: 0; pointer-events: none; overflow: hidden; }
+    .ember { position: absolute; bottom: -10px; width: 4px; height: 4px; border-radius: 50%; background: var(--orange); animation: floatUp linear infinite; opacity: 0; }
+    .ember:nth-child(1)  { left:10%; animation-duration:6s;   animation-delay:0s;   width:3px; height:3px; background:#FF8C42; }
+    .ember:nth-child(2)  { left:20%; animation-duration:8s;   animation-delay:1s;   background:var(--fire); }
+    .ember:nth-child(3)  { left:35%; animation-duration:7s;   animation-delay:2s;   width:2px; height:2px; }
+    .ember:nth-child(4)  { left:50%; animation-duration:9s;   animation-delay:0.5s; background:var(--gold); }
+    .ember:nth-child(5)  { left:65%; animation-duration:6.5s; animation-delay:1.5s; width:3px; height:3px; }
+    .ember:nth-child(6)  { left:78%; animation-duration:8.5s; animation-delay:3s;   background:var(--fire); }
+    .ember:nth-child(7)  { left:90%; animation-duration:7.5s; animation-delay:0.8s; width:2px; height:2px; }
+    .ember:nth-child(8)  { left:45%; animation-duration:5.5s; animation-delay:2.5s; background:#FFAA55; }
+    .ember:nth-child(9)  { left:25%; animation-duration:9.5s; animation-delay:4s;   width:3px; height:3px; }
+    .ember:nth-child(10) { left:60%; animation-duration:6.2s; animation-delay:1.2s; background:var(--gold); }
+    .ember:nth-child(11) { left:5%;  animation-duration:8s;   animation-delay:3.5s; width:2px; height:2px; }
+    .ember:nth-child(12) { left:82%; animation-duration:7s;   animation-delay:0.3s; background:#FF5500; }
+    @keyframes floatUp {
+      0%   { transform:translateY(0) translateX(0);   opacity:0; }
+      10%  { opacity:0.9; }
+      80%  { opacity:0.4; }
+      100% { transform:translateY(-90vh) translateX(40px); opacity:0; }
+    }
+    .hero-content { position: relative; z-index: 2; max-width: 860px; }
+    .hero-logo-wrap { margin: 0 auto 28px; display: flex; justify-content: center; }
+    .hero-logo-svg { width: 220px; max-width: 80vw; filter: drop-shadow(0 6px 28px rgba(255,107,26,0.45)); animation: logoPulse 3s ease-in-out infinite; }
+    @keyframes logoPulse {
+      0%,100% { filter: drop-shadow(0 6px 28px rgba(255,107,26,0.45)); }
+      50%      { filter: drop-shadow(0 8px 40px rgba(255,107,26,0.70)); }
+    }
+    .hero-eyebrow { font-family:'Oswald',sans-serif; font-size:13px; letter-spacing:5px; text-transform:uppercase; color:var(--orange); margin-bottom:12px; }
+    .hero-desc { font-size:18px; line-height:1.7; color:rgba(237,232,220,0.75); max-width:560px; margin:0 auto 40px; font-weight:300; }
+    .hero-cta-group { display:flex; gap:16px; justify-content:center; flex-wrap:wrap; }
+    .btn-primary { background:linear-gradient(135deg,var(--orange),var(--fire)); color:#fff; font-family:'Oswald',sans-serif; font-size:16px; font-weight:600; letter-spacing:2px; text-transform:uppercase; padding:16px 40px; border-radius:4px; border:none; cursor:pointer; text-decoration:none; display:inline-block; box-shadow:0 4px 30px rgba(255,107,26,0.35); transition:all 0.2s; }
+    .btn-primary:hover { transform:translateY(-2px); box-shadow:0 8px 40px rgba(255,107,26,0.5); }
+    .btn-secondary { background:transparent; color:var(--cream); font-family:'Oswald',sans-serif; font-size:16px; font-weight:500; letter-spacing:2px; text-transform:uppercase; padding:16px 40px; border-radius:4px; border:1px solid var(--border); cursor:pointer; text-decoration:none; display:inline-block; transition:all 0.2s; }
+    .btn-secondary:hover { border-color:var(--orange); color:var(--orange); transform:translateY(-2px); }
+
+    /* ── CLAIMS BAR ── */
+    .claims-bar { background:var(--orange); padding:14px 0; overflow:hidden; }
+    .claims-scroll { display:flex; gap:0; white-space:nowrap; animation:scrollLeft 20s linear infinite; }
+    .claims-scroll span { font-family:'Oswald',sans-serif; font-size:14px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:#fff; padding:0 32px; }
+    .claims-scroll span::before { content:"★  "; opacity:0.7; }
+    @keyframes scrollLeft { 0% { transform:translateX(0); } 100% { transform:translateX(-50%); } }
+
+    /* ── STATS ── */
+    .stats-section { padding:80px 48px; display:flex; justify-content:center; }
+    .stats-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:1px; max-width:900px; width:100%; border:1px solid var(--border); border-radius:8px; overflow:hidden; }
+    .stat-item { background:var(--card); padding:48px 32px; text-align:center; position:relative; }
+    .stat-item::after { content:''; position:absolute; top:0; left:0; right:0; height:3px; background:linear-gradient(90deg,var(--fire),var(--orange)); }
+    .stat-number { font-family:'Bebas Neue',sans-serif; font-size:72px; line-height:1; background:linear-gradient(135deg,var(--orange),var(--gold)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
+    .stat-unit { font-family:'Bebas Neue',sans-serif; font-size:36px; }
+    .stat-label { font-family:'Oswald',sans-serif; font-size:13px; letter-spacing:4px; text-transform:uppercase; color:var(--muted); margin-top:8px; }
+
+    /* ── SECTION SHARED ── */
+    section { padding:80px 48px; }
+    .section-label { font-family:'Oswald',sans-serif; font-size:12px; letter-spacing:5px; color:var(--orange); text-transform:uppercase; margin-bottom:12px; }
+    .section-title { font-family:'Bebas Neue',sans-serif; font-size:clamp(40px,5vw,64px); letter-spacing:2px; line-height:1; color:var(--cream); margin-bottom:20px; }
+    .section-desc { font-size:17px; line-height:1.8; color:rgba(237,232,220,0.65); max-width:560px; font-weight:300; }
+    .container { max-width:1100px; margin:0 auto; }
+
+    /* ── DELIVERY BADGE ── */
+    .delivery-badge {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: rgba(255,107,26,0.12); border: 1px solid rgba(255,107,26,0.35);
+      color: var(--orange); font-family: 'Oswald', sans-serif;
+      font-size: 13px; font-weight: 600; letter-spacing: 2px; text-transform: uppercase;
+      padding: 8px 18px; border-radius: 20px; margin-bottom: 32px;
+    }
+    .delivery-badge span { font-size: 16px; }
+
+    /* ── ORDER SECTION ── */
+    #order { background:var(--dark); padding:100px 48px; }
+    .order-header { text-align:center; margin-bottom:48px; }
+    .order-header .section-desc { margin:0 auto; }
+    .pack-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:24px; max-width:900px; margin:0 auto 40px; }
+    .pack-card { background:var(--card); border:2px solid var(--border); border-radius:12px; padding:36px 28px; text-align:center; cursor:pointer; transition:all 0.25s; position:relative; overflow:hidden; }
+    .pack-card::before { content:''; position:absolute; top:0; left:0; right:0; height:3px; background:var(--border); transition:background 0.25s; }
+    .pack-card:hover { border-color:rgba(255,107,26,0.5); transform:translateY(-4px); }
+    .pack-card:hover::before { background:linear-gradient(90deg,var(--fire),var(--orange)); }
+    .pack-card.active { border-color:var(--orange); background:linear-gradient(180deg,rgba(255,107,26,0.08) 0%,var(--card) 100%); transform:translateY(-6px); box-shadow:0 16px 48px rgba(255,107,26,0.2); }
+    .pack-card.active::before { background:linear-gradient(90deg,var(--fire),var(--orange)); }
+    .pack-badge { display:inline-block; background:linear-gradient(135deg,var(--fire),var(--orange)); color:#fff; font-family:'Oswald',sans-serif; font-size:11px; font-weight:600; letter-spacing:2px; text-transform:uppercase; padding:4px 12px; border-radius:20px; margin-bottom:20px; }
+    .pack-badge.hidden { visibility:hidden; }
+    .pack-cups { font-family:'Bebas Neue',sans-serif; font-size:72px; line-height:1; color:var(--cream); }
+    .pack-cups span { font-family:'Oswald',sans-serif; font-size:20px; color:var(--muted); font-weight:400; display:block; letter-spacing:2px; text-transform:uppercase; }
+    .pack-price-per { font-family:'Inter',sans-serif; font-size:14px; color:var(--muted); margin:8px 0; }
+    .pack-total { font-family:'Bebas Neue',sans-serif; font-size:40px; background:linear-gradient(135deg,var(--orange),var(--gold)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; margin:12px 0; }
+    .pack-savings { font-size:12px; color:#5CB85C; font-family:'Oswald',sans-serif; letter-spacing:1px; }
+    .order-type-toggle { display:flex; max-width:480px; margin:0 auto 32px; background:var(--card); border:1px solid var(--border); border-radius:8px; overflow:hidden; }
+    .toggle-btn { flex:1; padding:14px; font-family:'Oswald',sans-serif; font-size:14px; letter-spacing:2px; text-transform:uppercase; cursor:pointer; background:transparent; border:none; color:var(--muted); transition:all 0.2s; }
+    .toggle-btn.active { background:var(--orange); color:#fff; }
+    .sub-note { text-align:center; font-size:13px; color:var(--muted); margin-bottom:28px; display:none; }
+    .sub-note.visible { display:block; }
+    .sub-note strong { color:#5CB85C; }
+
+    /* ── DELIVERY SCHEDULER ── */
+    .delivery-scheduler {
+      max-width: 600px; margin: 0 auto 40px;
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: 12px; padding: 28px 32px;
+    }
+    .scheduler-title {
+      font-family: 'Oswald', sans-serif; font-size: 16px;
+      font-weight: 600; letter-spacing: 2px; text-transform: uppercase;
+      color: var(--cream); margin-bottom: 20px;
+      display: flex; align-items: center; gap: 10px;
+    }
+    .scheduler-title::before { content: "🚚"; font-size: 20px; }
+    .scheduler-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    .scheduler-field label {
+      display: block; font-family: 'Oswald', sans-serif;
+      font-size: 11px; letter-spacing: 3px; text-transform: uppercase;
+      color: var(--muted); margin-bottom: 8px;
+    }
+    .scheduler-field input,
+    .scheduler-field select {
+      width: 100%; background: var(--dark); border: 1px solid var(--border);
+      border-radius: 6px; padding: 12px 16px;
+      font-family: 'Oswald', sans-serif; font-size: 15px; letter-spacing: 1px;
+      color: var(--cream); outline: none; transition: border-color 0.2s;
+      appearance: none; -webkit-appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23888' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+      background-repeat: no-repeat; background-position: right 14px center;
+    }
+    .scheduler-field input[type="date"] {
+      background-image: none;
+      color-scheme: dark;
+    }
+    .scheduler-field input:focus,
+    .scheduler-field select:focus { border-color: var(--orange); }
+    .scheduler-note {
+      margin-top: 14px; font-size: 13px;
+      color: var(--muted); display: flex; align-items: center; gap: 6px;
+    }
+    .scheduler-note::before { content: "⚡"; }
+
+    .checkout-area { text-align:center; }
+    .checkout-area .btn-primary { font-size:18px; padding:20px 60px; letter-spacing:3px; }
+    .checkout-note { font-size:13px; color:var(--muted); margin-top:16px; }
+    .checkout-note span { color:#5CB85C; }
+
+    /* ── WHY FORGE ── */
+    #why { background:var(--black); }
+    .why-grid { display:grid; grid-template-columns:repeat(2,1fr); gap:32px; margin-top:60px; }
+    .why-card { background:var(--card); border:1px solid var(--border); border-radius:12px; padding:36px; display:flex; gap:24px; align-items:flex-start; transition:border-color 0.2s; }
+    .why-card:hover { border-color:rgba(255,107,26,0.4); }
+    .why-icon { font-size:36px; line-height:1; flex-shrink:0; }
+    .why-card-title { font-family:'Oswald',sans-serif; font-size:20px; font-weight:600; letter-spacing:1px; color:var(--cream); margin-bottom:10px; }
+    .why-card-desc { font-size:15px; line-height:1.7; color:rgba(237,232,220,0.6); }
+
+    /* ── INGREDIENTS ── */
+    #ingredients { background:var(--dark); }
+    .ingredients-layout { display:grid; grid-template-columns:1fr 1fr; gap:80px; align-items:center; margin-top:60px; }
+    .ingredients-list { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+    .ingredient-item { display:flex; align-items:center; gap:12px; font-family:'Oswald',sans-serif; font-size:16px; font-weight:400; letter-spacing:1px; color:var(--cream); }
+    .ingredient-dot { width:8px; height:8px; border-radius:50%; background:linear-gradient(135deg,var(--fire),var(--orange)); flex-shrink:0; }
+    .claims-list { margin-top:32px; display:flex; flex-wrap:wrap; gap:12px; }
+    .claim-tag { background:rgba(255,107,26,0.12); border:1px solid rgba(255,107,26,0.3); color:var(--orange); font-family:'Oswald',sans-serif; font-size:13px; font-weight:500; letter-spacing:2px; text-transform:uppercase; padding:8px 18px; border-radius:4px; }
+    .ingredients-visual { background:var(--card); border:1px solid var(--border); border-radius:16px; overflow:hidden; }
+    .ingredients-visual img { width:100%; display:block; }
+    .ingredients-visual-footer { padding:24px 28px; display:flex; justify-content:space-around; }
+    .iv-stat { text-align:center; }
+    .iv-num { font-family:'Bebas Neue',sans-serif; font-size:36px; color:var(--orange); }
+    .iv-label { font-size:11px; color:var(--muted); letter-spacing:2px; text-transform:uppercase; font-family:'Oswald',sans-serif; }
+
+    /* ── NUTRITION ── */
+    #nutrition { background:var(--black); }
+    .nutrition-layout { display:grid; grid-template-columns:1fr 1fr; gap:80px; align-items:start; margin-top:60px; }
+    .nutrition-facts { background:#fff; color:#000; border:3px solid #000; padding:16px; border-radius:4px; font-family:'Inter',sans-serif; max-width:380px; }
+    .nf-title { font-size:36px; font-weight:900; border-bottom:10px solid #000; padding-bottom:4px; margin-bottom:4px; }
+    .nf-serving { font-size:13px; border-bottom:1px solid #000; padding-bottom:6px; margin-bottom:4px; }
+    .nf-amount { font-size:12px; margin-bottom:4px; }
+    .nf-calories-row { display:flex; justify-content:space-between; align-items:flex-end; border-bottom:5px solid #000; padding-bottom:2px; margin-bottom:4px; }
+    .nf-calories-label { font-weight:700; font-size:15px; }
+    .nf-calories-num { font-size:48px; font-weight:900; line-height:1; }
+    .nf-dv { text-align:right; font-size:11px; border-bottom:1px solid #000; padding-bottom:4px; margin-bottom:2px; }
+    .nf-row { display:flex; justify-content:space-between; font-size:13px; padding:3px 0; border-bottom:1px solid #ccc; }
+    .nf-row.bold { font-weight:700; }
+    .nf-row.indent { padding-left:16px; font-weight:400; }
+    .nf-row.thick { border-bottom:8px solid #000; }
+    .nf-footer { font-size:10px; margin-top:8px; line-height:1.5; border-top:1px solid #000; padding-top:8px; }
+    .macro-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:16px; margin-bottom:40px; }
+    .macro-item { background:var(--card); border:1px solid var(--border); border-radius:8px; padding:24px 16px; text-align:center; }
+    .macro-num { font-family:'Bebas Neue',sans-serif; font-size:44px; background:linear-gradient(135deg,var(--orange),var(--gold)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
+    .macro-label { font-family:'Oswald',sans-serif; font-size:11px; letter-spacing:3px; color:var(--muted); text-transform:uppercase; margin-top:4px; }
+    .macro-note { font-size:15px; line-height:1.8; color:rgba(237,232,220,0.6); margin-top:24px; }
+
+    /* ── HOW IT WORKS ── */
+    #how { background:var(--dark); }
+    .steps-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:32px; margin-top:60px; position:relative; }
+    .step-connector { position:absolute; top:48px; left:calc(16.67% + 32px); right:calc(16.67% + 32px); height:2px; background:linear-gradient(90deg,var(--orange),var(--fire),var(--orange)); z-index:0; }
+    .step-card { background:var(--card); border:1px solid var(--border); border-radius:12px; padding:36px 28px; text-align:center; position:relative; z-index:1; }
+    .step-number { width:64px; height:64px; border-radius:50%; background:linear-gradient(135deg,var(--fire),var(--orange)); display:flex; align-items:center; justify-content:center; font-family:'Bebas Neue',sans-serif; font-size:28px; color:#fff; margin:0 auto 20px; box-shadow:0 4px 20px rgba(255,107,26,0.4); }
+    .step-title { font-family:'Oswald',sans-serif; font-size:18px; font-weight:600; letter-spacing:1px; color:var(--cream); margin-bottom:10px; }
+    .step-desc { font-size:14px; line-height:1.7; color:rgba(237,232,220,0.6); }
+
+    /* ── FAQ ── */
+    #faq { background:var(--black); }
+    .faq-list { max-width:760px; margin:60px auto 0; }
+    .faq-item { border-bottom:1px solid var(--border); }
+    .faq-question { width:100%; background:none; border:none; display:flex; justify-content:space-between; align-items:center; padding:24px 0; cursor:pointer; font-family:'Oswald',sans-serif; font-size:18px; font-weight:500; letter-spacing:0.5px; color:var(--cream); text-align:left; transition:color 0.2s; }
+    .faq-question:hover { color:var(--orange); }
+    .faq-arrow { font-size:20px; transition:transform 0.3s; flex-shrink:0; color:var(--orange); }
+    .faq-item.open .faq-arrow { transform:rotate(45deg); }
+    .faq-answer { max-height:0; overflow:hidden; transition:max-height 0.3s ease; }
+    .faq-item.open .faq-answer { max-height:300px; }
+    .faq-answer p { padding-bottom:24px; font-size:15px; line-height:1.8; color:rgba(237,232,220,0.65); }
+
+    /* ── FINAL CTA ── */
+    .final-cta { padding:120px 48px; text-align:center; background:radial-gradient(ellipse 80% 60% at 50% 100%,rgba(255,107,26,0.15) 0%,transparent 70%),var(--dark); }
+    .final-cta .section-title { font-size:clamp(48px,7vw,96px); }
+
+    /* ── FOOTER ── */
+    footer { background:var(--black); border-top:1px solid var(--border); padding:48px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:24px; }
+    .footer-brand { font-family:'Bebas Neue',sans-serif; font-size:28px; letter-spacing:4px; color:var(--cream); }
+    .footer-brand span { color:var(--orange); }
+    .footer-tagline { font-family:'Oswald',sans-serif; font-size:11px; letter-spacing:4px; color:var(--muted); text-transform:uppercase; margin-top:4px; }
+    .footer-links { display:flex; gap:24px; }
+    .footer-links a { color:var(--muted); text-decoration:none; font-size:13px; transition:color 0.2s; }
+    .footer-links a:hover { color:var(--orange); }
+    .footer-copy { font-size:12px; color:var(--muted); }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width:900px) {
+      nav { padding:16px 24px; }
+      .nav-links { display:none; }
+      section, #order { padding:60px 24px; }
+      .stats-grid,.pack-grid,.why-grid { grid-template-columns:1fr; }
+      .ingredients-layout,.nutrition-layout { grid-template-columns:1fr; gap:40px; }
+      .steps-grid { grid-template-columns:1fr; }
+      .step-connector { display:none; }
+      .stats-section { padding:40px 24px; }
+      .scheduler-row { grid-template-columns:1fr; }
+      footer { flex-direction:column; text-align:center; }
+      .footer-links { justify-content:center; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <a href="#" class="nav-logo">
+    <img src="forge-logo.png" alt="Forge Oats" />
+    <div class="nav-logo-text">FORGE OATS<span>FUEL THE WORK</span></div>
+  </a>
+  <div class="nav-links">
+    <a href="#why">Why Forge</a>
+    <a href="#ingredients">Ingredients</a>
+    <a href="#nutrition">Nutrition</a>
+    <a href="#faq">FAQ</a>
+  </div>
+  <a href="#order" class="btn-nav">Order Now</a>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="embers">
+    <div class="ember"></div><div class="ember"></div><div class="ember"></div>
+    <div class="ember"></div><div class="ember"></div><div class="ember"></div>
+    <div class="ember"></div><div class="ember"></div><div class="ember"></div>
+    <div class="ember"></div><div class="ember"></div><div class="ember"></div>
+  </div>
+  <div class="hero-content">
+    <div class="hero-logo-wrap">
+      <img src="forge-logo.png" alt="Forge Oats – Fuel The Work" class="hero-logo-svg" />
+    </div>
+    <p class="hero-eyebrow">Chocolate Performance Oats</p>
+    <p class="hero-desc">
+      40 grams of protein. 450 clean calories. Zero junk.<br>
+      Ready to eat straight from the fridge — no prep, no mixing, no excuses.
+    </p>
+    <div class="delivery-badge"><span>🚚</span> Delivered in 1–2 Days · Pick Your Date &amp; Time</div>
+    <div class="hero-cta-group">
+      <a href="#order" class="btn-primary">Shop Now</a>
+      <a href="#why" class="btn-secondary">Learn More</a>
+    </div>
+  </div>
+</section>
+
+<!-- CLAIMS BAR -->
+<div class="claims-bar">
+  <div class="claims-scroll">
+    <span>No Artificial Sweeteners</span><span>No Seed Oils</span><span>No Junk</span>
+    <span>40g Protein</span><span>10g Fiber</span><span>All Organic</span>
+    <span>Non-GMO</span><span>Grass-Fed Whey</span><span>Delivered in 1–2 Days</span><span>Free Delivery on All Orders</span>
+    <span>No Artificial Sweeteners</span><span>No Seed Oils</span><span>No Junk</span>
+    <span>40g Protein</span><span>10g Fiber</span><span>All Organic</span>
+    <span>Non-GMO</span><span>Grass-Fed Whey</span><span>Delivered in 1–2 Days</span><span>Free Delivery on All Orders</span>
+  </div>
+</div>
+
+<!-- STATS -->
+<div class="stats-section">
+  <div class="stats-grid">
+    <div class="stat-item"><div class="stat-number">40<span class="stat-unit">g</span></div><div class="stat-label">Protein Per Serving</div></div>
+    <div class="stat-item"><div class="stat-number">450</div><div class="stat-label">Clean Calories</div></div>
+    <div class="stat-item"><div class="stat-number">10<span class="stat-unit">g</span></div><div class="stat-label">Dietary Fiber</div></div>
+  </div>
+</div>
+
+<!-- ORDER -->
+<section id="order">
+  <div class="container">
+    <div class="order-header">
+      <p class="section-label">Choose Your Pack</p>
+      <h2 class="section-title">BUILD YOUR ORDER</h2>
+      <p class="section-desc">Save more when you stock up. Every cup delivers 40g protein and 450 clean calories.</p>
+    </div>
+
+    <!-- Pack pricing graphic -->
+    <div style="max-width:700px; margin:0 auto 40px;">
+      <img src="pack-pricing.jpg" alt="3-Pack $8/cup · 5-Pack $7.50/cup · 7-Pack $7/cup" style="width:100%; border-radius:12px; display:block;" />
+    </div>
+
+    <!-- One-time / Subscribe toggle -->
+    <div class="order-type-toggle">
+      <button class="toggle-btn active" onclick="setOrderType('one-time',this)">One-Time Purchase</button>
+      <button class="toggle-btn" onclick="setOrderType('subscribe',this)">Subscribe &amp; Save</button>
+    </div>
+    <p class="sub-note" id="subNote"><strong>Save 10% on every order</strong> · Ships weekly, bi-weekly, or monthly · Cancel anytime</p>
+
+    <!-- Pack cards -->
+    <div class="pack-grid">
+      <div class="pack-card" onclick="selectPack(this,3,24,8)" data-pack="3">
+        <div class="pack-badge hidden">_</div>
+        <div class="pack-cups">3<span>Cup Pack</span></div>
+        <div class="pack-price-per">$8.00 per cup</div>
+        <div class="pack-total" id="total-3">$24.00</div>
+        <div class="pack-savings">&nbsp;</div>
+      </div>
+      <div class="pack-card active" onclick="selectPack(this,5,37.50,7.50)" data-pack="5">
+        <div class="pack-badge">Most Popular</div>
+        <div class="pack-cups">5<span>Cup Pack</span></div>
+        <div class="pack-price-per">$7.50 per cup</div>
+        <div class="pack-total" id="total-5">$37.50</div>
+        <div class="pack-savings">Save $2.50 vs 3-pack rate</div>
+      </div>
+      <div class="pack-card" onclick="selectPack(this,7,49,7)" data-pack="7">
+        <div class="pack-badge">Best Value</div>
+        <div class="pack-cups">7<span>Cup Pack</span></div>
+        <div class="pack-price-per">$7.00 per cup</div>
+        <div class="pack-total" id="total-7">$49.00</div>
+        <div class="pack-savings">Save $7.00 vs 3-pack rate</div>
+      </div>
+    </div>
+
+    <!-- Delivery Scheduler -->
+    <div class="delivery-scheduler">
+      <div class="scheduler-title">Your Info &amp; Delivery Preference</div>
+      <div class="scheduler-row" style="margin-bottom:16px;">
+        <div class="scheduler-field">
+          <label>Your Name</label>
+          <input type="text" id="customerName" placeholder="First &amp; last name" autocomplete="name" />
+        </div>
+        <div class="scheduler-field">
+          <label>Email Address</label>
+          <input type="email" id="customerEmail" placeholder="you@email.com" autocomplete="email" />
+        </div>
+      </div>
+      <div class="scheduler-row">
+        <div class="scheduler-field">
+          <label>Preferred Delivery Date</label>
+          <input type="date" id="deliveryDate" />
+        </div>
+        <div class="scheduler-field">
+          <label>Preferred Time Window</label>
+          <select id="deliveryTime">
+            <option value="">Select a time window</option>
+            <option value="Morning (8am–12pm)">Morning (8am – 12pm)</option>
+            <option value="Afternoon (12pm–5pm)">Afternoon (12pm – 5pm)</option>
+            <option value="Evening (5pm–8pm)">Evening (5pm – 8pm)</option>
+          </select>
+        </div>
+      </div>
+      <p class="scheduler-note">Orders placed today arrive within 1–2 days. We'll confirm your delivery window by email.</p>
+    </div>
+
+    <!-- Checkout -->
+    <div class="checkout-area">
+      <button class="btn-primary" id="checkoutBtn" onclick="handleCheckout()">
+        Add to Cart — <span id="checkoutTotal">$37.50</span>
+      </button>
+      <p class="checkout-note">
+        <span>✓ Delivered in 1–2 days</span> &nbsp;·&nbsp;
+        <span>✓ Pick your date &amp; time</span> &nbsp;·&nbsp;
+        <span>✓ Free delivery on all orders</span>
+      </p>
+    </div>
+  </div>
+</section>
+
+<!-- WHY FORGE -->
+<section id="why">
+  <div class="container">
+    <p class="section-label">Why Forge</p>
+    <h2 class="section-title">BUILT DIFFERENT</h2>
+    <p class="section-desc">Most overnight oats are just sugar with a health story. Forge is built for performance.</p>
+    <div class="why-grid">
+      <div class="why-card"><div class="why-icon">🔥</div><div><div class="why-card-title">40g Complete Protein</div><div class="why-card-desc">Powered by grass-fed whey protein and collagen peptides for muscle recovery, connective tissue support, and sustained energy.</div></div></div>
+      <div class="why-card"><div class="why-icon">🌱</div><div><div class="why-card-title">All Organic, Non-GMO</div><div class="why-card-desc">Every ingredient is certified organic and non-GMO. No shortcuts, no compromises — just clean fuel from real whole foods.</div></div></div>
+      <div class="why-card"><div class="why-icon">⚡</div><div><div class="why-card-title">450 Balanced Calories</div><div class="why-card-desc">Precision-crafted macros — 40g protein, 41g carbs, 18g healthy fats, 10g fiber. A true performance meal, not a snack.</div></div></div>
+      <div class="why-card"><div class="why-icon">🚚</div><div><div class="why-card-title">Delivered in 1–2 Days</div><div class="why-card-desc">Fresh to your door within 1–2 days of ordering — always free, no minimum. Choose your preferred delivery date and time window at checkout and we'll work around your schedule.</div></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- INGREDIENTS -->
+<section id="ingredients">
+  <div class="container">
+    <div class="ingredients-layout">
+      <div>
+        <p class="section-label">What's Inside</p>
+        <h2 class="section-title">REAL INGREDIENTS.<br>NOTHING ELSE.</h2>
+        <p class="section-desc">Every ingredient earns its place. No fillers, no mystery additives — just whole foods that fuel performance.</p>
+        <div class="ingredients-list" style="margin-top:32px;">
+          <div class="ingredient-item"><div class="ingredient-dot"></div>Rolled Oats</div>
+          <div class="ingredient-item"><div class="ingredient-dot"></div>Almond Milk</div>
+          <div class="ingredient-item"><div class="ingredient-dot"></div>Grass-Fed Whey</div>
+          <div class="ingredient-item"><div class="ingredient-dot"></div>Collagen Peptides</div>
+          <div class="ingredient-item"><div class="ingredient-dot"></div>Chia Seeds</div>
+          <div class="ingredient-item"><div class="ingredient-dot"></div>Flaxseed Meal</div>
+          <div class="ingredient-item"><div class="ingredient-dot"></div>Hemp Seeds</div>
+          <div class="ingredient-item"><div class="ingredient-dot"></div>Pumpkin Seeds</div>
+          <div class="ingredient-item"><div class="ingredient-dot"></div>Almond Butter</div>
+          <div class="ingredient-item"><div class="ingredient-dot"></div>Raw Honey</div>
+          <div class="ingredient-item"><div class="ingredient-dot"></div>Cacao Powder</div>
+          <div class="ingredient-item"><div class="ingredient-dot"></div>Cacao Nibs</div>
+          <div class="ingredient-item"><div class="ingredient-dot"></div>Cinnamon</div>
+          <div class="ingredient-item"><div class="ingredient-dot"></div>Sea Salt</div>
+        </div>
+        <div class="claims-list">
+          <div class="claim-tag">Organic</div><div class="claim-tag">Non-GMO</div>
+          <div class="claim-tag">No Seed Oils</div><div class="claim-tag">No Sweeteners</div>
+          <div class="claim-tag">Grass-Fed Whey</div>
+        </div>
+      </div>
+      <div class="ingredients-visual">
+        <img src="product-cup.jpg" alt="Forge Oats Chocolate Performance Cup" />
+        <div class="ingredients-visual-footer">
+          <div class="iv-stat"><div class="iv-num">40g</div><div class="iv-label">Protein</div></div>
+          <div class="iv-stat"><div class="iv-num">450</div><div class="iv-label">Calories</div></div>
+          <div class="iv-stat"><div class="iv-num">10g</div><div class="iv-label">Fiber</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- NUTRITION -->
+<section id="nutrition">
+  <div class="container">
+    <p class="section-label">Nutrition Facts</p>
+    <h2 class="section-title">THE FULL BREAKDOWN</h2>
+    <div class="nutrition-layout">
+      <div class="nutrition-facts">
+        <div class="nf-title">Nutrition Facts</div>
+        <div class="nf-serving">Serving size: 1 cup (236g)</div>
+        <div class="nf-amount">Amount per serving</div>
+        <div class="nf-calories-row"><div class="nf-calories-label">Calories</div><div class="nf-calories-num">450</div></div>
+        <div class="nf-dv">% Daily Value*</div>
+        <div class="nf-row bold thick">Total Fat 18g <span><strong>23%</strong></span></div>
+        <div class="nf-row indent">Saturated Fat 2.5g <span>13%</span></div>
+        <div class="nf-row indent">Trans Fat 0g <span></span></div>
+        <div class="nf-row bold">Cholesterol 55mg <span><strong>18%</strong></span></div>
+        <div class="nf-row bold">Sodium 220mg <span><strong>10%</strong></span></div>
+        <div class="nf-row bold thick">Total Carbohydrate 41g <span><strong>15%</strong></span></div>
+        <div class="nf-row indent">Dietary Fiber 10g <span>36%</span></div>
+        <div class="nf-row indent">Total Sugars 7g <span></span></div>
+        <div class="nf-row bold">Protein 40g <span></span></div>
+        <div class="nf-row">Vitamin D 0mcg <span>0%</span></div>
+        <div class="nf-row">Calcium 220mg <span>15%</span></div>
+        <div class="nf-row">Iron 3mg <span>15%</span></div>
+        <div class="nf-row">Potassium 480mg <span>10%</span></div>
+        <div class="nf-footer">*The % Daily Value tells you how much a nutrient in a serving of food contributes to a daily diet. 2,000 calories a day is used for general nutrition guidance.</div>
+      </div>
+      <div>
+        <div class="macro-grid">
+          <div class="macro-item"><div class="macro-num">40g</div><div class="macro-label">Protein</div></div>
+          <div class="macro-item"><div class="macro-num">41g</div><div class="macro-label">Carbs</div></div>
+          <div class="macro-item"><div class="macro-num">18g</div><div class="macro-label">Healthy Fats</div></div>
+          <div class="macro-item"><div class="macro-num">10g</div><div class="macro-label">Fiber</div></div>
+          <div class="macro-item"><div class="macro-num">7g</div><div class="macro-label">Natural Sugar</div></div>
+          <div class="macro-item"><div class="macro-num">450</div><div class="macro-label">Calories</div></div>
+        </div>
+        <p class="macro-note">Forge delivers a clinically meaningful 40g of protein per serving — enough to maximize muscle protein synthesis. Paired with 10g of fiber, 18g of healthy fats from seeds and almond butter, and only 7g of natural sugars from raw honey.</p>
+        <p class="macro-note" style="margin-top:16px;">No synthetic sweeteners means no blood sugar spikes or crashes. Just clean, sustained energy from whole foods.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section id="how">
+  <div class="container">
+    <p class="section-label" style="text-align:center;">How It Works</p>
+    <h2 class="section-title" style="text-align:center;">AS EASY AS IT GETS</h2>
+    <div class="steps-grid">
+      <div class="step-connector"></div>
+      <div class="step-card">
+        <div class="step-number">1</div>
+        <div class="step-title">Order &amp; Schedule</div>
+        <div class="step-desc">Pick your pack, choose your preferred delivery date and time window. Orders arrive within 1–2 days of placement.</div>
+      </div>
+      <div class="step-card">
+        <div class="step-number">2</div>
+        <div class="step-title">Stick It In The Fridge</div>
+        <div class="step-desc">Drop your cups straight into the fridge. No prep, no mixing, no measuring. They're already made — just keep them cold.</div>
+      </div>
+      <div class="step-card">
+        <div class="step-number">3</div>
+        <div class="step-title">Grab &amp; Go</div>
+        <div class="step-desc">Whenever you're ready, crack open a cup and eat. 40g of protein, 450 clean calories — zero effort required.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FAQ -->
+<section id="faq">
+  <div class="container">
+    <p class="section-label" style="text-align:center;">Got Questions</p>
+    <h2 class="section-title" style="text-align:center;">FAQ</h2>
+    <div class="faq-list">
+      <div class="faq-item">
+        <button class="faq-question" onclick="toggleFaq(this)">How fast will my order arrive? <span class="faq-arrow">+</span></button>
+        <div class="faq-answer"><p>We deliver within 1–2 days of order placement. At checkout you can select your preferred delivery date and time window (morning, afternoon, or evening) and we'll do our best to match it.</p></div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-question" onclick="toggleFaq(this)">Where does the protein come from? <span class="faq-arrow">+</span></button>
+        <div class="faq-answer"><p>Forge uses a blend of grass-fed whey protein concentrate and collagen peptides. Grass-fed whey provides a complete amino acid profile for muscle recovery and growth. Collagen peptides support joint health and connective tissue — a combination most protein products skip entirely.</p></div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-question" onclick="toggleFaq(this)">Is Forge Oats gluten-free? <span class="faq-arrow">+</span></button>
+        <div class="faq-answer"><p>Forge Oats is made with rolled oats, which are naturally gluten-free. However, our product is manufactured in a facility that processes wheat, so we cannot certify it as 100% gluten-free for those with celiac disease.</p></div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-question" onclick="toggleFaq(this)">How long do they last in the fridge? <span class="faq-arrow">+</span></button>
+        <div class="faq-answer"><p>Your Forge Oats will keep in the refrigerator for up to 5 days. A 5-pack ordered Sunday means a high-protein breakfast ready every morning through Thursday — with zero effort.</p></div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-question" onclick="toggleFaq(this)">Can I cancel my subscription anytime? <span class="faq-arrow">+</span></button>
+        <div class="faq-answer"><p>Absolutely. There are no commitments or cancellation fees. You can pause, modify, or cancel your subscription at any time. We want your business because you love the product, not because we trapped you.</p></div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-question" onclick="toggleFaq(this)">Are all ingredients really organic and non-GMO? <span class="faq-arrow">+</span></button>
+        <div class="faq-answer"><p>Yes. Every ingredient in Forge Oats is certified organic and non-GMO verified. Our ingredient list is exactly what you see — no hidden additives, no "natural flavors" masking something else.</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FINAL CTA -->
+<section class="final-cta">
+  <div class="container">
+    <p class="section-label">Ready?</p>
+    <h2 class="section-title">FUEL THE WORK.</h2>
+    <p class="section-desc" style="margin:0 auto 40px; text-align:center;">Stop settling for sugary, low-protein breakfasts. Get the fuel you actually need — delivered free to your door in 1–2 days.</p>
+    <div style="text-align:center;">
+      <a href="#order" class="btn-primary" style="font-size:18px; padding:20px 60px; letter-spacing:3px;">Shop Forge Oats</a>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div>
+    <div class="footer-brand">FORGE <span>OATS</span></div>
+    <div class="footer-tagline">Fuel The Work</div>
+  </div>
+  <div class="footer-links">
+    <a href="#why">Why Forge</a><a href="#ingredients">Ingredients</a>
+    <a href="#nutrition">Nutrition</a><a href="#order">Order</a>
+    <a href="#">Privacy Policy</a><a href="#">Terms</a>
+  </div>
+  <div class="footer-copy">© 2025 Forge Oats. All rights reserved.</div>
+</footer>
+
+<script>
+  // ── State ──
+  let selectedPack = { cups:5, total:37.50, perCup:7.50 };
+  let orderType    = 'one-time';
+  const SUB_DISC   = 0.10;
+
+  // ── Set min delivery date to tomorrow ──
+  (function() {
+    const input = document.getElementById('deliveryDate');
+    const tomorrow = new Date();
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    input.min = tomorrow.toISOString().split('T')[0];
+    // Default to tomorrow
+    input.value = tomorrow.toISOString().split('T')[0];
+  })();
+
+  function selectPack(el, cups, total, perCup) {
+    document.querySelectorAll('.pack-card').forEach(c => c.classList.remove('active'));
+    el.classList.add('active');
+    selectedPack = { cups, total, perCup };
+    updateCheckout();
+  }
+
+  function setOrderType(type, btn) {
+    orderType = type;
+    document.querySelectorAll('.toggle-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById('subNote').classList.toggle('visible', type === 'subscribe');
+    updateCheckout();
+  }
+
+  function updateCheckout() {
+    const disc  = orderType === 'subscribe' ? SUB_DISC : 0;
+    const packs = [{id:'total-3',base:24},{id:'total-5',base:37.50},{id:'total-7',base:49}];
+    packs.forEach(p => {
+      const el = document.getElementById(p.id);
+      if (el) el.textContent = '$' + (p.base * (1-disc)).toFixed(2);
+    });
+    document.getElementById('checkoutTotal').textContent = '$' + (selectedPack.total*(1-disc)).toFixed(2);
+  }
+
+  async function handleCheckout() {
+    // ── Stripe Payment Links ──────────────────────────────────────────────
+    // Run stripe_setup.py to auto-populate, or paste your Stripe links here.
+    const stripeLinks = {
+      'one-time': {
+        3: 'https://buy.stripe.com/REPLACE_3PACK_LINK',
+        5: 'https://buy.stripe.com/REPLACE_5PACK_LINK',
+        7: 'https://buy.stripe.com/REPLACE_7PACK_LINK',
+      },
+      'subscribe': {
+        3: 'https://buy.stripe.com/REPLACE_3PACK_SUB_LINK',
+        5: 'https://buy.stripe.com/REPLACE_5PACK_SUB_LINK',
+        7: 'https://buy.stripe.com/REPLACE_7PACK_SUB_LINK',
+      }
+    };
+
+    // ── Formspree endpoint ────────────────────────────────────────────────
+    // 1. Go to https://formspree.io → New Form → copy your endpoint URL
+    // 2. Replace the value below with your endpoint, e.g.:
+    //    'https://formspree.io/f/abcd1234'
+    const FORMSPREE_URL = 'https://formspree.io/f/REPLACE_YOUR_FORMSPREE_ID';
+
+    // ── Collect form values ───────────────────────────────────────────────
+    const name         = document.getElementById('customerName').value.trim();
+    const email        = document.getElementById('customerEmail').value.trim();
+    const deliveryDate = document.getElementById('deliveryDate').value;
+    const deliveryTime = document.getElementById('deliveryTime').value;
+    const disc         = orderType === 'subscribe' ? SUB_DISC : 0;
+    const total        = '$' + (selectedPack.total * (1 - disc)).toFixed(2);
+
+    // ── Validate required fields ──────────────────────────────────────────
+    const missing = [];
+    if (!name)         missing.push('name');
+    if (!email)        missing.push('email');
+    if (!deliveryDate) missing.push('delivery date');
+    if (!deliveryTime) missing.push('delivery time');
+
+    if (missing.length) {
+      showFieldError(`Please fill in: ${missing.join(', ')}.`);
+      return;
+    }
+
+    const btn = document.getElementById('checkoutBtn');
+    btn.textContent = 'Processing…';
+    btn.disabled = true;
+
+    // ── Step 1: Send order details to Formspree (email notification to you) ──
+    const formspreeReady = !FORMSPREE_URL.includes('REPLACE');
+    if (formspreeReady) {
+      try {
+        await fetch(FORMSPREE_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+          body: JSON.stringify({
+            customer_name:    name,
+            customer_email:   email,
+            pack:             `${selectedPack.cups}-Pack`,
+            order_type:       orderType,
+            total:            total,
+            delivery_date:    deliveryDate,
+            delivery_time:    deliveryTime,
+            _subject:         `🔥 New Forge Oats Order — ${selectedPack.cups}-Pack from ${name}`,
+          })
+        });
+      } catch (err) {
+        console.warn('Formspree error (non-blocking):', err);
+      }
+    }
+
+    // ── Step 2: Redirect to Stripe with delivery info in client_reference_id ──
+    const stripeLink = stripeLinks[orderType]?.[selectedPack.cups];
+    if (stripeLink && !stripeLink.includes('REPLACE')) {
+      // Encode delivery details so they appear in your Stripe dashboard per order
+      const ref = encodeURIComponent(
+        `${selectedPack.cups}pack|${orderType}|date:${deliveryDate}|time:${deliveryTime}|name:${name}`
+      );
+      const url = new URL(stripeLink);
+      url.searchParams.set('client_reference_id', ref);
+      url.searchParams.set('prefilled_email', email);
+      window.location.href = url.toString();
+    } else {
+      // Stripe not yet configured — show setup reminder
+      btn.textContent = '⚡ Add your Stripe links to activate checkout';
+      btn.style.background = '#444';
+      btn.disabled = false;
+      setTimeout(() => {
+        btn.innerHTML = 'Add to Cart — <span id="checkoutTotal">' + total + '</span>';
+        btn.style.background = '';
+      }, 4000);
+    }
+  }
+
+  function showFieldError(msg) {
+    let err = document.getElementById('fieldError');
+    if (!err) {
+      err = document.createElement('p');
+      err.id = 'fieldError';
+      err.style.cssText = 'color:#FF6B1A;font-family:Oswald,sans-serif;font-size:14px;letter-spacing:1px;text-align:center;margin-bottom:12px;';
+      document.querySelector('.checkout-area').prepend(err);
+    }
+    err.textContent = msg;
+    setTimeout(() => err.textContent = '', 4000);
+  }
+
+  function toggleFaq(btn) {
+    const item = btn.closest('.faq-item');
+    const isOpen = item.classList.contains('open');
+    document.querySelectorAll('.faq-item.open').forEach(i => i.classList.remove('open'));
+    if (!isOpen) item.classList.add('open');
+  }
+
+  document.querySelectorAll('a[href^="#"]').forEach(a => {
+    a.addEventListener('click', e => {
+      const t = document.querySelector(a.getAttribute('href'));
+      if (t) { e.preventDefault(); t.scrollIntoView({ behavior:'smooth' }); }
+    });
+  });
+
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (e.isIntersecting) { e.target.style.opacity='1'; e.target.style.transform='translateY(0)'; }
+    });
+  }, { threshold:0.1 });
+  document.querySelectorAll('.why-card,.pack-card,.step-card,.stat-item,.faq-item').forEach(el => {
+    el.style.opacity='0'; el.style.transform='translateY(24px)';
+    el.style.transition='opacity 0.5s ease, transform 0.5s ease';
+    observer.observe(el);
+  });
+</script>
+</body>
+</html>
