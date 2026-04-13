@@ -133,6 +133,25 @@
     .sub-note.visible { display:block; }
     .sub-note strong { color:#5CB85C; }
 
+    /* ── ORDER STEPS ── */
+    .order-step { margin-bottom: 48px; }
+    .step-label { font-family:'Oswald',sans-serif; font-size:18px; font-weight:600; letter-spacing:2px; text-transform:uppercase; color:var(--cream); margin-bottom:20px; display:flex; align-items:center; justify-content:center; gap:12px; }
+    .step-num { display:inline-flex; align-items:center; justify-content:center; width:32px; height:32px; border-radius:50%; background:linear-gradient(135deg,var(--fire),var(--orange)); font-family:'Bebas Neue',sans-serif; font-size:18px; color:#fff; flex-shrink:0; }
+    .option-grid-2 { display:grid; grid-template-columns:1fr 1fr; gap:20px; max-width:700px; margin:0 auto; }
+    .option-card { background:var(--card); border:2px solid var(--border); border-radius:12px; padding:28px 24px; cursor:pointer; transition:all 0.25s; text-align:center; position:relative; overflow:hidden; }
+    .option-card::before { content:''; position:absolute; top:0; left:0; right:0; height:3px; background:var(--border); transition:background 0.25s; }
+    .option-card:hover { border-color:rgba(255,107,26,0.5); transform:translateY(-3px); }
+    .option-card:hover::before { background:linear-gradient(90deg,var(--fire),var(--orange)); }
+    .option-card.active { border-color:var(--orange); background:linear-gradient(180deg,rgba(255,107,26,0.08) 0%,var(--card) 100%); transform:translateY(-4px); box-shadow:0 12px 40px rgba(255,107,26,0.18); }
+    .option-card.active::before { background:linear-gradient(90deg,var(--fire),var(--orange)); }
+    .option-icon { font-size:40px; margin-bottom:12px; line-height:1; }
+    .option-name { font-family:'Oswald',sans-serif; font-size:20px; font-weight:600; letter-spacing:1px; color:var(--cream); margin-bottom:8px; }
+    .option-desc { font-size:14px; color:rgba(237,232,220,0.6); line-height:1.5; }
+    .portion-macros { display:flex; justify-content:center; gap:16px; margin:12px 0; }
+    .pm-item { text-align:center; }
+    .pm-num { font-family:'Bebas Neue',sans-serif; font-size:28px; background:linear-gradient(135deg,var(--orange),var(--gold)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; line-height:1; }
+    .pm-label { font-family:'Oswald',sans-serif; font-size:10px; letter-spacing:2px; text-transform:uppercase; color:var(--muted); }
+
     /* ── DELIVERY SCHEDULER ── */
     .delivery-scheduler {
       max-width: 600px; margin: 0 auto 40px;
@@ -265,7 +284,7 @@
       nav { padding:16px 24px; }
       .nav-links { display:none; }
       section, #order { padding:60px 24px; }
-      .stats-grid,.pack-grid,.why-grid { grid-template-columns:1fr; }
+      .stats-grid,.pack-grid,.why-grid,.option-grid-2 { grid-template-columns:1fr; }
       .ingredients-layout,.nutrition-layout { grid-template-columns:1fr; gap:40px; }
       .steps-grid { grid-template-columns:1fr; }
       .step-connector { display:none; }
@@ -308,7 +327,7 @@
     <p class="hero-eyebrow">Chocolate Performance Oats</p>
     <p class="hero-desc">
       40 grams of protein. 450 clean calories. Zero junk.<br>
-      Ready to eat straight from the fridge — no prep, no mixing, no excuses.
+      Ready to eat straight from the fridge. No prep, no mixing, no excuses.
     </p>
     <div class="delivery-badge"><span>🚚</span> Delivered in 1–2 Days · Pick Your Date &amp; Time</div>
     <div class="hero-cta-group">
@@ -343,46 +362,89 @@
 <section id="order">
   <div class="container">
     <div class="order-header">
-      <p class="section-label">Choose Your Pack</p>
+      <p class="section-label">Build Your Order</p>
       <h2 class="section-title">BUILD YOUR ORDER</h2>
-      <p class="section-desc">Save more when you stock up. Every cup delivers 40g protein and 450 clean calories.</p>
+      <p class="section-desc">Four simple choices. We handle everything else.</p>
     </div>
 
-    <!-- Pack pricing graphic -->
-    <div style="max-width:700px; margin:0 auto 40px;">
-      <img src="pack-pricing.jpg" alt="3-Pack $8/cup · 5-Pack $7.50/cup · 7-Pack $7/cup" style="width:100%; border-radius:12px; display:block;" />
+    <!-- STEP 1: FLAVOR -->
+    <div class="order-step">
+      <div class="step-label"><span class="step-num">1</span> Choose Your Flavor</div>
+      <div class="option-grid-2">
+        <div class="option-card active" onclick="selectOption(this,'flavor','chocolate')" data-group="flavor">
+          <div class="option-icon">🍫</div>
+          <div class="option-name">Chocolate</div>
+          <div class="option-desc">Rich cacao, smooth dark chocolate taste. The original Forge.</div>
+        </div>
+        <div class="option-card" onclick="selectOption(this,'flavor','peanut-butter')" data-group="flavor">
+          <div class="option-icon">🥜</div>
+          <div class="option-name">Peanut Butter</div>
+          <div class="option-desc">Creamy, nutty, and satisfying. Perfect for PB lovers.</div>
+        </div>
+      </div>
     </div>
 
-    <!-- One-time / Subscribe toggle -->
-    <div class="order-type-toggle">
-      <button class="toggle-btn active" onclick="setOrderType('one-time',this)">One-Time Purchase</button>
-      <button class="toggle-btn" onclick="setOrderType('subscribe',this)">Subscribe &amp; Save</button>
+    <!-- STEP 2: PORTION SIZE -->
+    <div class="order-step">
+      <div class="step-label"><span class="step-num">2</span> Choose Your Portion Size</div>
+      <div class="option-grid-2">
+        <div class="option-card active" onclick="selectOption(this,'portion','full')" data-group="portion">
+          <div class="option-name">Full Serving</div>
+          <div class="portion-macros">
+            <div class="pm-item"><div class="pm-num">40g</div><div class="pm-label">Protein</div></div>
+            <div class="pm-item"><div class="pm-num">450</div><div class="pm-label">Calories</div></div>
+            <div class="pm-item"><div class="pm-num">10g</div><div class="pm-label">Fiber</div></div>
+          </div>
+          <div class="option-desc">Complete performance meal. Max fuel for hard training days.</div>
+        </div>
+        <div class="option-card" onclick="selectOption(this,'portion','half')" data-group="portion">
+          <div class="option-name">Half Serving</div>
+          <div class="portion-macros">
+            <div class="pm-item"><div class="pm-num">20g</div><div class="pm-label">Protein</div></div>
+            <div class="pm-item"><div class="pm-num">225</div><div class="pm-label">Calories</div></div>
+            <div class="pm-item"><div class="pm-num">5g</div><div class="pm-label">Fiber</div></div>
+          </div>
+          <div class="option-desc">Lighter fuel. Great as a snack or alongside another meal.</div>
+        </div>
+      </div>
     </div>
-    <p class="sub-note" id="subNote"><strong>Save 10% on every order</strong> · Ships weekly, bi-weekly, or monthly · Cancel anytime</p>
 
-    <!-- Pack cards -->
-    <div class="pack-grid">
-      <div class="pack-card" onclick="selectPack(this,3,24,8)" data-pack="3">
-        <div class="pack-badge hidden">_</div>
-        <div class="pack-cups">3<span>Cup Pack</span></div>
-        <div class="pack-price-per">$8.00 per cup</div>
-        <div class="pack-total" id="total-3">$24.00</div>
-        <div class="pack-savings">&nbsp;</div>
+    <!-- STEP 3: PACK SIZE -->
+    <div class="order-step">
+      <div class="step-label"><span class="step-num">3</span> Choose Your Pack Size</div>
+      <div class="pack-grid" id="packGrid">
+        <div class="pack-card" onclick="selectPack(this,0)" data-index="0">
+          <div class="pack-badge hidden">_</div>
+          <div class="pack-cups">3<span>Cup Pack</span></div>
+          <div class="pack-price-per">$8.00 per cup</div>
+          <div class="pack-total">$24.00</div>
+          <div class="pack-savings">&nbsp;</div>
+        </div>
+        <div class="pack-card active" onclick="selectPack(this,1)" data-index="1">
+          <div class="pack-badge">Most Popular</div>
+          <div class="pack-cups">5<span>Cup Pack</span></div>
+          <div class="pack-price-per">$7.50 per cup</div>
+          <div class="pack-total">$37.50</div>
+          <div class="pack-savings">Save $2.50 vs 3-pack rate</div>
+        </div>
+        <div class="pack-card" onclick="selectPack(this,2)" data-index="2">
+          <div class="pack-badge">Best Value</div>
+          <div class="pack-cups">7<span>Cup Pack</span></div>
+          <div class="pack-price-per">$7.00 per cup</div>
+          <div class="pack-total">$49.00</div>
+          <div class="pack-savings">Save $7.00 vs 3-pack rate</div>
+        </div>
       </div>
-      <div class="pack-card active" onclick="selectPack(this,5,37.50,7.50)" data-pack="5">
-        <div class="pack-badge">Most Popular</div>
-        <div class="pack-cups">5<span>Cup Pack</span></div>
-        <div class="pack-price-per">$7.50 per cup</div>
-        <div class="pack-total" id="total-5">$37.50</div>
-        <div class="pack-savings">Save $2.50 vs 3-pack rate</div>
+    </div>
+
+    <!-- STEP 4: PURCHASE TYPE -->
+    <div class="order-step">
+      <div class="step-label"><span class="step-num">4</span> One-Time or Subscribe?</div>
+      <div class="order-type-toggle">
+        <button class="toggle-btn active" onclick="setOrderType('one-time',this)">One-Time Purchase</button>
+        <button class="toggle-btn" onclick="setOrderType('subscribe',this)">Subscribe &amp; Save 10%</button>
       </div>
-      <div class="pack-card" onclick="selectPack(this,7,49,7)" data-pack="7">
-        <div class="pack-badge">Best Value</div>
-        <div class="pack-cups">7<span>Cup Pack</span></div>
-        <div class="pack-price-per">$7.00 per cup</div>
-        <div class="pack-total" id="total-7">$49.00</div>
-        <div class="pack-savings">Save $7.00 vs 3-pack rate</div>
-      </div>
+      <p class="sub-note" id="subNote"><strong>Save 10% on every order</strong> · Ships weekly, bi-weekly, or monthly · Cancel anytime</p>
     </div>
 
     <!-- Delivery Scheduler -->
@@ -419,7 +481,7 @@
     <!-- Checkout -->
     <div class="checkout-area">
       <button class="btn-primary" id="checkoutBtn" onclick="handleCheckout()">
-        Add to Cart — <span id="checkoutTotal">$37.50</span>
+        Add to Cart: <span id="checkoutTotal">$37.50</span>
       </button>
       <p class="checkout-note">
         <span>✓ Delivered in 1–2 days</span> &nbsp;·&nbsp;
@@ -438,9 +500,9 @@
     <p class="section-desc">Most overnight oats are just sugar with a health story. Forge is built for performance.</p>
     <div class="why-grid">
       <div class="why-card"><div class="why-icon">🔥</div><div><div class="why-card-title">40g Complete Protein</div><div class="why-card-desc">Powered by grass-fed whey protein and collagen peptides for muscle recovery, connective tissue support, and sustained energy.</div></div></div>
-      <div class="why-card"><div class="why-icon">🌱</div><div><div class="why-card-title">All Organic, Non-GMO</div><div class="why-card-desc">Every ingredient is certified organic and non-GMO. No shortcuts, no compromises — just clean fuel from real whole foods.</div></div></div>
-      <div class="why-card"><div class="why-icon">⚡</div><div><div class="why-card-title">450 Balanced Calories</div><div class="why-card-desc">Precision-crafted macros — 40g protein, 41g carbs, 18g healthy fats, 10g fiber. A true performance meal, not a snack.</div></div></div>
-      <div class="why-card"><div class="why-icon">🚚</div><div><div class="why-card-title">Delivered in 1–2 Days</div><div class="why-card-desc">Fresh to your door within 1–2 days of ordering — always free, no minimum. Choose your preferred delivery date and time window at checkout and we'll work around your schedule.</div></div></div>
+      <div class="why-card"><div class="why-icon">🌱</div><div><div class="why-card-title">All Organic, Non-GMO</div><div class="why-card-desc">Every ingredient is certified organic and non-GMO. No shortcuts, no compromises. Just clean fuel from real whole foods.</div></div></div>
+      <div class="why-card"><div class="why-icon">⚡</div><div><div class="why-card-title">450 Balanced Calories</div><div class="why-card-desc">Precision-crafted macros: 40g protein, 41g carbs, 18g healthy fats, 10g fiber. A true performance meal, not a snack.</div></div></div>
+      <div class="why-card"><div class="why-icon">🚚</div><div><div class="why-card-title">Delivered in 1–2 Days</div><div class="why-card-desc">Fresh to your door within 1-2 days of ordering, always free with no minimum. Choose your preferred delivery date and time window at checkout and we'll work around your schedule.</div></div></div>
     </div>
   </div>
 </section>
@@ -452,7 +514,7 @@
       <div>
         <p class="section-label">What's Inside</p>
         <h2 class="section-title">REAL INGREDIENTS.<br>NOTHING ELSE.</h2>
-        <p class="section-desc">Every ingredient earns its place. No fillers, no mystery additives — just whole foods that fuel performance.</p>
+        <p class="section-desc">Every ingredient earns its place. No fillers, no mystery additives. Just whole foods that fuel performance.</p>
         <div class="ingredients-list" style="margin-top:32px;">
           <div class="ingredient-item"><div class="ingredient-dot"></div>Rolled Oats</div>
           <div class="ingredient-item"><div class="ingredient-dot"></div>Almond Milk</div>
@@ -523,7 +585,7 @@
           <div class="macro-item"><div class="macro-num">7g</div><div class="macro-label">Natural Sugar</div></div>
           <div class="macro-item"><div class="macro-num">450</div><div class="macro-label">Calories</div></div>
         </div>
-        <p class="macro-note">Forge delivers a clinically meaningful 40g of protein per serving — enough to maximize muscle protein synthesis. Paired with 10g of fiber, 18g of healthy fats from seeds and almond butter, and only 7g of natural sugars from raw honey.</p>
+        <p class="macro-note">Forge delivers a clinically meaningful 40g of protein per serving, enough to maximize muscle protein synthesis. Paired with 10g of fiber, 18g of healthy fats from seeds and almond butter, and only 7g of natural sugars from raw honey.</p>
         <p class="macro-note" style="margin-top:16px;">No synthetic sweeteners means no blood sugar spikes or crashes. Just clean, sustained energy from whole foods.</p>
       </div>
     </div>
@@ -545,12 +607,12 @@
       <div class="step-card">
         <div class="step-number">2</div>
         <div class="step-title">Stick It In The Fridge</div>
-        <div class="step-desc">Drop your cups straight into the fridge. No prep, no mixing, no measuring. They're already made — just keep them cold.</div>
+        <div class="step-desc">Drop your cups straight into the fridge. No prep, no mixing, no measuring. They're already made. Just keep them cold.</div>
       </div>
       <div class="step-card">
         <div class="step-number">3</div>
         <div class="step-title">Grab &amp; Go</div>
-        <div class="step-desc">Whenever you're ready, crack open a cup and eat. 40g of protein, 450 clean calories — zero effort required.</div>
+        <div class="step-desc">Whenever you're ready, crack open a cup and eat. 40g of protein, 450 clean calories. Zero effort required.</div>
       </div>
     </div>
   </div>
@@ -568,7 +630,7 @@
       </div>
       <div class="faq-item">
         <button class="faq-question" onclick="toggleFaq(this)">Where does the protein come from? <span class="faq-arrow">+</span></button>
-        <div class="faq-answer"><p>Forge uses a blend of grass-fed whey protein concentrate and collagen peptides. Grass-fed whey provides a complete amino acid profile for muscle recovery and growth. Collagen peptides support joint health and connective tissue — a combination most protein products skip entirely.</p></div>
+        <div class="faq-answer"><p>Forge uses a blend of grass-fed whey protein concentrate and collagen peptides. Grass-fed whey provides a complete amino acid profile for muscle recovery and growth. Collagen peptides support joint health and connective tissue, a combination most protein products skip entirely.</p></div>
       </div>
       <div class="faq-item">
         <button class="faq-question" onclick="toggleFaq(this)">Is Forge Oats gluten-free? <span class="faq-arrow">+</span></button>
@@ -576,7 +638,7 @@
       </div>
       <div class="faq-item">
         <button class="faq-question" onclick="toggleFaq(this)">How long do they last in the fridge? <span class="faq-arrow">+</span></button>
-        <div class="faq-answer"><p>Your Forge Oats will keep in the refrigerator for up to 5 days. A 5-pack ordered Sunday means a high-protein breakfast ready every morning through Thursday — with zero effort.</p></div>
+        <div class="faq-answer"><p>Your Forge Oats will keep in the refrigerator for up to 5 days. A 5-pack ordered Sunday means a high-protein breakfast ready every morning through Thursday with zero effort.</p></div>
       </div>
       <div class="faq-item">
         <button class="faq-question" onclick="toggleFaq(this)">Can I cancel my subscription anytime? <span class="faq-arrow">+</span></button>
@@ -584,7 +646,7 @@
       </div>
       <div class="faq-item">
         <button class="faq-question" onclick="toggleFaq(this)">Are all ingredients really organic and non-GMO? <span class="faq-arrow">+</span></button>
-        <div class="faq-answer"><p>Yes. Every ingredient in Forge Oats is certified organic and non-GMO verified. Our ingredient list is exactly what you see — no hidden additives, no "natural flavors" masking something else.</p></div>
+        <div class="faq-answer"><p>Yes. Every ingredient in Forge Oats is certified organic and non-GMO verified. Our ingredient list is exactly what you see, with no hidden additives and no "natural flavors" masking something else.</p></div>
       </div>
     </div>
   </div>
@@ -595,7 +657,7 @@
   <div class="container">
     <p class="section-label">Ready?</p>
     <h2 class="section-title">FUEL THE WORK.</h2>
-    <p class="section-desc" style="margin:0 auto 40px; text-align:center;">Stop settling for sugary, low-protein breakfasts. Get the fuel you actually need — delivered free to your door in 1–2 days.</p>
+    <p class="section-desc" style="margin:0 auto 40px; text-align:center;">Stop settling for sugary, low-protein breakfasts. Get the fuel you actually need, delivered free to your door in 1-2 days.</p>
     <div style="text-align:center;">
       <a href="#order" class="btn-primary" style="font-size:18px; padding:20px 60px; letter-spacing:3px;">Shop Forge Oats</a>
     </div>
@@ -618,9 +680,25 @@
 
 <script>
   // ── State ──
-  let selectedPack = { cups:5, total:37.50, perCup:7.50 };
-  let orderType    = 'one-time';
-  const SUB_DISC   = 0.10;
+  let selectedFlavor    = 'chocolate';
+  let selectedPortion   = 'full';
+  let selectedPackIndex = 1;
+  let orderType         = 'one-time';
+  const SUB_DISC        = 0.10;
+
+  // Pack options per portion size
+  const PACK_OPTIONS = {
+    full: [
+      { cups: 3, perCup: 8.00,  total: 24.00,  badge: null,           savings: '' },
+      { cups: 5, perCup: 7.50,  total: 37.50,  badge: 'Most Popular', savings: 'Save $2.50 vs 3-pack rate' },
+      { cups: 7, perCup: 7.00,  total: 49.00,  badge: 'Best Value',   savings: 'Save $7.00 vs 3-pack rate' },
+    ],
+    half: [
+      { cups: 5, perCup: 5.00,  total: 25.00,  badge: null,           savings: '' },
+      { cups: 7, perCup: 4.50,  total: 31.50,  badge: 'Most Popular', savings: 'Save $3.50 vs 5-pack rate' },
+      { cups: 9, perCup: 4.00,  total: 36.00,  badge: 'Best Value',   savings: 'Save $9.00 vs 5-pack rate' },
+    ]
+  };
 
   // ── Set min delivery date to tomorrow ──
   (function() {
@@ -628,14 +706,28 @@
     const tomorrow = new Date();
     tomorrow.setDate(tomorrow.getDate() + 1);
     input.min = tomorrow.toISOString().split('T')[0];
-    // Default to tomorrow
     input.value = tomorrow.toISOString().split('T')[0];
   })();
 
-  function selectPack(el, cups, total, perCup) {
+  function selectOption(el, group, value) {
+    document.querySelectorAll(`.option-card[data-group="${group}"]`).forEach(c => c.classList.remove('active'));
+    el.classList.add('active');
+    if (group === 'flavor') {
+      selectedFlavor = value;
+    }
+    if (group === 'portion') {
+      selectedPortion   = value;
+      selectedPackIndex = 1; // reset to Most Popular
+      document.querySelectorAll('.pack-card').forEach((c, i) => c.classList.toggle('active', i === 1));
+      renderPackCards();
+    }
+    updateCheckout();
+  }
+
+  function selectPack(el, index) {
     document.querySelectorAll('.pack-card').forEach(c => c.classList.remove('active'));
     el.classList.add('active');
-    selectedPack = { cups, total, perCup };
+    selectedPackIndex = index;
     updateCheckout();
   }
 
@@ -644,50 +736,66 @@
     document.querySelectorAll('.toggle-btn').forEach(b => b.classList.remove('active'));
     btn.classList.add('active');
     document.getElementById('subNote').classList.toggle('visible', type === 'subscribe');
+    renderPackCards();
     updateCheckout();
+  }
+
+  function renderPackCards() {
+    const disc    = orderType === 'subscribe' ? SUB_DISC : 0;
+    const options = PACK_OPTIONS[selectedPortion];
+    document.querySelectorAll('.pack-card').forEach((card, i) => {
+      const pack = options[i];
+      const t    = (pack.total  * (1 - disc)).toFixed(2);
+      const pc   = (pack.perCup * (1 - disc)).toFixed(2);
+      card.querySelector('.pack-cups').innerHTML   = pack.cups + '<span>Cup Pack</span>';
+      card.querySelector('.pack-price-per').textContent = '$' + pc + ' per cup';
+      card.querySelector('.pack-total').textContent     = '$' + t;
+      card.querySelector('.pack-savings').textContent   = pack.savings || '\u00a0';
+      const badge = card.querySelector('.pack-badge');
+      if (pack.badge) { badge.textContent = pack.badge; badge.classList.remove('hidden'); }
+      else            { badge.textContent = '_';         badge.classList.add('hidden'); }
+    });
   }
 
   function updateCheckout() {
     const disc  = orderType === 'subscribe' ? SUB_DISC : 0;
-    const packs = [{id:'total-3',base:24},{id:'total-5',base:37.50},{id:'total-7',base:49}];
-    packs.forEach(p => {
-      const el = document.getElementById(p.id);
-      if (el) el.textContent = '$' + (p.base * (1-disc)).toFixed(2);
-    });
-    document.getElementById('checkoutTotal').textContent = '$' + (selectedPack.total*(1-disc)).toFixed(2);
+    const pack  = PACK_OPTIONS[selectedPortion][selectedPackIndex];
+    document.getElementById('checkoutTotal').textContent = '$' + (pack.total * (1 - disc)).toFixed(2);
   }
 
   async function handleCheckout() {
-    // ── Stripe Payment Links ──────────────────────────────────────────────
-    // Run stripe_setup.py to auto-populate, or paste your Stripe links here.
+    // ── Stripe Payment Links (keyed by "portion-cups") ───────────────────
     const stripeLinks = {
       'one-time': {
-        3: 'https://buy.stripe.com/REPLACE_3PACK_LINK',
-        5: 'https://buy.stripe.com/REPLACE_5PACK_LINK',
-        7: 'https://buy.stripe.com/REPLACE_7PACK_LINK',
+        'full-3': 'https://buy.stripe.com/14AcN5dsH7eKfYB12t3ZK01',
+        'full-5': 'https://buy.stripe.com/fZu9ATbkz0Qm8w96mN3ZK00',
+        'full-7': 'https://buy.stripe.com/7sYfZhfAPbv0cMp4eF3ZK02',
+        'half-5': 'https://buy.stripe.com/9B63cv0FVeHc7s5dPf3ZK0c',
+        'half-7': 'https://buy.stripe.com/dRm7sL74jdD83bP3aB3ZK0d',
+        'half-9': 'https://buy.stripe.com/aFadR94WbfLg3bPeTj3ZK0e',
       },
       'subscribe': {
-        3: 'https://buy.stripe.com/REPLACE_3PACK_SUB_LINK',
-        5: 'https://buy.stripe.com/REPLACE_5PACK_SUB_LINK',
-        7: 'https://buy.stripe.com/REPLACE_7PACK_SUB_LINK',
+        'full-3': 'https://buy.stripe.com/aFacN59cr8iO7s58uV3ZK09',
+        'full-5': 'https://buy.stripe.com/14AfZh74j8iOeUx12t3ZK0a',
+        'full-7': 'https://buy.stripe.com/14A8wPewLdD8fYB12t3ZK0b',
+        'half-5': 'https://buy.stripe.com/8x24gz4Wb9mS5jXfXn3ZK0f',
+        'half-7': 'https://buy.stripe.com/3cI8wPagvgPkdQt12t3ZK0g',
+        'half-9': 'https://buy.stripe.com/fZudR9dsH0QmcMpfXn3ZK0h',
       }
     };
 
-    // ── Formspree endpoint ────────────────────────────────────────────────
-    // 1. Go to https://formspree.io → New Form → copy your endpoint URL
-    // 2. Replace the value below with your endpoint, e.g.:
-    //    'https://formspree.io/f/abcd1234'
     const FORMSPREE_URL = 'https://formspree.io/f/REPLACE_YOUR_FORMSPREE_ID';
 
-    // ── Collect form values ───────────────────────────────────────────────
     const name         = document.getElementById('customerName').value.trim();
     const email        = document.getElementById('customerEmail').value.trim();
     const deliveryDate = document.getElementById('deliveryDate').value;
     const deliveryTime = document.getElementById('deliveryTime').value;
     const disc         = orderType === 'subscribe' ? SUB_DISC : 0;
-    const total        = '$' + (selectedPack.total * (1 - disc)).toFixed(2);
+    const pack         = PACK_OPTIONS[selectedPortion][selectedPackIndex];
+    const total        = '$' + (pack.total * (1 - disc)).toFixed(2);
+    const flavorLabel  = selectedFlavor === 'peanut-butter' ? 'Peanut Butter' : 'Chocolate';
+    const portionLabel = selectedPortion === 'half' ? 'Half Serving' : 'Full Serving';
 
-    // ── Validate required fields ──────────────────────────────────────────
     const missing = [];
     if (!name)         missing.push('name');
     if (!email)        missing.push('email');
@@ -703,7 +811,6 @@
     btn.textContent = 'Processing…';
     btn.disabled = true;
 
-    // ── Step 1: Send order details to Formspree (email notification to you) ──
     const formspreeReady = !FORMSPREE_URL.includes('REPLACE');
     if (formspreeReady) {
       try {
@@ -711,14 +818,16 @@
           method: 'POST',
           headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
           body: JSON.stringify({
-            customer_name:    name,
-            customer_email:   email,
-            pack:             `${selectedPack.cups}-Pack`,
-            order_type:       orderType,
-            total:            total,
-            delivery_date:    deliveryDate,
-            delivery_time:    deliveryTime,
-            _subject:         `🔥 New Forge Oats Order — ${selectedPack.cups}-Pack from ${name}`,
+            customer_name:  name,
+            customer_email: email,
+            flavor:         flavorLabel,
+            portion:        portionLabel,
+            pack:           `${pack.cups}-Pack`,
+            order_type:     orderType,
+            total:          total,
+            delivery_date:  deliveryDate,
+            delivery_time:  deliveryTime,
+            _subject:       `🔥 New Forge Oats Order — ${selectedCups}-Pack ${flavorLabel} ${portionLabel} from ${name}`,
           })
         });
       } catch (err) {
@@ -726,24 +835,23 @@
       }
     }
 
-    // ── Step 2: Redirect to Stripe with delivery info in client_reference_id ──
-    const stripeLink = stripeLinks[orderType]?.[selectedPack.cups];
+    const stripeLink = stripeLinks[orderType]?.[`${selectedPortion}-${pack.cups}`];
     if (stripeLink && !stripeLink.includes('REPLACE')) {
-      // Encode delivery details so they appear in your Stripe dashboard per order
       const ref = encodeURIComponent(
-        `${selectedPack.cups}pack|${orderType}|date:${deliveryDate}|time:${deliveryTime}|name:${name}`
+        `${pack.cups}pack|${orderType}|flavor:${flavorLabel}|portion:${portionLabel}|date:${deliveryDate}|time:${deliveryTime}|name:${name}`
       );
       const url = new URL(stripeLink);
       url.searchParams.set('client_reference_id', ref);
       url.searchParams.set('prefilled_email', email);
       window.location.href = url.toString();
     } else {
-      // Stripe not yet configured — show setup reminder
       btn.textContent = '⚡ Add your Stripe links to activate checkout';
       btn.style.background = '#444';
       btn.disabled = false;
       setTimeout(() => {
-        btn.innerHTML = 'Add to Cart — <span id="checkoutTotal">' + total + '</span>';
+        const disc2 = orderType === 'subscribe' ? SUB_DISC : 0;
+        const t2    = PACK_OPTIONS[selectedPortion][selectedPackIndex].total * (1 - disc2);
+        btn.innerHTML = 'Add to Cart: <span id="checkoutTotal">$' + t2.toFixed(2) + '</span>';
         btn.style.background = '';
       }, 4000);
     }
@@ -780,7 +888,7 @@
       if (e.isIntersecting) { e.target.style.opacity='1'; e.target.style.transform='translateY(0)'; }
     });
   }, { threshold:0.1 });
-  document.querySelectorAll('.why-card,.pack-card,.step-card,.stat-item,.faq-item').forEach(el => {
+  document.querySelectorAll('.why-card,.pack-card,.option-card,.step-card,.stat-item,.faq-item').forEach(el => {
     el.style.opacity='0'; el.style.transform='translateY(24px)';
     el.style.transition='opacity 0.5s ease, transform 0.5s ease';
     observer.observe(el);
