@@ -81,10 +81,18 @@
     .success-title { font-family: 'Bebas Neue', sans-serif; font-size: clamp(48px, 8vw, 96px); letter-spacing: 3px; color: var(--cream); line-height: 1; margin-bottom: 20px; position: relative; z-index: 2; }
     .success-sub { font-size: 18px; line-height: 1.7; color: rgba(237,232,220,0.75); max-width: 480px; margin: 0 auto 48px; font-weight: 300; position: relative; z-index: 2; }
 
-    /* Order detail strip */
-    .order-detail { display: none; background: rgba(255,107,26,0.1); border: 1px solid rgba(255,107,26,0.3); border-radius: 8px; padding: 16px 28px; margin-bottom: 40px; font-family: 'Oswald', sans-serif; font-size: 15px; letter-spacing: 1px; color: var(--cream); position: relative; z-index: 2; }
-    .order-detail.visible { display: inline-block; }
-    .order-detail span { color: var(--orange); }
+    /* Order summary card */
+    .order-summary { display: none; background: var(--card); border: 1px solid rgba(255,107,26,0.35); border-radius: 12px; padding: 32px 36px; margin-bottom: 40px; max-width: 480px; width: 100%; position: relative; z-index: 2; text-align: left; }
+    .order-summary::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: linear-gradient(90deg, var(--fire), var(--orange)); border-radius: 12px 12px 0 0; }
+    .order-summary.visible { display: block; }
+    .order-summary-header { font-family: 'Oswald', sans-serif; font-size: 11px; letter-spacing: 4px; color: var(--orange); text-transform: uppercase; margin-bottom: 20px; }
+    .order-rows { display: flex; flex-direction: column; gap: 12px; }
+    .order-row { display: flex; justify-content: space-between; align-items: center; }
+    .order-row-label { font-family: 'Oswald', sans-serif; font-size: 13px; letter-spacing: 1px; text-transform: uppercase; color: rgba(237,232,220,0.55); }
+    .order-row-value { font-family: 'Oswald', sans-serif; font-size: 15px; letter-spacing: 1px; color: var(--cream); font-weight: 600; }
+    .order-divider { border: none; border-top: 1px solid var(--border); margin: 8px 0; }
+    .order-row.total .order-row-label { color: var(--cream); font-size: 15px; }
+    .order-row.total .order-row-value { color: var(--orange); font-size: 22px; font-weight: 700; }
 
     /* CTA buttons */
     .cta-group { display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; position: relative; z-index: 2; }
@@ -147,7 +155,10 @@
   <h1 class="success-title">YOU'RE FUELED UP.</h1>
   <p class="success-sub">Your Forge Oats are confirmed and on their way. Check your email for delivery details.</p>
 
-  <div class="order-detail" id="orderDetail"></div>
+  <div class="order-summary" id="orderSummary">
+    <div class="order-summary-header">Order Summary</div>
+    <div class="order-rows" id="orderRows"></div>
+  </div>
 
   <div class="cta-group">
     <a href="index.html" class="btn-primary">Order More</a>
@@ -188,7 +199,6 @@
 </footer>
 
 <script>
-  // Parse order details from URL if Stripe passed client_reference_id back
   (function() {
     const params = new URLSearchParams(window.location.search);
     const ref    = params.get('client_reference_id');
@@ -197,22 +207,46 @@
       const decoded = decodeURIComponent(ref);
       const parts   = {};
       decoded.split('|').forEach(p => {
-        const [k, v] = p.split(':');
-        if (k && v) parts[k.trim()] = v.trim();
+        const idx = p.indexOf(':');
+        if (idx > -1) parts[p.slice(0, idx).trim()] = p.slice(idx + 1).trim();
       });
-      const cups    = decoded.match(/^(\d+)pack/)?.[1];
-      const flavor  = parts['flavor']  || '';
-      const portion = parts['portion'] || '';
-      const name    = parts['name']    || '';
-      if (cups || flavor) {
-        const el = document.getElementById('orderDetail');
-        el.innerHTML =
-          (name    ? `<span>${name}</span> &nbsp;·&nbsp; ` : '') +
-          (cups    ? `<span>${cups}-Pack</span> &nbsp;·&nbsp; ` : '') +
-          (flavor  ? `<span>${flavor}</span> &nbsp;·&nbsp; ` : '') +
-          (portion ? `<span>${portion}</span>` : '');
-        el.classList.add('visible');
+      const cups      = decoded.match(/^(\d+)pack/)?.[1];
+      const orderType = decoded.split('|')[1] || '';
+      const flavor    = parts['flavor']  || '';
+      const portion   = parts['portion'] || '';
+      const price     = parts['price']   || '';
+      const perCup    = parts['perCup']  || '';
+
+      if (!cups && !flavor) return;
+
+      const rows = [];
+      if (flavor)    rows.push({ label: 'Flavor',      value: flavor });
+      if (cups)      rows.push({ label: 'Pack Size',   value: cups + ' Cups' });
+      if (portion)   rows.push({ label: 'Serving',     value: portion });
+      if (perCup)    rows.push({ label: 'Price Per Cup', value: perCup });
+      if (orderType) rows.push({ label: 'Order Type',  value: orderType === 'subscribe' ? 'Subscribe & Save 10%' : 'One-Time Purchase' });
+
+      const rowsEl = document.getElementById('orderRows');
+      rows.forEach(r => {
+        rowsEl.insertAdjacentHTML('beforeend',
+          `<div class="order-row">
+            <span class="order-row-label">${r.label}</span>
+            <span class="order-row-value">${r.value}</span>
+          </div>`
+        );
+      });
+
+      if (price) {
+        rowsEl.insertAdjacentHTML('beforeend', '<hr class="order-divider">');
+        rowsEl.insertAdjacentHTML('beforeend',
+          `<div class="order-row total">
+            <span class="order-row-label">Total</span>
+            <span class="order-row-value">${price}</span>
+          </div>`
+        );
       }
+
+      document.getElementById('orderSummary').classList.add('visible');
     } catch(e) {}
   })();
 </script>
