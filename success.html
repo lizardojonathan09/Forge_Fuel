@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Order Confirmed – Forge Oats</title>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Oswald:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --black: #080808; --dark: #111111; --card: #181818;
+      --orange: #FF6B1A; --fire: #FF3D00; --gold: #C9A04A;
+      --cream: #EDE8DC; --muted: #888888; --border: #2A2A2A;
+    }
+    html { scroll-behavior: smooth; }
+    body { background: var(--black); color: var(--cream); font-family: 'Inter', sans-serif; overflow-x: hidden; min-height: 100vh; }
+
+    /* ── NAV ── */
+    nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 14px 48px;
+      background: rgba(8,8,8,0.92); backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+    }
+    .nav-logo { display: flex; align-items: center; gap: 12px; text-decoration: none; }
+    .nav-logo img { height: 46px; width: auto; }
+    .nav-logo-text { font-family: 'Bebas Neue', sans-serif; font-size: 22px; letter-spacing: 2px; color: var(--cream); line-height: 1; }
+    .nav-logo-text span { display: block; font-family: 'Oswald', sans-serif; font-size: 10px; letter-spacing: 4px; color: var(--orange); font-weight: 500; }
+    .btn-nav { background: var(--orange); color: #fff; font-family: 'Oswald', sans-serif; font-size: 13px; font-weight: 600; letter-spacing: 2px; text-transform: uppercase; padding: 10px 24px; border-radius: 4px; text-decoration: none; transition: background 0.2s; }
+    .btn-nav:hover { background: var(--fire); }
+
+    /* ── HERO ── */
+    .success-hero {
+      min-height: 100vh; display: flex; align-items: center; justify-content: center;
+      flex-direction: column; text-align: center;
+      padding: 120px 48px 80px;
+      background: radial-gradient(ellipse 70% 50% at 50% 80%, rgba(255,107,26,0.15) 0%, transparent 70%), var(--black);
+      position: relative; overflow: hidden;
+    }
+
+    /* Embers */
+    .embers { position: absolute; inset: 0; pointer-events: none; overflow: hidden; }
+    .ember { position: absolute; bottom: -10px; width: 4px; height: 4px; border-radius: 50%; background: var(--orange); animation: floatUp linear infinite; opacity: 0; }
+    .ember:nth-child(1) { left:10%; animation-duration:6s;   animation-delay:0s;   width:3px; height:3px; background:#FF8C42; }
+    .ember:nth-child(2) { left:25%; animation-duration:8s;   animation-delay:1s;   background:var(--fire); }
+    .ember:nth-child(3) { left:40%; animation-duration:7s;   animation-delay:2s;   width:2px; height:2px; }
+    .ember:nth-child(4) { left:55%; animation-duration:9s;   animation-delay:0.5s; background:var(--gold); }
+    .ember:nth-child(5) { left:70%; animation-duration:6.5s; animation-delay:1.5s; width:3px; height:3px; }
+    .ember:nth-child(6) { left:85%; animation-duration:8.5s; animation-delay:3s;   background:var(--fire); }
+    @keyframes floatUp {
+      0%   { transform:translateY(0) translateX(0);   opacity:0; }
+      10%  { opacity:0.9; }
+      80%  { opacity:0.4; }
+      100% { transform:translateY(-90vh) translateX(40px); opacity:0; }
+    }
+
+    /* Checkmark */
+    .check-wrap {
+      width: 100px; height: 100px; border-radius: 50%;
+      background: linear-gradient(135deg, var(--fire), var(--orange));
+      display: flex; align-items: center; justify-content: center;
+      margin: 0 auto 32px;
+      box-shadow: 0 0 60px rgba(255,107,26,0.5);
+      animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) both;
+      position: relative; z-index: 2;
+    }
+    @keyframes popIn {
+      0%   { transform: scale(0); opacity: 0; }
+      100% { transform: scale(1); opacity: 1; }
+    }
+    .check-wrap svg { width: 48px; height: 48px; stroke: #fff; stroke-width: 3; fill: none; stroke-linecap: round; stroke-linejoin: round; }
+    .check-path {
+      stroke-dasharray: 60;
+      stroke-dashoffset: 60;
+      animation: drawCheck 0.4s ease 0.4s forwards;
+    }
+    @keyframes drawCheck { to { stroke-dashoffset: 0; } }
+
+    .success-eyebrow { font-family: 'Oswald', sans-serif; font-size: 13px; letter-spacing: 5px; text-transform: uppercase; color: var(--orange); margin-bottom: 12px; position: relative; z-index: 2; }
+    .success-title { font-family: 'Bebas Neue', sans-serif; font-size: clamp(48px, 8vw, 96px); letter-spacing: 3px; color: var(--cream); line-height: 1; margin-bottom: 20px; position: relative; z-index: 2; }
+    .success-sub { font-size: 18px; line-height: 1.7; color: rgba(237,232,220,0.75); max-width: 480px; margin: 0 auto 48px; font-weight: 300; position: relative; z-index: 2; }
+
+    /* Order detail strip */
+    .order-detail { display: none; background: rgba(255,107,26,0.1); border: 1px solid rgba(255,107,26,0.3); border-radius: 8px; padding: 16px 28px; margin-bottom: 40px; font-family: 'Oswald', sans-serif; font-size: 15px; letter-spacing: 1px; color: var(--cream); position: relative; z-index: 2; }
+    .order-detail.visible { display: inline-block; }
+    .order-detail span { color: var(--orange); }
+
+    /* CTA buttons */
+    .cta-group { display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; position: relative; z-index: 2; }
+    .btn-primary { background: linear-gradient(135deg, var(--orange), var(--fire)); color: #fff; font-family: 'Oswald', sans-serif; font-size: 16px; font-weight: 600; letter-spacing: 2px; text-transform: uppercase; padding: 16px 40px; border-radius: 4px; border: none; cursor: pointer; text-decoration: none; display: inline-block; box-shadow: 0 4px 30px rgba(255,107,26,0.35); transition: all 0.2s; }
+    .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 40px rgba(255,107,26,0.5); }
+    .btn-secondary { background: transparent; color: var(--cream); font-family: 'Oswald', sans-serif; font-size: 16px; font-weight: 500; letter-spacing: 2px; text-transform: uppercase; padding: 16px 40px; border-radius: 4px; border: 1px solid var(--border); cursor: pointer; text-decoration: none; display: inline-block; transition: all 0.2s; }
+    .btn-secondary:hover { border-color: var(--orange); color: var(--orange); transform: translateY(-2px); }
+
+    /* ── WHAT'S NEXT ── */
+    .next-section { background: var(--dark); padding: 100px 48px; text-align: center; }
+    .section-label { font-family: 'Oswald', sans-serif; font-size: 12px; letter-spacing: 5px; color: var(--orange); text-transform: uppercase; margin-bottom: 12px; }
+    .section-title { font-family: 'Bebas Neue', sans-serif; font-size: clamp(36px, 4vw, 56px); letter-spacing: 2px; color: var(--cream); margin-bottom: 60px; }
+    .steps-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; max-width: 900px; margin: 0 auto; }
+    .step-card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 40px 28px; text-align: center; position: relative; }
+    .step-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: linear-gradient(90deg, var(--fire), var(--orange)); border-radius: 12px 12px 0 0; }
+    .step-icon { font-size: 40px; margin-bottom: 16px; line-height: 1; }
+    .step-title { font-family: 'Oswald', sans-serif; font-size: 18px; font-weight: 600; letter-spacing: 1px; color: var(--cream); margin-bottom: 10px; }
+    .step-desc { font-size: 14px; line-height: 1.7; color: rgba(237,232,220,0.6); }
+
+    /* ── FOOTER ── */
+    footer { background: var(--black); border-top: 1px solid var(--border); padding: 48px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 24px; }
+    .footer-brand { font-family: 'Bebas Neue', sans-serif; font-size: 28px; letter-spacing: 4px; color: var(--cream); }
+    .footer-brand span { color: var(--orange); }
+    .footer-tagline { font-family: 'Oswald', sans-serif; font-size: 11px; letter-spacing: 4px; color: var(--muted); text-transform: uppercase; margin-top: 4px; }
+    .footer-copy { font-size: 12px; color: var(--muted); }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 900px) {
+      nav { padding: 16px 24px; }
+      .success-hero { padding: 100px 24px 60px; }
+      .next-section { padding: 60px 24px; }
+      .steps-grid { grid-template-columns: 1fr; }
+      footer { flex-direction: column; text-align: center; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <a href="index.html" class="nav-logo">
+    <img src="forge-logo.png" alt="Forge Oats" />
+    <div class="nav-logo-text">FORGE OATS<span>FUEL THE WORK</span></div>
+  </a>
+  <a href="index.html" class="btn-nav">Order Again</a>
+</nav>
+
+<!-- SUCCESS HERO -->
+<section class="success-hero">
+  <div class="embers">
+    <div class="ember"></div><div class="ember"></div><div class="ember"></div>
+    <div class="ember"></div><div class="ember"></div><div class="ember"></div>
+  </div>
+
+  <div class="check-wrap">
+    <svg viewBox="0 0 24 24"><polyline class="check-path" points="20 6 9 17 4 12"></polyline></svg>
+  </div>
+
+  <p class="success-eyebrow">Payment Confirmed</p>
+  <h1 class="success-title">YOU'RE FUELED UP.</h1>
+  <p class="success-sub">Your Forge Oats are confirmed and on their way. Check your email for delivery details.</p>
+
+  <div class="order-detail" id="orderDetail"></div>
+
+  <div class="cta-group">
+    <a href="index.html" class="btn-primary">Order More</a>
+    <a href="index.html#why" class="btn-secondary">Learn More</a>
+  </div>
+</section>
+
+<!-- WHAT'S NEXT -->
+<section class="next-section">
+  <p class="section-label">What Happens Next</p>
+  <h2 class="section-title">EXPECT THE BEST.</h2>
+  <div class="steps-grid">
+    <div class="step-card">
+      <div class="step-icon">📧</div>
+      <div class="step-title">Check Your Email</div>
+      <div class="step-desc">A confirmation with your order details and delivery tracking will be sent to your inbox shortly.</div>
+    </div>
+    <div class="step-card">
+      <div class="step-icon">🚚</div>
+      <div class="step-title">Delivered in 1-2 Days</div>
+      <div class="step-desc">Your Forge Oats ship fast and arrive fresh. We'll reach out to confirm your delivery window.</div>
+    </div>
+    <div class="step-card">
+      <div class="step-icon">❄️</div>
+      <div class="step-title">Fridge. Done. Fuel.</div>
+      <div class="step-desc">Drop them straight in the fridge. No prep, no mixing. Grab one when you're ready and get to work.</div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div>
+    <div class="footer-brand">FORGE <span>OATS</span></div>
+    <div class="footer-tagline">Fuel The Work</div>
+  </div>
+  <div class="footer-copy">© 2025 Forge Oats. All rights reserved.</div>
+</footer>
+
+<script>
+  // Parse order details from URL if Stripe passed client_reference_id back
+  (function() {
+    const params = new URLSearchParams(window.location.search);
+    const ref    = params.get('client_reference_id');
+    if (!ref) return;
+    try {
+      const decoded = decodeURIComponent(ref);
+      const parts   = {};
+      decoded.split('|').forEach(p => {
+        const [k, v] = p.split(':');
+        if (k && v) parts[k.trim()] = v.trim();
+      });
+      const cups    = decoded.match(/^(\d+)pack/)?.[1];
+      const flavor  = parts['flavor']  || '';
+      const portion = parts['portion'] || '';
+      const name    = parts['name']    || '';
+      if (cups || flavor) {
+        const el = document.getElementById('orderDetail');
+        el.innerHTML =
+          (name    ? `<span>${name}</span> &nbsp;·&nbsp; ` : '') +
+          (cups    ? `<span>${cups}-Pack</span> &nbsp;·&nbsp; ` : '') +
+          (flavor  ? `<span>${flavor}</span> &nbsp;·&nbsp; ` : '') +
+          (portion ? `<span>${portion}</span>` : '');
+        el.classList.add('visible');
+      }
+    } catch(e) {}
+  })();
+</script>
+
+</body>
+</html>

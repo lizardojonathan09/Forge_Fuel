@@ -840,9 +840,11 @@
       const ref = encodeURIComponent(
         `${pack.cups}pack|${orderType}|flavor:${flavorLabel}|portion:${portionLabel}|date:${deliveryDate}|time:${deliveryTime}|name:${name}`
       );
+      const successUrl = encodeURIComponent(window.location.origin + window.location.pathname.replace('index.html', '') + 'success.html?client_reference_id=' + ref);
       const url = new URL(stripeLink);
       url.searchParams.set('client_reference_id', ref);
       url.searchParams.set('prefilled_email', email);
+      url.searchParams.set('success_url', successUrl);
       window.location.href = url.toString();
     } else {
       btn.textContent = '⚡ Add your Stripe links to activate checkout';
