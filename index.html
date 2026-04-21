@@ -152,6 +152,31 @@
     .pm-num { font-family:'Bebas Neue',sans-serif; font-size:28px; background:linear-gradient(135deg,var(--orange),var(--gold)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; line-height:1; }
     .pm-label { font-family:'Oswald',sans-serif; font-size:10px; letter-spacing:2px; text-transform:uppercase; color:var(--muted); }
 
+    /* ── FLAVOR QUANTITY PICKER ── */
+    .flavor-qty-grid { display:grid; grid-template-columns:1fr 1fr; gap:20px; max-width:700px; margin:0 auto; }
+    .flavor-qty-card { background:var(--card); border:2px solid var(--border); border-radius:12px; padding:32px 24px; text-align:center; position:relative; overflow:hidden; transition:all 0.25s; }
+    .flavor-qty-card::before { content:''; position:absolute; top:0; left:0; right:0; height:3px; background:var(--border); transition:background 0.25s; }
+    .flavor-qty-card.has-qty { border-color:var(--orange); background:linear-gradient(180deg,rgba(255,107,26,0.08) 0%,var(--card) 100%); }
+    .flavor-qty-card.has-qty::before { background:linear-gradient(90deg,var(--fire),var(--orange)); }
+    .flavor-qty-icon { font-size:36px; margin-bottom:10px; line-height:1; }
+    .flavor-qty-name { font-family:'Oswald',sans-serif; font-size:20px; font-weight:600; letter-spacing:1px; color:var(--cream); margin-bottom:6px; }
+    .flavor-qty-desc { font-size:13px; color:rgba(237,232,220,0.55); line-height:1.4; margin-bottom:20px; }
+    .qty-control { display:flex; align-items:center; justify-content:center; gap:18px; }
+    .qty-btn { width:42px; height:42px; border-radius:50%; background:var(--dark); border:1px solid var(--border); color:var(--cream); font-size:22px; cursor:pointer; display:flex; align-items:center; justify-content:center; transition:all 0.2s; line-height:1; padding:0; font-family:'Inter',sans-serif; font-weight:300; }
+    .qty-btn:hover:not(:disabled) { background:var(--orange); border-color:var(--orange); transform:scale(1.1); }
+    .qty-btn:disabled { opacity:0.25; cursor:not-allowed; transform:none; }
+    .qty-display { text-align:center; }
+    .qty-num { font-family:'Bebas Neue',sans-serif; font-size:64px; color:var(--cream); line-height:1; min-width:52px; display:block; }
+    .qty-cups-label { font-family:'Oswald',sans-serif; font-size:11px; letter-spacing:3px; text-transform:uppercase; color:var(--muted); margin-top:2px; }
+    .flavor-total-bar { display:flex; align-items:center; justify-content:center; gap:10px; max-width:700px; margin:20px auto 0; padding:14px 24px; background:var(--card); border:1px solid var(--border); border-radius:8px; font-family:'Oswald',sans-serif; font-size:14px; letter-spacing:2px; text-transform:uppercase; color:var(--muted); transition:border-color 0.3s; }
+    .flavor-total-bar.matched { border-color:rgba(92,184,92,0.5); background:rgba(92,184,92,0.06); }
+    .flavor-total-bar.over { border-color:rgba(255,61,0,0.5); }
+    .flavor-total-nums { font-family:'Bebas Neue',sans-serif; font-size:22px; color:var(--cream); }
+    .flavor-total-nums.matched { color:#5CB85C; }
+    .flavor-total-nums.over { color:var(--fire); }
+    .flavor-total-hint { font-size:12px; color:var(--muted); margin-left:4px; }
+    .flavor-total-check { color:#5CB85C; font-size:18px; }
+
     /* ── DELIVERY SCHEDULER ── */
     .delivery-scheduler {
       max-width: 600px; margin: 0 auto 40px;
@@ -284,7 +309,7 @@
       nav { padding:16px 24px; }
       .nav-links { display:none; }
       section, #order { padding:60px 24px; }
-      .stats-grid,.pack-grid,.why-grid,.option-grid-2 { grid-template-columns:1fr; }
+      .stats-grid,.pack-grid,.why-grid,.option-grid-2,.flavor-qty-grid { grid-template-columns:1fr; }
       .ingredients-layout,.nutrition-layout { grid-template-columns:1fr; gap:40px; }
       .steps-grid { grid-template-columns:1fr; }
       .step-connector { display:none; }
@@ -367,20 +392,42 @@
       <p class="section-desc">Four simple choices. We handle everything else.</p>
     </div>
 
-    <!-- STEP 1: FLAVOR -->
+    <!-- STEP 1: FLAVOR QUANTITIES -->
     <div class="order-step">
-      <div class="step-label"><span class="step-num">1</span> Choose Your Flavor</div>
-      <div class="option-grid-2">
-        <div class="option-card active" onclick="selectOption(this,'flavor','chocolate')" data-group="flavor">
-          <div class="option-icon">🍫</div>
-          <div class="option-name">Chocolate</div>
-          <div class="option-desc">Rich cacao, smooth dark chocolate taste. The original Forge.</div>
+      <div class="step-label"><span class="step-num">1</span> Choose Your Flavors</div>
+      <div class="flavor-qty-grid">
+        <div class="flavor-qty-card" id="qtyCardChocolate">
+          <div class="flavor-qty-icon">🍫</div>
+          <div class="flavor-qty-name">Chocolate</div>
+          <div class="flavor-qty-desc">Rich cacao, smooth dark chocolate taste. The original Forge.</div>
+          <div class="qty-control">
+            <button class="qty-btn" id="btnChocMinus" onclick="adjustFlavor('chocolate',-1)">−</button>
+            <div class="qty-display">
+              <span class="qty-num" id="qtyChocolate">5</span>
+              <div class="qty-cups-label">cups</div>
+            </div>
+            <button class="qty-btn" id="btnChocPlus" onclick="adjustFlavor('chocolate',1)">+</button>
+          </div>
         </div>
-        <div class="option-card" onclick="selectOption(this,'flavor','peanut-butter')" data-group="flavor">
-          <div class="option-icon">🥜</div>
-          <div class="option-name">Peanut Butter</div>
-          <div class="option-desc">Creamy, nutty, and satisfying. Perfect for PB lovers.</div>
+        <div class="flavor-qty-card" id="qtyCardPeanutButter">
+          <div class="flavor-qty-icon">🥜</div>
+          <div class="flavor-qty-name">Peanut Butter</div>
+          <div class="flavor-qty-desc">Creamy, nutty, and satisfying. Perfect for PB lovers.</div>
+          <div class="qty-control">
+            <button class="qty-btn" id="btnPBMinus" onclick="adjustFlavor('peanut-butter',-1)">−</button>
+            <div class="qty-display">
+              <span class="qty-num" id="qtyPeanutButter">0</span>
+              <div class="qty-cups-label">cups</div>
+            </div>
+            <button class="qty-btn" id="btnPBPlus" onclick="adjustFlavor('peanut-butter',1)">+</button>
+          </div>
         </div>
+      </div>
+      <div class="flavor-total-bar matched" id="flavorTotalBar">
+        <span>Your mix:</span>
+        <span class="flavor-total-nums matched" id="flavorTotalNums">5 / 5</span>
+        <span class="flavor-total-hint" id="flavorTotalHint">cups selected</span>
+        <span class="flavor-total-check" id="flavorTotalCheck">✓</span>
       </div>
     </div>
 
@@ -680,7 +727,7 @@
 
 <script>
   // ── State ──
-  let selectedFlavor    = 'chocolate';
+  let flavorCups        = { chocolate: 5, 'peanut-butter': 0 };
   let selectedPortion   = 'full';
   let selectedPackIndex = 1;
   let orderType         = 'one-time';
@@ -709,17 +756,82 @@
     input.value = tomorrow.toISOString().split('T')[0];
   })();
 
+  // ── Initialize flavor display ──
+  updateFlavorDisplay();
+
+  // ── Flavor quantity controls ──
+  function adjustFlavor(flavor, delta) {
+    const pack  = PACK_OPTIONS[selectedPortion][selectedPackIndex];
+    const total = flavorCups.chocolate + flavorCups['peanut-butter'];
+    const newVal = flavorCups[flavor] + delta;
+    if (newVal < 0) return;
+    if (delta > 0 && total >= pack.cups) return;
+    flavorCups[flavor] = newVal;
+    updateFlavorDisplay();
+    updateCheckout();
+  }
+
+  function resetFlavorCups() {
+    const pack = PACK_OPTIONS[selectedPortion][selectedPackIndex];
+    flavorCups = { chocolate: pack.cups, 'peanut-butter': 0 };
+    updateFlavorDisplay();
+  }
+
+  function updateFlavorDisplay() {
+    const pack  = PACK_OPTIONS[selectedPortion][selectedPackIndex];
+    const total = flavorCups.chocolate + flavorCups['peanut-butter'];
+    const choc  = flavorCups.chocolate;
+    const pb    = flavorCups['peanut-butter'];
+
+    document.getElementById('qtyChocolate').textContent    = choc;
+    document.getElementById('qtyPeanutButter').textContent = pb;
+
+    // Card highlighting
+    document.getElementById('qtyCardChocolate').classList.toggle('has-qty', choc > 0);
+    document.getElementById('qtyCardPeanutButter').classList.toggle('has-qty', pb > 0);
+
+    // Button states
+    document.getElementById('btnChocMinus').disabled = choc <= 0;
+    document.getElementById('btnPBMinus').disabled   = pb <= 0;
+    document.getElementById('btnChocPlus').disabled  = total >= pack.cups;
+    document.getElementById('btnPBPlus').disabled    = total >= pack.cups;
+
+    // Total bar
+    const bar      = document.getElementById('flavorTotalBar');
+    const numsEl   = document.getElementById('flavorTotalNums');
+    const hintEl   = document.getElementById('flavorTotalHint');
+    const checkEl  = document.getElementById('flavorTotalCheck');
+    const matched  = total === pack.cups;
+    const over     = total > pack.cups;
+    const remaining = pack.cups - total;
+
+    numsEl.textContent = `${total} / ${pack.cups}`;
+    bar.classList.toggle('matched', matched);
+    bar.classList.toggle('over', over);
+    numsEl.classList.toggle('matched', matched);
+    numsEl.classList.toggle('over', over);
+
+    if (matched) {
+      hintEl.textContent  = 'cups selected';
+      checkEl.style.display = 'inline';
+    } else if (over) {
+      hintEl.textContent  = 'too many cups';
+      checkEl.style.display = 'none';
+    } else {
+      hintEl.textContent  = `cup${remaining !== 1 ? 's' : ''} remaining`;
+      checkEl.style.display = 'none';
+    }
+  }
+
   function selectOption(el, group, value) {
     document.querySelectorAll(`.option-card[data-group="${group}"]`).forEach(c => c.classList.remove('active'));
     el.classList.add('active');
-    if (group === 'flavor') {
-      selectedFlavor = value;
-    }
     if (group === 'portion') {
       selectedPortion   = value;
-      selectedPackIndex = 1; // reset to Most Popular
+      selectedPackIndex = 1;
       document.querySelectorAll('.pack-card').forEach((c, i) => c.classList.toggle('active', i === 1));
       renderPackCards();
+      resetFlavorCups();
     }
     updateCheckout();
   }
@@ -728,6 +840,7 @@
     document.querySelectorAll('.pack-card').forEach(c => c.classList.remove('active'));
     el.classList.add('active');
     selectedPackIndex = index;
+    resetFlavorCups();
     updateCheckout();
   }
 
@@ -793,14 +906,26 @@
     const disc         = orderType === 'subscribe' ? SUB_DISC : 0;
     const pack         = PACK_OPTIONS[selectedPortion][selectedPackIndex];
     const total        = '$' + (pack.total * (1 - disc)).toFixed(2);
-    const flavorLabel  = selectedFlavor === 'peanut-butter' ? 'Peanut Butter' : 'Chocolate';
     const portionLabel = selectedPortion === 'half' ? 'Half Serving' : 'Full Serving';
+    const flavorTotal  = flavorCups.chocolate + flavorCups['peanut-butter'];
+    const flavorParts  = [];
+    if (flavorCups.chocolate > 0)          flavorParts.push(`${flavorCups.chocolate} Chocolate`);
+    if (flavorCups['peanut-butter'] > 0)   flavorParts.push(`${flavorCups['peanut-butter']} Peanut Butter`);
+    const flavorLabel  = flavorParts.join(' + ') || 'None';
 
     const missing = [];
     if (!name)         missing.push('name');
     if (!email)        missing.push('email');
     if (!deliveryDate) missing.push('delivery date');
     if (!deliveryTime) missing.push('delivery time');
+    if (flavorTotal !== pack.cups) {
+      const rem = pack.cups - flavorTotal;
+      showFieldError(rem > 0
+        ? `Add ${rem} more cup${rem !== 1 ? 's' : ''} to complete your ${pack.cups}-pack.`
+        : `Too many cups selected. Remove ${flavorTotal - pack.cups} cup${(flavorTotal - pack.cups) !== 1 ? 's' : ''}.`
+      );
+      return;
+    }
 
     if (missing.length) {
       showFieldError(`Please fill in: ${missing.join(', ')}.`);
@@ -827,7 +952,7 @@
             total:          total,
             delivery_date:  deliveryDate,
             delivery_time:  deliveryTime,
-            _subject:       `🔥 New Forge Oats Order — ${selectedCups}-Pack ${flavorLabel} ${portionLabel} from ${name}`,
+            _subject:       `🔥 New Forge Oats Order — ${pack.cups}-Pack (${flavorLabel}) ${portionLabel} from ${name}`,
           })
         });
       } catch (err) {
