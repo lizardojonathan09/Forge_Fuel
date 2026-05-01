@@ -522,6 +522,12 @@
           </select>
         </div>
       </div>
+      <div class="scheduler-row" style="margin-top:16px;">
+        <div class="scheduler-field" style="grid-column:1/-1;">
+          <label>How did you hear about us? <span style="color:var(--muted);font-size:10px;letter-spacing:1px;">(Optional)</span></label>
+          <input type="text" id="referralSource" placeholder="e.g. a friend, Instagram, TikTok…" autocomplete="off" />
+        </div>
+      </div>
       <p class="scheduler-note">Orders placed today arrive within 1–2 days. We'll confirm your delivery window by email.</p>
     </div>
 
@@ -897,12 +903,13 @@
       }
     };
 
-    const FORMSPREE_URL = 'https://formspree.io/f/REPLACE_YOUR_FORMSPREE_ID';
+    const FORMSPREE_URL = 'https://formspree.io/f/REPLACE_WITH_YOUR_ID'; // ← paste your Formspree form ID here
 
-    const name         = document.getElementById('customerName').value.trim();
-    const email        = document.getElementById('customerEmail').value.trim();
-    const deliveryDate = document.getElementById('deliveryDate').value;
-    const deliveryTime = document.getElementById('deliveryTime').value;
+    const name           = document.getElementById('customerName').value.trim();
+    const email          = document.getElementById('customerEmail').value.trim();
+    const deliveryDate   = document.getElementById('deliveryDate').value;
+    const deliveryTime   = document.getElementById('deliveryTime').value;
+    const referralSource = document.getElementById('referralSource').value.trim();
     const disc         = orderType === 'subscribe' ? SUB_DISC : 0;
     const pack         = PACK_OPTIONS[selectedPortion][selectedPackIndex];
     const total        = '$' + (pack.total * (1 - disc)).toFixed(2);
@@ -952,6 +959,7 @@
             total:          total,
             delivery_date:  deliveryDate,
             delivery_time:  deliveryTime,
+            referred_by:    referralSource || 'Not provided',
             _subject:       `🔥 New Forge Oats Order — ${pack.cups}-Pack (${flavorLabel}) ${portionLabel} from ${name}`,
           })
         });
@@ -964,7 +972,7 @@
     if (stripeLink && !stripeLink.includes('REPLACE')) {
       const perCup = '$' + pack.perCup.toFixed(2);
       const ref = encodeURIComponent(
-        `${pack.cups}pack|${orderType}|flavor:${flavorLabel}|portion:${portionLabel}|price:${total}|perCup:${perCup}|date:${deliveryDate}|time:${deliveryTime}|name:${name}`
+        `${pack.cups}pack|${orderType}|flavor:${flavorLabel}|portion:${portionLabel}|price:${total}|perCup:${perCup}|date:${deliveryDate}|time:${deliveryTime}|name:${name}${referralSource ? '|ref:' + referralSource : ''}`
       );
       const successUrl = encodeURIComponent(window.location.origin + window.location.pathname.replace('index.html', '') + 'success.html?client_reference_id=' + ref);
       const url = new URL(stripeLink);
