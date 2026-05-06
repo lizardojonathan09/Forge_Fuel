@@ -64,6 +64,19 @@
 
     /* Portion cards (mini) */
     .portion-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; max-width: 480px; }
+
+    /* Pack size cards */
+    .pack-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+    .pack-card { background: var(--dark); border: 2px solid var(--border); border-radius: 10px; padding: 18px 12px 14px; cursor: pointer; transition: all 0.2s; text-align: center; position: relative; overflow: hidden; }
+    .pack-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; background: var(--border); transition: background 0.2s; }
+    .pack-card.active { border-color: var(--orange); background: rgba(255,107,26,0.06); }
+    .pack-card.active::before { background: linear-gradient(90deg, var(--fire), var(--orange)); }
+    .pack-badge-mini { display: inline-block; font-family: 'Oswald', sans-serif; font-size: 9px; letter-spacing: 1.5px; text-transform: uppercase; padding: 2px 8px; border-radius: 20px; background: rgba(255,107,26,0.15); color: var(--orange); border: 1px solid rgba(255,107,26,0.3); margin-bottom: 8px; }
+    .pack-badge-placeholder { height: 20px; margin-bottom: 8px; }
+    .pack-cup-num { font-family: 'Bebas Neue', sans-serif; font-size: 34px; color: var(--cream); line-height: 1; }
+    .pack-cup-label { font-family: 'Oswald', sans-serif; font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: var(--muted); margin-bottom: 10px; }
+    .pack-sub-price { font-family: 'Oswald', sans-serif; font-size: 17px; font-weight: 600; color: var(--orange); }
+    .pack-per-cup { font-family: 'Oswald', sans-serif; font-size: 10px; letter-spacing: 1px; color: var(--muted); margin-top: 2px; }
     .portion-card { background: var(--dark); border: 2px solid var(--border); border-radius: 10px; padding: 18px 16px; cursor: pointer; transition: all 0.2s; text-align: center; position: relative; overflow: hidden; }
     .portion-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; background: var(--border); transition: background 0.2s; }
     .portion-card.active { border-color: var(--orange); background: rgba(255,107,26,0.06); }
@@ -97,10 +110,13 @@
     .freq-select { width: 100%; max-width: 280px; background: var(--dark); border: 1px solid var(--border); border-radius: 6px; padding: 12px 16px; font-family: 'Oswald', sans-serif; font-size: 15px; letter-spacing: 1px; color: var(--cream); outline: none; transition: border-color 0.2s; appearance: none; -webkit-appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23888' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 14px center; }
     .freq-select:focus { border-color: var(--orange); }
 
-    /* Save button */
+    /* Save / Subscribe buttons */
     .btn-save { background: linear-gradient(135deg, var(--orange), var(--fire)); color: #fff; font-family: 'Oswald', sans-serif; font-size: 15px; font-weight: 600; letter-spacing: 2px; text-transform: uppercase; padding: 14px 36px; border-radius: 4px; border: none; cursor: pointer; box-shadow: 0 4px 20px rgba(255,107,26,0.3); transition: all 0.2s; }
     .btn-save:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 8px 28px rgba(255,107,26,0.45); }
     .btn-save:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+    .btn-ghost-save { background: transparent; color: var(--muted); border: 1px solid var(--border); font-family: 'Oswald', sans-serif; font-size: 14px; font-weight: 500; letter-spacing: 2px; text-transform: uppercase; padding: 13px 28px; border-radius: 4px; cursor: pointer; transition: all 0.2s; }
+    .btn-ghost-save:hover:not(:disabled) { border-color: var(--orange); color: var(--orange); }
+    .btn-ghost-save:disabled { opacity: 0.5; cursor: not-allowed; }
     .save-msg { display: inline-block; font-family: 'Oswald', sans-serif; font-size: 13px; letter-spacing: 1px; margin-left: 14px; opacity: 0; transition: opacity 0.3s; }
     .save-msg.show { opacity: 1; color: var(--green); }
 
@@ -216,9 +232,17 @@
           </div>
         </div>
 
+        <!-- Pack Size -->
+        <div class="sub-section">
+          <div class="sub-label">Pack Size <span style="color:var(--muted);font-size:10px;">— Subscription Pricing</span></div>
+          <div class="pack-grid" id="packGrid">
+            <!-- rendered by renderPackCards() -->
+          </div>
+        </div>
+
         <!-- Flavor mix -->
         <div class="sub-section">
-          <div class="sub-label">Flavor Mix <span style="color:var(--muted);font-size:10px;" id="packLabel">(5-cup pack)</span></div>
+          <div class="sub-label">Flavor Mix <span style="color:var(--muted);font-size:10px;" id="packLabel"></span></div>
           <div class="flavor-grid">
             <div class="flavor-card has-qty" id="cardChoc">
               <div class="flavor-icon">🍫</div>
@@ -263,9 +287,10 @@
           </select>
         </div>
 
-        <!-- Save -->
+        <!-- Save / Subscribe -->
         <div style="display:flex;align-items:center;flex-wrap:wrap;gap:12px;">
-          <button class="btn-save" id="btnSave" onclick="saveSubscription()">Save Changes</button>
+          <button class="btn-ghost-save" id="btnSave" onclick="saveSubscription()">Save Preferences</button>
+          <button class="btn-save" id="btnSubscribe" onclick="subscribeNow()">Subscribe Now →</button>
           <span class="save-msg" id="saveMsg">✓ Saved!</span>
         </div>
 
@@ -303,6 +328,8 @@
   const sb = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
   // ─────────────────────────────────────────────────────────
 
+  const SUB_DISC = 0.10; // 10% subscription discount
+
   const PACK_OPTIONS = {
     full: [
       { cups: 3, perCup: 8.00,  total: 24.00 },
@@ -316,7 +343,19 @@
     ]
   };
 
-  let currentUser = null;
+  const STRIPE_SUB_LINKS = {
+    'full-3': 'https://buy.stripe.com/aFacN59cr8iO7s58uV3ZK09',
+    'full-5': 'https://buy.stripe.com/14AfZh74j8iOeUx12t3ZK0a',
+    'full-7': 'https://buy.stripe.com/14A8wPewLdD8fYB12t3ZK0b',
+    'half-5': 'https://buy.stripe.com/8x24gz4Wb9mS5jXfXn3ZK0f',
+    'half-7': 'https://buy.stripe.com/3cI8wPagvgPkdQt12t3ZK0g',
+    'half-9': 'https://buy.stripe.com/fZudR9dsH0QmcMpfXn3ZK0h',
+  };
+
+  const PACK_BADGES = [null, 'Most Popular', 'Best Value'];
+
+  let currentUser     = null;
+  let selectedPackIndex = 1; // default to Most Popular
   let sub = { chocolate_cups: 5, peanut_butter_cups: 0, portion: 'full', frequency: 'weekly', status: 'active' };
   let flavorCups = { chocolate: 5, 'peanut-butter': 0 };
 
@@ -347,6 +386,11 @@
     const { data } = await sb.from('subscriptions').select('*').eq('customer_id', currentUser.id).single();
     if (data) sub = data;
     flavorCups = { chocolate: sub.chocolate_cups, 'peanut-butter': sub.peanut_butter_cups };
+    // Derive selected pack index from saved cup total
+    const loadedTotal = sub.chocolate_cups + sub.peanut_butter_cups;
+    const opts = PACK_OPTIONS[sub.portion];
+    const foundIdx = opts.findIndex(o => o.cups === loadedTotal);
+    selectedPackIndex = foundIdx >= 0 ? foundIdx : 1;
     renderSubscription();
   }
 
@@ -363,6 +407,8 @@
     setStatus(sub.status, false);
     // Portion
     selectPortion(sub.portion, false);
+    // Pack cards (render with current selectedPackIndex derived in loadSubscription)
+    renderPackCards();
     // Frequency
     document.getElementById('freqSelect').value = sub.frequency || 'weekly';
     // Flavors
@@ -408,10 +454,37 @@
     document.getElementById('portionFull').classList.toggle('active', portion === 'full');
     document.getElementById('portionHalf').classList.toggle('active', portion === 'half');
     if (update) {
-      // Reset flavors to all-chocolate for new portion
-      const packCups = PACK_OPTIONS[portion][1].cups; // default to Most Popular
+      selectedPackIndex = 1; // reset to Most Popular
+      const packCups = PACK_OPTIONS[portion][selectedPackIndex].cups;
       flavorCups = { chocolate: packCups, 'peanut-butter': 0 };
+      renderPackCards();
     }
+    updateFlavorDisplay();
+  }
+
+  function renderPackCards() {
+    const opts = PACK_OPTIONS[sub.portion];
+    const grid = document.getElementById('packGrid');
+    grid.innerHTML = opts.map((opt, i) => {
+      const subTotal  = (opt.total  * (1 - SUB_DISC)).toFixed(2);
+      const subPerCup = (opt.perCup * (1 - SUB_DISC)).toFixed(2);
+      const badge     = PACK_BADGES[i];
+      return `
+        <div class="pack-card ${i === selectedPackIndex ? 'active' : ''}" onclick="selectPack(${i})">
+          ${badge ? `<div class="pack-badge-mini">${badge}</div>` : '<div class="pack-badge-placeholder"></div>'}
+          <div class="pack-cup-num">${opt.cups}</div>
+          <div class="pack-cup-label">cups</div>
+          <div class="pack-sub-price">$${subTotal}</div>
+          <div class="pack-per-cup">$${subPerCup}/cup</div>
+        </div>`;
+    }).join('');
+  }
+
+  function selectPack(index) {
+    selectedPackIndex = index;
+    const packCups = PACK_OPTIONS[sub.portion][selectedPackIndex].cups;
+    flavorCups = { chocolate: packCups, 'peanut-butter': 0 };
+    renderPackCards();
     updateFlavorDisplay();
   }
 
@@ -423,65 +496,52 @@
   }
 
   function adjustFlavor(flavor, delta) {
-    const maxCups = PACK_OPTIONS[sub.portion][PACK_OPTIONS[sub.portion].length - 1].cups;
-    const minCups = PACK_OPTIONS[sub.portion][0].cups;
-    const total   = flavorCups.chocolate + flavorCups['peanut-butter'];
-    const newVal  = flavorCups[flavor] + delta;
+    const packCups = PACK_OPTIONS[sub.portion][selectedPackIndex].cups;
+    const total    = flavorCups.chocolate + flavorCups['peanut-butter'];
+    const newVal   = flavorCups[flavor] + delta;
     if (newVal < 0) return;
-    // Allow growing up to max pack size, or shrinking
-    if (delta > 0 && total >= maxCups) return;
+    if (delta > 0 && total >= packCups) return;
     flavorCups[flavor] = newVal;
     updateFlavorDisplay();
   }
 
   function updateFlavorDisplay() {
-    const choc  = flavorCups.chocolate;
-    const pb    = flavorCups['peanut-butter'];
-    const total = choc + pb;
-    const opts  = PACK_OPTIONS[sub.portion];
-    // Find closest valid pack
-    const validPack = opts.find(o => o.cups === total);
+    const choc     = flavorCups.chocolate;
+    const pb       = flavorCups['peanut-butter'];
+    const total    = choc + pb;
+    const opt      = PACK_OPTIONS[sub.portion][selectedPackIndex];
+    const packCups = opt.cups;
+    const subTotal = (opt.total * (1 - SUB_DISC)).toFixed(2);
+    const subPerCup= (opt.perCup * (1 - SUB_DISC)).toFixed(2);
 
     document.getElementById('qtyChocolate').textContent = choc;
     document.getElementById('qtyPB').textContent        = pb;
     document.getElementById('cardChoc').classList.toggle('has-qty', choc > 0);
     document.getElementById('cardPB').classList.toggle('has-qty',   pb > 0);
 
-    const maxCups = opts[opts.length - 1].cups;
-    document.getElementById('btnChocPlus').disabled  = total >= maxCups;
-    document.getElementById('btnPBPlus').disabled    = total >= maxCups;
+    document.getElementById('btnChocPlus').disabled  = total >= packCups;
+    document.getElementById('btnPBPlus').disabled    = total >= packCups;
     document.getElementById('btnChocMinus').disabled = choc <= 0;
     document.getElementById('btnPBMinus').disabled   = pb   <= 0;
 
-    const bar      = document.getElementById('flavorBar');
-    const numsEl   = document.getElementById('flavorNums');
-    const hintEl   = document.getElementById('flavorHint');
-    const checkEl  = document.getElementById('flavorCheck');
+    const bar     = document.getElementById('flavorBar');
+    const numsEl  = document.getElementById('flavorNums');
+    const hintEl  = document.getElementById('flavorHint');
+    const checkEl = document.getElementById('flavorCheck');
 
-    // Show pack label
-    const packLabel = validPack ? `(${total}-cup pack · $${validPack.total.toFixed(2)})` : `(${total} cups — pick ${opts.map(o=>o.cups).join(', ')} for a valid pack)`;
-    document.getElementById('packLabel').textContent = packLabel;
+    document.getElementById('packLabel').textContent = `(${packCups}-cup pack · $${subTotal} sub price)`;
 
-    numsEl.textContent = `${total}`;
-    const matched = !!validPack;
+    const matched = total === packCups;
+    numsEl.textContent = `${total} / ${packCups}`;
     bar.classList.toggle('matched', matched);
     numsEl.classList.toggle('matched', matched);
-    hintEl.textContent   = matched ? 'cups — valid pack' : `cups — adjust to ${opts.map(o=>o.cups).join(', ')}`;
+    hintEl.textContent    = matched ? `cups — $${subTotal} ($${subPerCup}/cup)` : `cups selected`;
     checkEl.style.display = matched ? 'inline' : 'none';
   }
 
   // ── Save ──────────────────────────────────────────────────
-  async function saveSubscription() {
-    const total = flavorCups.chocolate + flavorCups['peanut-butter'];
-    const opts  = PACK_OPTIONS[sub.portion];
-    if (!opts.find(o => o.cups === total)) {
-      alert(`Please set your cups to a valid pack size: ${opts.map(o => o.cups).join(', ')}`);
-      return;
-    }
-    const btn = document.getElementById('btnSave');
-    btn.textContent = 'Saving…'; btn.disabled = true;
-
-    const payload = {
+  function buildSubPayload() {
+    return {
       customer_id:        currentUser.id,
       chocolate_cups:     flavorCups.chocolate,
       peanut_butter_cups: flavorCups['peanut-butter'],
@@ -490,15 +550,51 @@
       status:             sub.status,
       updated_at:         new Date().toISOString(),
     };
+  }
 
-    const { error } = await sb.from('subscriptions').upsert(payload, { onConflict: 'customer_id' });
+  function validateFlavorMatch() {
+    const packCups = PACK_OPTIONS[sub.portion][selectedPackIndex].cups;
+    const total    = flavorCups.chocolate + flavorCups['peanut-butter'];
+    if (total !== packCups) {
+      alert(`Please set your flavor cups to exactly ${packCups} to match your selected pack.`);
+      return false;
+    }
+    return true;
+  }
 
-    btn.textContent = 'Save Changes'; btn.disabled = false;
+  async function saveSubscription() {
+    if (!validateFlavorMatch()) return;
+    const btn = document.getElementById('btnSave');
+    btn.textContent = 'Saving…'; btn.disabled = true;
+    const { error } = await sb.from('subscriptions').upsert(buildSubPayload(), { onConflict: 'customer_id' });
+    btn.textContent = 'Save Preferences'; btn.disabled = false;
     const msgEl = document.getElementById('saveMsg');
     if (error) { msgEl.textContent = '✗ Error saving'; msgEl.style.color = 'var(--fire)'; }
     else        { msgEl.textContent = '✓ Saved!';       msgEl.style.color = 'var(--green)'; }
     msgEl.classList.add('show');
     setTimeout(() => msgEl.classList.remove('show'), 3000);
+  }
+
+  async function subscribeNow() {
+    if (!validateFlavorMatch()) return;
+    const btn = document.getElementById('btnSubscribe');
+    btn.textContent = 'Saving…'; btn.disabled = true;
+    // Save preferences to Supabase
+    await sb.from('subscriptions').upsert(buildSubPayload(), { onConflict: 'customer_id' });
+    // Build Stripe URL
+    const packCups = PACK_OPTIONS[sub.portion][selectedPackIndex].cups;
+    const key      = `${sub.portion}-${packCups}`;
+    const stripeUrl= STRIPE_SUB_LINKS[key];
+    if (!stripeUrl) {
+      alert('Could not find a Stripe link for this configuration. Please contact support.');
+      btn.textContent = 'Subscribe Now →'; btn.disabled = false;
+      return;
+    }
+    const params = new URLSearchParams({
+      prefilled_email:      currentUser.email,
+      client_reference_id:  currentUser.id,
+    });
+    window.location.href = `${stripeUrl}?${params.toString()}`;
   }
 
   // ── Sign out ───────────────────────────────────────────────
