@@ -392,9 +392,62 @@
       <p class="section-desc">Four simple choices. We handle everything else.</p>
     </div>
 
-    <!-- STEP 1: FLAVOR QUANTITIES -->
+    <!-- STEP 1: PORTION SIZE -->
     <div class="order-step">
-      <div class="step-label"><span class="step-num">1</span> Choose Your Flavors</div>
+      <div class="step-label"><span class="step-num">1</span> Choose Your Portion Size</div>
+      <div class="option-grid-2">
+        <div class="option-card active" onclick="selectOption(this,'portion','full')" data-group="portion">
+          <div class="option-name">Full Serving</div>
+          <div class="portion-macros">
+            <div class="pm-item"><div class="pm-num">40g</div><div class="pm-label">Protein</div></div>
+            <div class="pm-item"><div class="pm-num">450</div><div class="pm-label">Calories</div></div>
+            <div class="pm-item"><div class="pm-num">10g</div><div class="pm-label">Fiber</div></div>
+          </div>
+          <div class="option-desc">Complete performance meal. Max fuel for hard training days.</div>
+        </div>
+        <div class="option-card" onclick="selectOption(this,'portion','half')" data-group="portion">
+          <div class="option-name">Half Serving</div>
+          <div class="portion-macros">
+            <div class="pm-item"><div class="pm-num">20g</div><div class="pm-label">Protein</div></div>
+            <div class="pm-item"><div class="pm-num">225</div><div class="pm-label">Calories</div></div>
+            <div class="pm-item"><div class="pm-num">5g</div><div class="pm-label">Fiber</div></div>
+          </div>
+          <div class="option-desc">Lighter fuel. Great as a snack or alongside another meal.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- STEP 2: PACK SIZE -->
+    <div class="order-step">
+      <div class="step-label"><span class="step-num">2</span> Choose Your Pack Size</div>
+      <div class="pack-grid" id="packGrid">
+        <div class="pack-card" onclick="selectPack(this,0)" data-index="0">
+          <div class="pack-badge hidden">_</div>
+          <div class="pack-cups">3<span>Cup Pack</span></div>
+          <div class="pack-price-per">$8.00 per cup</div>
+          <div class="pack-total">$24.00</div>
+          <div class="pack-savings">&nbsp;</div>
+        </div>
+        <div class="pack-card active" onclick="selectPack(this,1)" data-index="1">
+          <div class="pack-badge">Most Popular</div>
+          <div class="pack-cups">5<span>Cup Pack</span></div>
+          <div class="pack-price-per">$7.50 per cup</div>
+          <div class="pack-total">$37.50</div>
+          <div class="pack-savings">Save $2.50 vs 3-pack rate</div>
+        </div>
+        <div class="pack-card" onclick="selectPack(this,2)" data-index="2">
+          <div class="pack-badge">Best Value</div>
+          <div class="pack-cups">7<span>Cup Pack</span></div>
+          <div class="pack-price-per">$7.00 per cup</div>
+          <div class="pack-total">$49.00</div>
+          <div class="pack-savings">Save $7.00 vs 3-pack rate</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- STEP 3: FLAVOR QUANTITIES -->
+    <div class="order-step">
+      <div class="step-label"><span class="step-num">3</span> Choose Your Flavors</div>
       <div class="flavor-qty-grid">
         <div class="flavor-qty-card" id="qtyCardChocolate">
           <div class="flavor-qty-icon">🍫</div>
@@ -428,59 +481,6 @@
         <span class="flavor-total-nums matched" id="flavorTotalNums">5 / 5</span>
         <span class="flavor-total-hint" id="flavorTotalHint">cups selected</span>
         <span class="flavor-total-check" id="flavorTotalCheck">✓</span>
-      </div>
-    </div>
-
-    <!-- STEP 2: PORTION SIZE -->
-    <div class="order-step">
-      <div class="step-label"><span class="step-num">2</span> Choose Your Portion Size</div>
-      <div class="option-grid-2">
-        <div class="option-card active" onclick="selectOption(this,'portion','full')" data-group="portion">
-          <div class="option-name">Full Serving</div>
-          <div class="portion-macros">
-            <div class="pm-item"><div class="pm-num">40g</div><div class="pm-label">Protein</div></div>
-            <div class="pm-item"><div class="pm-num">450</div><div class="pm-label">Calories</div></div>
-            <div class="pm-item"><div class="pm-num">10g</div><div class="pm-label">Fiber</div></div>
-          </div>
-          <div class="option-desc">Complete performance meal. Max fuel for hard training days.</div>
-        </div>
-        <div class="option-card" onclick="selectOption(this,'portion','half')" data-group="portion">
-          <div class="option-name">Half Serving</div>
-          <div class="portion-macros">
-            <div class="pm-item"><div class="pm-num">20g</div><div class="pm-label">Protein</div></div>
-            <div class="pm-item"><div class="pm-num">225</div><div class="pm-label">Calories</div></div>
-            <div class="pm-item"><div class="pm-num">5g</div><div class="pm-label">Fiber</div></div>
-          </div>
-          <div class="option-desc">Lighter fuel. Great as a snack or alongside another meal.</div>
-        </div>
-      </div>
-    </div>
-
-    <!-- STEP 3: PACK SIZE -->
-    <div class="order-step">
-      <div class="step-label"><span class="step-num">3</span> Choose Your Pack Size</div>
-      <div class="pack-grid" id="packGrid">
-        <div class="pack-card" onclick="selectPack(this,0)" data-index="0">
-          <div class="pack-badge hidden">_</div>
-          <div class="pack-cups">3<span>Cup Pack</span></div>
-          <div class="pack-price-per">$8.00 per cup</div>
-          <div class="pack-total">$24.00</div>
-          <div class="pack-savings">&nbsp;</div>
-        </div>
-        <div class="pack-card active" onclick="selectPack(this,1)" data-index="1">
-          <div class="pack-badge">Most Popular</div>
-          <div class="pack-cups">5<span>Cup Pack</span></div>
-          <div class="pack-price-per">$7.50 per cup</div>
-          <div class="pack-total">$37.50</div>
-          <div class="pack-savings">Save $2.50 vs 3-pack rate</div>
-        </div>
-        <div class="pack-card" onclick="selectPack(this,2)" data-index="2">
-          <div class="pack-badge">Best Value</div>
-          <div class="pack-cups">7<span>Cup Pack</span></div>
-          <div class="pack-price-per">$7.00 per cup</div>
-          <div class="pack-total">$49.00</div>
-          <div class="pack-savings">Save $7.00 vs 3-pack rate</div>
-        </div>
       </div>
     </div>
 
