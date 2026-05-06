@@ -145,6 +145,9 @@
     .option-card.active { border-color:var(--orange); background:linear-gradient(180deg,rgba(255,107,26,0.08) 0%,var(--card) 100%); transform:translateY(-4px); box-shadow:0 12px 40px rgba(255,107,26,0.18); }
     .option-card.active::before { background:linear-gradient(90deg,var(--fire),var(--orange)); }
     .option-icon { font-size:40px; margin-bottom:12px; line-height:1; }
+    .portion-img-wrap { width:100%; aspect-ratio:1/1; overflow:hidden; border-radius:8px; margin-bottom:16px; background:var(--dark); }
+    .portion-img { width:100%; height:100%; object-fit:cover; display:block; transition:transform 0.4s ease; }
+    .option-card:hover .portion-img { transform:scale(1.04); }
     .option-name { font-family:'Oswald',sans-serif; font-size:20px; font-weight:600; letter-spacing:1px; color:var(--cream); margin-bottom:8px; }
     .option-desc { font-size:14px; color:rgba(237,232,220,0.6); line-height:1.5; }
     .portion-macros { display:flex; justify-content:center; gap:16px; margin:12px 0; }
@@ -397,6 +400,7 @@
       <div class="step-label"><span class="step-num">1</span> Choose Your Portion Size</div>
       <div class="option-grid-2">
         <div class="option-card active" onclick="selectOption(this,'portion','full')" data-group="portion">
+          <div class="portion-img-wrap"><img src="product-cup.jpg" alt="Full Serving Cup" class="portion-img" /></div>
           <div class="option-name">Full Serving</div>
           <div class="portion-macros">
             <div class="pm-item"><div class="pm-num">40g</div><div class="pm-label">Protein</div></div>
@@ -406,6 +410,7 @@
           <div class="option-desc">Complete performance meal. Max fuel for hard training days.</div>
         </div>
         <div class="option-card" onclick="selectOption(this,'portion','half')" data-group="portion">
+          <div class="portion-img-wrap"><img src="cup-half.jpg" alt="Half Serving Cup" class="portion-img" /></div>
           <div class="option-name">Half Serving</div>
           <div class="portion-macros">
             <div class="pm-item"><div class="pm-num">20g</div><div class="pm-label">Protein</div></div>
