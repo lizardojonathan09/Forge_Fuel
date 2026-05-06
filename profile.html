@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>My Account – Forge Oats</title>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Oswald:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --black: #080808; --dark: #111111; --card: #181818;
+      --orange: #FF6B1A; --fire: #FF3D00; --gold: #C9A04A;
+      --cream: #EDE8DC; --muted: #888888; --border: #2A2A2A;
+    }
+    body { background: var(--black); color: var(--cream); font-family: 'Inter', sans-serif; min-height: 100vh; display: flex; flex-direction: column; }
+
+    nav { position: fixed; top: 0; left: 0; right: 0; z-index: 100; display: flex; align-items: center; justify-content: space-between; padding: 14px 48px; background: rgba(8,8,8,0.92); backdrop-filter: blur(12px); border-bottom: 1px solid var(--border); }
+    .nav-logo { display: flex; align-items: center; gap: 12px; text-decoration: none; }
+    .nav-logo img { height: 46px; width: auto; }
+    .nav-logo-text { font-family: 'Bebas Neue', sans-serif; font-size: 22px; letter-spacing: 2px; color: var(--cream); line-height: 1; }
+    .nav-logo-text span { display: block; font-family: 'Oswald', sans-serif; font-size: 10px; letter-spacing: 4px; color: var(--orange); font-weight: 500; }
+    .btn-nav { background: var(--orange); color: #fff; font-family: 'Oswald', sans-serif; font-size: 13px; font-weight: 600; letter-spacing: 2px; text-transform: uppercase; padding: 10px 24px; border-radius: 4px; text-decoration: none; transition: background 0.2s; border: none; cursor: pointer; }
+    .btn-nav:hover { background: var(--fire); }
+
+    .auth-main { flex: 1; display: flex; align-items: center; justify-content: center; padding: 120px 24px 80px; background: radial-gradient(ellipse 60% 40% at 50% 80%, rgba(255,107,26,0.12) 0%, transparent 70%), var(--black); }
+
+    .auth-card { background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 48px 40px; width: 100%; max-width: 440px; position: relative; overflow: hidden; }
+    .auth-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: linear-gradient(90deg, var(--fire), var(--orange)); }
+
+    .auth-eyebrow { font-family: 'Oswald', sans-serif; font-size: 11px; letter-spacing: 4px; color: var(--orange); text-transform: uppercase; margin-bottom: 8px; text-align: center; }
+    .auth-title { font-family: 'Bebas Neue', sans-serif; font-size: 40px; letter-spacing: 2px; color: var(--cream); text-align: center; margin-bottom: 32px; }
+
+    .auth-tabs { display: flex; background: var(--dark); border: 1px solid var(--border); border-radius: 8px; overflow: hidden; margin-bottom: 32px; }
+    .auth-tab { flex: 1; padding: 12px; font-family: 'Oswald', sans-serif; font-size: 14px; letter-spacing: 1.5px; text-transform: uppercase; background: transparent; border: none; color: var(--muted); cursor: pointer; transition: all 0.2s; }
+    .auth-tab.active { background: var(--orange); color: #fff; }
+
+    .auth-form { display: flex; flex-direction: column; gap: 16px; }
+    .form-field label { display: block; font-family: 'Oswald', sans-serif; font-size: 11px; letter-spacing: 3px; text-transform: uppercase; color: var(--muted); margin-bottom: 8px; }
+    .form-field input { width: 100%; background: var(--dark); border: 1px solid var(--border); border-radius: 6px; padding: 14px 16px; font-family: 'Inter', sans-serif; font-size: 15px; color: var(--cream); outline: none; transition: border-color 0.2s; }
+    .form-field input:focus { border-color: var(--orange); }
+    .form-field input::placeholder { color: var(--muted); }
+
+    .btn-auth { width: 100%; background: linear-gradient(135deg, var(--orange), var(--fire)); color: #fff; font-family: 'Oswald', sans-serif; font-size: 16px; font-weight: 600; letter-spacing: 2px; text-transform: uppercase; padding: 16px; border-radius: 4px; border: none; cursor: pointer; margin-top: 8px; box-shadow: 0 4px 24px rgba(255,107,26,0.3); transition: all 0.2s; }
+    .btn-auth:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 8px 32px rgba(255,107,26,0.45); }
+    .btn-auth:disabled { opacity: 0.6; cursor: not-allowed; }
+
+    .auth-link { text-align: center; font-size: 13px; color: var(--muted); margin-top: 16px; }
+    .auth-link button { color: var(--orange); background: none; border: none; cursor: pointer; font-size: 13px; text-decoration: underline; padding: 0; }
+
+    .auth-msg { font-size: 14px; padding: 12px 16px; border-radius: 6px; margin-top: 16px; text-align: center; display: none; }
+    .auth-msg.error   { background: rgba(255,61,0,0.12);  border: 1px solid rgba(255,61,0,0.3);  color: #FF6060; display: block; }
+    .auth-msg.success { background: rgba(92,184,92,0.12); border: 1px solid rgba(92,184,92,0.3); color: #5CB85C; display: block; }
+
+    footer { background: var(--black); border-top: 1px solid var(--border); padding: 32px 48px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px; }
+    .footer-brand { font-family: 'Bebas Neue', sans-serif; font-size: 24px; letter-spacing: 4px; color: var(--cream); }
+    .footer-brand span { color: var(--orange); }
+    .footer-copy { font-size: 12px; color: var(--muted); }
+
+    @media (max-width: 600px) {
+      nav { padding: 16px 20px; }
+      .auth-card { padding: 36px 24px; }
+      footer { flex-direction: column; text-align: center; }
+    }
+  </style>
+</head>
+<body>
+
+<nav>
+  <a href="index.html" class="nav-logo">
+    <img src="forge-logo.png" alt="Forge Oats" />
+    <div class="nav-logo-text">FORGE OATS<span>FUEL THE WORK</span></div>
+  </a>
+  <a href="index.html" class="btn-nav">Order Now</a>
+</nav>
+
+<main class="auth-main">
+  <div class="auth-card">
+    <p class="auth-eyebrow">Customer Portal</p>
+    <h1 class="auth-title">YOUR ACCOUNT</h1>
+
+    <div class="auth-tabs">
+      <button class="auth-tab active" id="tabBtnSignin" onclick="showTab('signin')">Sign In</button>
+      <button class="auth-tab" id="tabBtnSignup" onclick="showTab('signup')">Create Account</button>
+    </div>
+
+    <!-- SIGN IN -->
+    <div id="formSignin">
+      <div class="auth-form">
+        <div class="form-field">
+          <label>Email</label>
+          <input type="email" id="signinEmail" placeholder="you@email.com" />
+        </div>
+        <div class="form-field">
+          <label>Password</label>
+          <input type="password" id="signinPassword" placeholder="••••••••" />
+        </div>
+        <button class="btn-auth" id="btnSignin" onclick="handleSignIn()">Sign In</button>
+      </div>
+      <div class="auth-link"><button onclick="showTab('forgot')">Forgot your password?</button></div>
+    </div>
+
+    <!-- SIGN UP -->
+    <div id="formSignup" style="display:none">
+      <div class="auth-form">
+        <div class="form-field">
+          <label>Full Name</label>
+          <input type="text" id="signupName" placeholder="First &amp; last name" />
+        </div>
+        <div class="form-field">
+          <label>Email</label>
+          <input type="email" id="signupEmail" placeholder="you@email.com" />
+        </div>
+        <div class="form-field">
+          <label>Password</label>
+          <input type="password" id="signupPassword" placeholder="Min. 8 characters" />
+        </div>
+        <button class="btn-auth" id="btnSignup" onclick="handleSignUp()">Create Account</button>
+      </div>
+    </div>
+
+    <!-- FORGOT PASSWORD -->
+    <div id="formForgot" style="display:none">
+      <div class="auth-form">
+        <div class="form-field">
+          <label>Email</label>
+          <input type="email" id="forgotEmail" placeholder="you@email.com" />
+        </div>
+        <button class="btn-auth" onclick="handleForgotPassword()">Send Reset Link</button>
+      </div>
+      <div class="auth-link"><button onclick="showTab('signin')">Back to sign in</button></div>
+    </div>
+
+    <div id="authMsg" class="auth-msg"></div>
+  </div>
+</main>
+
+<footer>
+  <div>
+    <div class="footer-brand">FORGE <span>OATS</span></div>
+  </div>
+  <div class="footer-copy">© 2025 Forge Oats. All rights reserved.</div>
+</footer>
+
+<script>
+  const SUPABASE_URL      = 'https://YOUR_PROJECT_ID.supabase.co'; // ← replace
+  const SUPABASE_ANON_KEY = 'YOUR_ANON_KEY';                       // ← replace
+  const { createClient }  = supabase;
+  const sb = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+  // Redirect if already logged in
+  (async () => {
+    const { data: { session } } = await sb.auth.getSession();
+    if (session) window.location.href = 'dashboard.html';
+  })();
+
+  // Pre-select tab from URL param e.g. profile.html?tab=signup
+  const urlTab = new URLSearchParams(window.location.search).get('tab');
+  if (urlTab === 'signup') showTab('signup');
+
+  function showTab(tab) {
+    ['signin','signup','forgot'].forEach(t => {
+      document.getElementById('formSign' + (t === 'forgot' ? 'in' : '') + t === 'forgot' ? '' : t).style.display = 'none';
+    });
+    document.getElementById('formSignin').style.display = tab === 'signin' ? 'block' : 'none';
+    document.getElementById('formSignup').style.display = tab === 'signup' ? 'block' : 'none';
+    document.getElementById('formForgot').style.display = tab === 'forgot' ? 'block' : 'none';
+    document.getElementById('tabBtnSignin').classList.toggle('active', tab === 'signin');
+    document.getElementById('tabBtnSignup').classList.toggle('active', tab === 'signup');
+    showMsg('', '');
+  }
+
+  function showMsg(text, type) {
+    const el = document.getElementById('authMsg');
+    el.textContent = text;
+    el.className = 'auth-msg' + (type ? ' ' + type : '');
+  }
+
+  async function handleSignIn() {
+    const email    = document.getElementById('signinEmail').value.trim();
+    const password = document.getElementById('signinPassword').value;
+    if (!email || !password) return showMsg('Please fill in all fields.', 'error');
+    const btn = document.getElementById('btnSignin');
+    btn.textContent = 'Signing in…'; btn.disabled = true;
+    const { error } = await sb.auth.signInWithPassword({ email, password });
+    if (error) { showMsg(error.message, 'error'); btn.textContent = 'Sign In'; btn.disabled = false; }
+    else window.location.href = 'dashboard.html';
+  }
+
+  async function handleSignUp() {
+    const name     = document.getElementById('signupName').value.trim();
+    const email    = document.getElementById('signupEmail').value.trim();
+    const password = document.getElementById('signupPassword').value;
+    if (!name || !email || !password) return showMsg('Please fill in all fields.', 'error');
+    if (password.length < 8) return showMsg('Password must be at least 8 characters.', 'error');
+    const btn = document.getElementById('btnSignup');
+    btn.textContent = 'Creating account…'; btn.disabled = true;
+    const { data, error } = await sb.auth.signUp({ email, password });
+    if (error) { showMsg(error.message, 'error'); btn.textContent = 'Create Account'; btn.disabled = false; return; }
+    if (data.user) {
+      await sb.from('customers').upsert({ id: data.user.id, name, email });
+    }
+    showMsg('Account created! Check your email to confirm, then sign in.', 'success');
+    btn.textContent = 'Create Account'; btn.disabled = false;
+  }
+
+  async function handleForgotPassword() {
+    const email = document.getElementById('forgotEmail').value.trim();
+    if (!email) return showMsg('Please enter your email.', 'error');
+    const { error } = await sb.auth.resetPasswordForEmail(email, {
+      redirectTo: window.location.origin + '/dashboard.html'
+    });
+    if (error) showMsg(error.message, 'error');
+    else showMsg('Reset link sent! Check your inbox.', 'success');
+  }
+
+  // Allow Enter key to submit
+  document.addEventListener('keydown', e => {
+    if (e.key !== 'Enter') return;
+    const active = document.getElementById('formSignin').style.display !== 'none' ? 'signin'
+                 : document.getElementById('formSignup').style.display !== 'none' ? 'signup' : 'forgot';
+    if (active === 'signin') handleSignIn();
+    else if (active === 'signup') handleSignUp();
+    else handleForgotPassword();
+  });
+</script>
+</body>
+</html>

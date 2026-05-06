@@ -1,0 +1,511 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>My Dashboard – Forge Oats</title>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Oswald:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --black: #080808; --dark: #111111; --card: #181818;
+      --orange: #FF6B1A; --fire: #FF3D00; --gold: #C9A04A;
+      --cream: #EDE8DC; --muted: #888888; --border: #2A2A2A;
+      --green: #5CB85C;
+    }
+    body { background: var(--black); color: var(--cream); font-family: 'Inter', sans-serif; min-height: 100vh; }
+
+    /* NAV */
+    nav { position: fixed; top: 0; left: 0; right: 0; z-index: 100; display: flex; align-items: center; justify-content: space-between; padding: 14px 48px; background: rgba(8,8,8,0.92); backdrop-filter: blur(12px); border-bottom: 1px solid var(--border); }
+    .nav-logo { display: flex; align-items: center; gap: 12px; text-decoration: none; }
+    .nav-logo img { height: 46px; width: auto; }
+    .nav-logo-text { font-family: 'Bebas Neue', sans-serif; font-size: 22px; letter-spacing: 2px; color: var(--cream); line-height: 1; }
+    .nav-logo-text span { display: block; font-family: 'Oswald', sans-serif; font-size: 10px; letter-spacing: 4px; color: var(--orange); font-weight: 500; }
+    .nav-right { display: flex; align-items: center; gap: 16px; }
+    .nav-user { font-family: 'Oswald', sans-serif; font-size: 14px; letter-spacing: 1px; color: var(--muted); }
+    .btn-nav { background: var(--orange); color: #fff; font-family: 'Oswald', sans-serif; font-size: 13px; font-weight: 600; letter-spacing: 2px; text-transform: uppercase; padding: 10px 24px; border-radius: 4px; text-decoration: none; transition: background 0.2s; border: none; cursor: pointer; }
+    .btn-nav:hover { background: var(--fire); }
+    .btn-nav-ghost { background: transparent; color: var(--muted); border: 1px solid var(--border); font-family: 'Oswald', sans-serif; font-size: 13px; font-weight: 500; letter-spacing: 2px; text-transform: uppercase; padding: 10px 20px; border-radius: 4px; cursor: pointer; transition: all 0.2s; }
+    .btn-nav-ghost:hover { border-color: var(--orange); color: var(--orange); }
+
+    /* HERO */
+    .dash-hero { padding: 120px 48px 60px; background: radial-gradient(ellipse 80% 40% at 50% 100%, rgba(255,107,26,0.1) 0%, transparent 70%), var(--black); border-bottom: 1px solid var(--border); }
+    .dash-hero-inner { max-width: 1000px; margin: 0 auto; display: flex; justify-content: space-between; align-items: flex-end; flex-wrap: wrap; gap: 20px; }
+    .dash-eyebrow { font-family: 'Oswald', sans-serif; font-size: 12px; letter-spacing: 5px; color: var(--orange); text-transform: uppercase; margin-bottom: 8px; }
+    .dash-title { font-family: 'Bebas Neue', sans-serif; font-size: clamp(36px, 5vw, 64px); letter-spacing: 2px; color: var(--cream); line-height: 1; }
+    .dash-title span { color: var(--orange); }
+    .dash-meta { font-size: 14px; color: var(--muted); margin-top: 8px; }
+    .status-pill { display: inline-flex; align-items: center; gap: 6px; padding: 6px 14px; border-radius: 20px; font-family: 'Oswald', sans-serif; font-size: 12px; letter-spacing: 2px; text-transform: uppercase; }
+    .status-pill.active  { background: rgba(92,184,92,0.15);  border: 1px solid rgba(92,184,92,0.4);  color: var(--green); }
+    .status-pill.paused  { background: rgba(136,136,136,0.15); border: 1px solid rgba(136,136,136,0.3); color: var(--muted); }
+    .status-dot { width: 7px; height: 7px; border-radius: 50%; background: currentColor; }
+
+    /* LAYOUT */
+    .dash-body { max-width: 1000px; margin: 0 auto; padding: 60px 48px 100px; display: grid; grid-template-columns: 1fr 1fr; gap: 32px; align-items: start; }
+
+    /* CARDS */
+    .dash-card { background: var(--card); border: 1px solid var(--border); border-radius: 16px; overflow: hidden; }
+    .dash-card-header { padding: 24px 28px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
+    .dash-card-title { font-family: 'Oswald', sans-serif; font-size: 16px; font-weight: 600; letter-spacing: 2px; text-transform: uppercase; color: var(--cream); }
+    .dash-card-body { padding: 28px; }
+
+    /* SUBSCRIPTION */
+    .sub-card { grid-column: 1 / -1; }
+    .sub-section { margin-bottom: 28px; }
+    .sub-section:last-child { margin-bottom: 0; }
+    .sub-label { font-family: 'Oswald', sans-serif; font-size: 11px; letter-spacing: 3px; text-transform: uppercase; color: var(--muted); margin-bottom: 14px; }
+
+    /* Status toggle */
+    .status-toggle { display: flex; background: var(--dark); border: 1px solid var(--border); border-radius: 8px; overflow: hidden; max-width: 320px; }
+    .status-btn { flex: 1; padding: 12px; font-family: 'Oswald', sans-serif; font-size: 13px; letter-spacing: 1.5px; text-transform: uppercase; background: transparent; border: none; color: var(--muted); cursor: pointer; transition: all 0.2s; }
+    .status-btn.active-on  { background: rgba(92,184,92,0.2); color: var(--green); }
+    .status-btn.active-off { background: rgba(136,136,136,0.15); color: var(--muted); }
+
+    /* Portion cards (mini) */
+    .portion-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; max-width: 480px; }
+    .portion-card { background: var(--dark); border: 2px solid var(--border); border-radius: 10px; padding: 18px 16px; cursor: pointer; transition: all 0.2s; text-align: center; position: relative; overflow: hidden; }
+    .portion-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; background: var(--border); transition: background 0.2s; }
+    .portion-card.active { border-color: var(--orange); background: rgba(255,107,26,0.06); }
+    .portion-card.active::before { background: linear-gradient(90deg, var(--fire), var(--orange)); }
+    .portion-card-name { font-family: 'Oswald', sans-serif; font-size: 15px; font-weight: 600; letter-spacing: 1px; color: var(--cream); margin-bottom: 6px; }
+    .portion-macros { display: flex; justify-content: center; gap: 12px; }
+    .pm-item { text-align: center; }
+    .pm-num { font-family: 'Bebas Neue', sans-serif; font-size: 20px; background: linear-gradient(135deg, var(--orange), var(--gold)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; line-height: 1; }
+    .pm-label { font-family: 'Oswald', sans-serif; font-size: 9px; letter-spacing: 2px; text-transform: uppercase; color: var(--muted); }
+
+    /* Flavor qty */
+    .flavor-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    .flavor-card { background: var(--dark); border: 2px solid var(--border); border-radius: 10px; padding: 20px 16px; text-align: center; transition: all 0.2s; }
+    .flavor-card.has-qty { border-color: var(--orange); background: rgba(255,107,26,0.05); }
+    .flavor-icon { font-size: 28px; margin-bottom: 8px; }
+    .flavor-name { font-family: 'Oswald', sans-serif; font-size: 14px; font-weight: 600; letter-spacing: 1px; color: var(--cream); margin-bottom: 12px; }
+    .qty-control { display: flex; align-items: center; justify-content: center; gap: 14px; }
+    .qty-btn { width: 36px; height: 36px; border-radius: 50%; background: var(--card); border: 1px solid var(--border); color: var(--cream); font-size: 18px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s; padding: 0; font-family: 'Inter', sans-serif; }
+    .qty-btn:hover:not(:disabled) { background: var(--orange); border-color: var(--orange); }
+    .qty-btn:disabled { opacity: 0.25; cursor: not-allowed; }
+    .qty-num { font-family: 'Bebas Neue', sans-serif; font-size: 48px; color: var(--cream); line-height: 1; min-width: 40px; }
+    .qty-cups-label { font-family: 'Oswald', sans-serif; font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: var(--muted); }
+
+    .flavor-total-bar { display: flex; align-items: center; justify-content: center; gap: 8px; padding: 12px 20px; background: var(--dark); border: 1px solid var(--border); border-radius: 8px; font-family: 'Oswald', sans-serif; font-size: 13px; letter-spacing: 2px; text-transform: uppercase; color: var(--muted); margin-top: 14px; transition: border-color 0.3s; }
+    .flavor-total-bar.matched { border-color: rgba(92,184,92,0.5); background: rgba(92,184,92,0.05); }
+    .flavor-total-nums { font-family: 'Bebas Neue', sans-serif; font-size: 20px; color: var(--cream); }
+    .flavor-total-nums.matched { color: var(--green); }
+    .flavor-check { color: var(--green); }
+
+    /* Frequency select */
+    .freq-select { width: 100%; max-width: 280px; background: var(--dark); border: 1px solid var(--border); border-radius: 6px; padding: 12px 16px; font-family: 'Oswald', sans-serif; font-size: 15px; letter-spacing: 1px; color: var(--cream); outline: none; transition: border-color 0.2s; appearance: none; -webkit-appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23888' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 14px center; }
+    .freq-select:focus { border-color: var(--orange); }
+
+    /* Save button */
+    .btn-save { background: linear-gradient(135deg, var(--orange), var(--fire)); color: #fff; font-family: 'Oswald', sans-serif; font-size: 15px; font-weight: 600; letter-spacing: 2px; text-transform: uppercase; padding: 14px 36px; border-radius: 4px; border: none; cursor: pointer; box-shadow: 0 4px 20px rgba(255,107,26,0.3); transition: all 0.2s; }
+    .btn-save:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 8px 28px rgba(255,107,26,0.45); }
+    .btn-save:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+    .save-msg { display: inline-block; font-family: 'Oswald', sans-serif; font-size: 13px; letter-spacing: 1px; margin-left: 14px; opacity: 0; transition: opacity 0.3s; }
+    .save-msg.show { opacity: 1; color: var(--green); }
+
+    /* ORDER HISTORY */
+    .orders-card { grid-column: 1 / -1; }
+    .orders-table { width: 100%; border-collapse: collapse; }
+    .orders-table th { font-family: 'Oswald', sans-serif; font-size: 11px; letter-spacing: 3px; text-transform: uppercase; color: var(--muted); padding: 0 0 16px; text-align: left; border-bottom: 1px solid var(--border); }
+    .orders-table td { padding: 16px 0; border-bottom: 1px solid rgba(42,42,42,0.6); font-size: 14px; color: rgba(237,232,220,0.85); vertical-align: middle; }
+    .orders-table tr:last-child td { border-bottom: none; }
+    .order-type-tag { display: inline-block; font-family: 'Oswald', sans-serif; font-size: 11px; letter-spacing: 1px; text-transform: uppercase; padding: 3px 10px; border-radius: 4px; }
+    .order-type-tag.subscribe { background: rgba(92,184,92,0.15); color: var(--green); border: 1px solid rgba(92,184,92,0.3); }
+    .order-type-tag.one-time  { background: rgba(201,160,74,0.15); color: var(--gold);  border: 1px solid rgba(201,160,74,0.3); }
+    .empty-state { text-align: center; padding: 48px 24px; color: var(--muted); }
+    .empty-state p { font-family: 'Oswald', sans-serif; font-size: 14px; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 16px; }
+    .empty-state a { color: var(--orange); text-decoration: none; font-family: 'Oswald', sans-serif; font-size: 14px; letter-spacing: 1px; }
+
+    /* Loading */
+    .loading { text-align: center; padding: 80px 24px; }
+    .loading-spinner { width: 40px; height: 40px; border: 3px solid var(--border); border-top-color: var(--orange); border-radius: 50%; animation: spin 0.8s linear infinite; margin: 0 auto 16px; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    footer { background: var(--black); border-top: 1px solid var(--border); padding: 32px 48px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px; }
+    .footer-brand { font-family: 'Bebas Neue', sans-serif; font-size: 24px; letter-spacing: 4px; color: var(--cream); }
+    .footer-brand span { color: var(--orange); }
+    .footer-copy { font-size: 12px; color: var(--muted); }
+
+    @media (max-width: 900px) {
+      nav { padding: 16px 24px; }
+      .nav-user { display: none; }
+      .dash-hero { padding: 100px 24px 48px; }
+      .dash-body { padding: 40px 24px 80px; grid-template-columns: 1fr; }
+      .sub-card, .orders-card { grid-column: 1; }
+      .flavor-grid, .portion-grid { grid-template-columns: 1fr 1fr; }
+      footer { flex-direction: column; text-align: center; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <a href="index.html" class="nav-logo">
+    <img src="forge-logo.png" alt="Forge Oats" />
+    <div class="nav-logo-text">FORGE OATS<span>FUEL THE WORK</span></div>
+  </a>
+  <div class="nav-right">
+    <span class="nav-user" id="navUser"></span>
+    <a href="index.html" class="btn-nav-ghost">Order More</a>
+    <button class="btn-nav" onclick="handleSignOut()">Sign Out</button>
+  </div>
+</nav>
+
+<!-- Loading state -->
+<div class="loading" id="loadingState">
+  <div class="loading-spinner"></div>
+  <p style="font-family:'Oswald',sans-serif;letter-spacing:3px;color:var(--muted);text-transform:uppercase;font-size:13px;">Loading your account…</p>
+</div>
+
+<!-- Main dashboard (hidden until loaded) -->
+<div id="dashMain" style="display:none">
+
+  <!-- HERO -->
+  <div class="dash-hero">
+    <div class="dash-hero-inner">
+      <div>
+        <p class="dash-eyebrow">Customer Dashboard</p>
+        <h1 class="dash-title">WELCOME BACK, <span id="heroName">—</span></h1>
+        <p class="dash-meta" id="heroEmail"></p>
+      </div>
+      <div id="subStatusBadge"></div>
+    </div>
+  </div>
+
+  <!-- BODY -->
+  <div class="dash-body">
+
+    <!-- SUBSCRIPTION CARD -->
+    <div class="dash-card sub-card">
+      <div class="dash-card-header">
+        <span class="dash-card-title">🔥 Subscription Settings</span>
+      </div>
+      <div class="dash-card-body">
+
+        <!-- Status -->
+        <div class="sub-section">
+          <div class="sub-label">Subscription Status</div>
+          <div class="status-toggle">
+            <button class="status-btn" id="btnActive" onclick="setStatus('active')">Active</button>
+            <button class="status-btn" id="btnPaused" onclick="setStatus('paused')">Paused</button>
+          </div>
+        </div>
+
+        <!-- Portion -->
+        <div class="sub-section">
+          <div class="sub-label">Portion Size</div>
+          <div class="portion-grid">
+            <div class="portion-card active" id="portionFull" onclick="selectPortion('full')">
+              <div class="portion-card-name">Full Serving</div>
+              <div class="portion-macros">
+                <div class="pm-item"><div class="pm-num">40g</div><div class="pm-label">Protein</div></div>
+                <div class="pm-item"><div class="pm-num">450</div><div class="pm-label">Cal</div></div>
+                <div class="pm-item"><div class="pm-num">10g</div><div class="pm-label">Fiber</div></div>
+              </div>
+            </div>
+            <div class="portion-card" id="portionHalf" onclick="selectPortion('half')">
+              <div class="portion-card-name">Half Serving</div>
+              <div class="portion-macros">
+                <div class="pm-item"><div class="pm-num">20g</div><div class="pm-label">Protein</div></div>
+                <div class="pm-item"><div class="pm-num">225</div><div class="pm-label">Cal</div></div>
+                <div class="pm-item"><div class="pm-num">5g</div><div class="pm-label">Fiber</div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Flavor mix -->
+        <div class="sub-section">
+          <div class="sub-label">Flavor Mix <span style="color:var(--muted);font-size:10px;" id="packLabel">(5-cup pack)</span></div>
+          <div class="flavor-grid">
+            <div class="flavor-card has-qty" id="cardChoc">
+              <div class="flavor-icon">🍫</div>
+              <div class="flavor-name">Chocolate</div>
+              <div class="qty-control">
+                <button class="qty-btn" id="btnChocMinus" onclick="adjustFlavor('chocolate',-1)">−</button>
+                <div>
+                  <div class="qty-num" id="qtyChocolate">5</div>
+                  <div class="qty-cups-label">cups</div>
+                </div>
+                <button class="qty-btn" id="btnChocPlus" onclick="adjustFlavor('chocolate',1)">+</button>
+              </div>
+            </div>
+            <div class="flavor-card" id="cardPB">
+              <div class="flavor-icon">🥜</div>
+              <div class="flavor-name">Peanut Butter</div>
+              <div class="qty-control">
+                <button class="qty-btn" id="btnPBMinus" onclick="adjustFlavor('peanut-butter',-1)">−</button>
+                <div>
+                  <div class="qty-num" id="qtyPB">0</div>
+                  <div class="qty-cups-label">cups</div>
+                </div>
+                <button class="qty-btn" id="btnPBPlus" onclick="adjustFlavor('peanut-butter',1)">+</button>
+              </div>
+            </div>
+          </div>
+          <div class="flavor-total-bar matched" id="flavorBar">
+            <span>Your mix:</span>
+            <span class="flavor-total-nums matched" id="flavorNums">5 / 5</span>
+            <span id="flavorHint">cups selected</span>
+            <span class="flavor-check" id="flavorCheck">✓</span>
+          </div>
+        </div>
+
+        <!-- Frequency -->
+        <div class="sub-section">
+          <div class="sub-label">Delivery Frequency</div>
+          <select class="freq-select" id="freqSelect">
+            <option value="weekly">Every Week</option>
+            <option value="biweekly">Every 2 Weeks</option>
+            <option value="monthly">Every Month</option>
+          </select>
+        </div>
+
+        <!-- Save -->
+        <div style="display:flex;align-items:center;flex-wrap:wrap;gap:12px;">
+          <button class="btn-save" id="btnSave" onclick="saveSubscription()">Save Changes</button>
+          <span class="save-msg" id="saveMsg">✓ Saved!</span>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ORDER HISTORY -->
+    <div class="dash-card orders-card">
+      <div class="dash-card-header">
+        <span class="dash-card-title">📦 Order History</span>
+      </div>
+      <div class="dash-card-body" id="ordersBody">
+        <div class="empty-state">
+          <p>No orders yet</p>
+          <a href="index.html">Place your first order →</a>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<footer>
+  <div>
+    <div class="footer-brand">FORGE <span>OATS</span></div>
+  </div>
+  <div class="footer-copy">© 2025 Forge Oats. All rights reserved.</div>
+</footer>
+
+<script>
+  // ── Supabase config ──────────────────────────────────────
+  const SUPABASE_URL      = 'https://YOUR_PROJECT_ID.supabase.co'; // ← replace
+  const SUPABASE_ANON_KEY = 'YOUR_ANON_KEY';                       // ← replace
+  const { createClient }  = supabase;
+  const sb = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+  // ─────────────────────────────────────────────────────────
+
+  const PACK_OPTIONS = {
+    full: [
+      { cups: 3, perCup: 8.00,  total: 24.00 },
+      { cups: 5, perCup: 7.50,  total: 37.50 },
+      { cups: 7, perCup: 7.00,  total: 49.00 },
+    ],
+    half: [
+      { cups: 5, perCup: 5.00,  total: 25.00 },
+      { cups: 7, perCup: 4.50,  total: 31.50 },
+      { cups: 9, perCup: 4.00,  total: 36.00 },
+    ]
+  };
+
+  let currentUser = null;
+  let sub = { chocolate_cups: 5, peanut_butter_cups: 0, portion: 'full', frequency: 'weekly', status: 'active' };
+  let flavorCups = { chocolate: 5, 'peanut-butter': 0 };
+
+  // ── Init ──────────────────────────────────────────────────
+  (async () => {
+    const { data: { session } } = await sb.auth.getSession();
+    if (!session) { window.location.href = 'profile.html'; return; }
+    currentUser = session.user;
+    await Promise.all([ loadProfile(), loadSubscription(), loadOrders() ]);
+    document.getElementById('loadingState').style.display = 'none';
+    document.getElementById('dashMain').style.display = 'block';
+  })();
+
+  async function loadProfile() {
+    let { data } = await sb.from('customers').select('*').eq('id', currentUser.id).single();
+    if (!data) {
+      // Create profile if missing (e.g. OAuth sign-in)
+      await sb.from('customers').insert({ id: currentUser.id, email: currentUser.email, name: currentUser.email.split('@')[0] });
+      data = { name: currentUser.email.split('@')[0], email: currentUser.email };
+    }
+    const name = data.name || currentUser.email;
+    document.getElementById('heroName').textContent  = name.split(' ')[0].toUpperCase();
+    document.getElementById('heroEmail').textContent = data.email || currentUser.email;
+    document.getElementById('navUser').textContent   = 'Hi, ' + name.split(' ')[0];
+  }
+
+  async function loadSubscription() {
+    const { data } = await sb.from('subscriptions').select('*').eq('customer_id', currentUser.id).single();
+    if (data) sub = data;
+    flavorCups = { chocolate: sub.chocolate_cups, 'peanut-butter': sub.peanut_butter_cups };
+    renderSubscription();
+  }
+
+  async function loadOrders() {
+    const { data: orders } = await sb.from('orders')
+      .select('*').eq('customer_id', currentUser.id)
+      .order('created_at', { ascending: false }).limit(20);
+    if (orders && orders.length > 0) renderOrders(orders);
+  }
+
+  // ── Render ────────────────────────────────────────────────
+  function renderSubscription() {
+    // Status
+    setStatus(sub.status, false);
+    // Portion
+    selectPortion(sub.portion, false);
+    // Frequency
+    document.getElementById('freqSelect').value = sub.frequency || 'weekly';
+    // Flavors
+    updateFlavorDisplay();
+    // Hero badge
+    const badge = document.getElementById('subStatusBadge');
+    badge.innerHTML = `<div class="status-pill ${sub.status}"><div class="status-dot"></div>${sub.status === 'active' ? 'Subscription Active' : 'Subscription Paused'}</div>`;
+  }
+
+  function renderOrders(orders) {
+    const fmt = d => d ? new Date(d).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : '—';
+    document.getElementById('ordersBody').innerHTML = `
+      <div style="overflow-x:auto;">
+        <table class="orders-table">
+          <thead><tr>
+            <th>Date</th><th>Flavor</th><th>Portion</th><th>Pack</th><th>Type</th><th style="text-align:right">Total</th>
+          </tr></thead>
+          <tbody>
+            ${orders.map(o => `<tr>
+              <td>${fmt(o.created_at)}</td>
+              <td>${o.flavor || '—'}</td>
+              <td>${o.portion || '—'}</td>
+              <td>${o.pack_size ? o.pack_size + '-Pack' : '—'}</td>
+              <td><span class="order-type-tag ${o.order_type === 'subscribe' ? 'subscribe' : 'one-time'}">${o.order_type === 'subscribe' ? 'Subscribe' : 'One-Time'}</span></td>
+              <td style="text-align:right;font-family:'Oswald',sans-serif;color:var(--orange);font-weight:600;">${o.total || '—'}</td>
+            </tr>`).join('')}
+          </tbody>
+        </table>
+      </div>`;
+  }
+
+  // ── Controls ──────────────────────────────────────────────
+  function setStatus(status, update = true) {
+    sub.status = status;
+    document.getElementById('btnActive').className = 'status-btn' + (status === 'active' ? ' active-on' : '');
+    document.getElementById('btnPaused').className = 'status-btn' + (status === 'paused' ? ' active-off' : '');
+    const badge = document.getElementById('subStatusBadge');
+    if (badge) badge.innerHTML = `<div class="status-pill ${status}"><div class="status-dot"></div>${status === 'active' ? 'Subscription Active' : 'Subscription Paused'}</div>`;
+  }
+
+  function selectPortion(portion, update = true) {
+    sub.portion = portion;
+    document.getElementById('portionFull').classList.toggle('active', portion === 'full');
+    document.getElementById('portionHalf').classList.toggle('active', portion === 'half');
+    if (update) {
+      // Reset flavors to all-chocolate for new portion
+      const packCups = PACK_OPTIONS[portion][1].cups; // default to Most Popular
+      flavorCups = { chocolate: packCups, 'peanut-butter': 0 };
+    }
+    updateFlavorDisplay();
+  }
+
+  function getPackCups() {
+    // Find the pack option whose total cups matches current flavorCups total, or default to Most Popular
+    const total = flavorCups.chocolate + flavorCups['peanut-butter'];
+    const opts  = PACK_OPTIONS[sub.portion];
+    return opts.find(o => o.cups === total)?.cups || opts[1].cups;
+  }
+
+  function adjustFlavor(flavor, delta) {
+    const maxCups = PACK_OPTIONS[sub.portion][PACK_OPTIONS[sub.portion].length - 1].cups;
+    const minCups = PACK_OPTIONS[sub.portion][0].cups;
+    const total   = flavorCups.chocolate + flavorCups['peanut-butter'];
+    const newVal  = flavorCups[flavor] + delta;
+    if (newVal < 0) return;
+    // Allow growing up to max pack size, or shrinking
+    if (delta > 0 && total >= maxCups) return;
+    flavorCups[flavor] = newVal;
+    updateFlavorDisplay();
+  }
+
+  function updateFlavorDisplay() {
+    const choc  = flavorCups.chocolate;
+    const pb    = flavorCups['peanut-butter'];
+    const total = choc + pb;
+    const opts  = PACK_OPTIONS[sub.portion];
+    // Find closest valid pack
+    const validPack = opts.find(o => o.cups === total);
+
+    document.getElementById('qtyChocolate').textContent = choc;
+    document.getElementById('qtyPB').textContent        = pb;
+    document.getElementById('cardChoc').classList.toggle('has-qty', choc > 0);
+    document.getElementById('cardPB').classList.toggle('has-qty',   pb > 0);
+
+    const maxCups = opts[opts.length - 1].cups;
+    document.getElementById('btnChocPlus').disabled  = total >= maxCups;
+    document.getElementById('btnPBPlus').disabled    = total >= maxCups;
+    document.getElementById('btnChocMinus').disabled = choc <= 0;
+    document.getElementById('btnPBMinus').disabled   = pb   <= 0;
+
+    const bar      = document.getElementById('flavorBar');
+    const numsEl   = document.getElementById('flavorNums');
+    const hintEl   = document.getElementById('flavorHint');
+    const checkEl  = document.getElementById('flavorCheck');
+
+    // Show pack label
+    const packLabel = validPack ? `(${total}-cup pack · $${validPack.total.toFixed(2)})` : `(${total} cups — pick ${opts.map(o=>o.cups).join(', ')} for a valid pack)`;
+    document.getElementById('packLabel').textContent = packLabel;
+
+    numsEl.textContent = `${total}`;
+    const matched = !!validPack;
+    bar.classList.toggle('matched', matched);
+    numsEl.classList.toggle('matched', matched);
+    hintEl.textContent   = matched ? 'cups — valid pack' : `cups — adjust to ${opts.map(o=>o.cups).join(', ')}`;
+    checkEl.style.display = matched ? 'inline' : 'none';
+  }
+
+  // ── Save ──────────────────────────────────────────────────
+  async function saveSubscription() {
+    const total = flavorCups.chocolate + flavorCups['peanut-butter'];
+    const opts  = PACK_OPTIONS[sub.portion];
+    if (!opts.find(o => o.cups === total)) {
+      alert(`Please set your cups to a valid pack size: ${opts.map(o => o.cups).join(', ')}`);
+      return;
+    }
+    const btn = document.getElementById('btnSave');
+    btn.textContent = 'Saving…'; btn.disabled = true;
+
+    const payload = {
+      customer_id:        currentUser.id,
+      chocolate_cups:     flavorCups.chocolate,
+      peanut_butter_cups: flavorCups['peanut-butter'],
+      portion:            sub.portion,
+      frequency:          document.getElementById('freqSelect').value,
+      status:             sub.status,
+      updated_at:         new Date().toISOString(),
+    };
+
+    const { error } = await sb.from('subscriptions').upsert(payload, { onConflict: 'customer_id' });
+
+    btn.textContent = 'Save Changes'; btn.disabled = false;
+    const msgEl = document.getElementById('saveMsg');
+    if (error) { msgEl.textContent = '✗ Error saving'; msgEl.style.color = 'var(--fire)'; }
+    else        { msgEl.textContent = '✓ Saved!';       msgEl.style.color = 'var(--green)'; }
+    msgEl.classList.add('show');
+    setTimeout(() => msgEl.classList.remove('show'), 3000);
+  }
+
+  // ── Sign out ───────────────────────────────────────────────
+  async function handleSignOut() {
+    await sb.auth.signOut();
+    window.location.href = 'index.html';
+  }
+</script>
+</body>
+</html>

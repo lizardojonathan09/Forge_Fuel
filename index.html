@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Forge Oats – Fuel The Work</title>
   <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Oswald:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     :root {
@@ -336,6 +337,7 @@
     <a href="#ingredients">Ingredients</a>
     <a href="#nutrition">Nutrition</a>
     <a href="#faq">FAQ</a>
+    <a href="profile.html" id="navAccountLink">My Account</a>
   </div>
   <a href="#order" class="btn-nav">Order Now</a>
 </nav>
@@ -737,6 +739,29 @@
 </footer>
 
 <script>
+  // ── Supabase ─────────────────────────────────────────────────
+  const SUPABASE_URL      = 'https://YOUR_PROJECT_ID.supabase.co'; // ← replace
+  const SUPABASE_ANON_KEY = 'YOUR_ANON_KEY';                       // ← replace
+  const { createClient }  = supabase;
+  const sb = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+  // Pre-fill name/email if logged in, update nav link
+  (async () => {
+    const { data: { session } } = await sb.auth.getSession();
+    if (session) {
+      const { data: profile } = await sb.from('customers').select('name,email').eq('id', session.user.id).single();
+      if (profile) {
+        const nameEl  = document.getElementById('customerName');
+        const emailEl = document.getElementById('customerEmail');
+        if (nameEl  && !nameEl.value)  nameEl.value  = profile.name  || '';
+        if (emailEl && !emailEl.value) emailEl.value = profile.email || '';
+      }
+      const link = document.getElementById('navAccountLink');
+      if (link) { link.textContent = 'My Dashboard'; link.href = 'dashboard.html'; }
+    }
+  })();
+  // ─────────────────────────────────────────────────────────────
+
   // ── State ──
   let flavorCups        = { chocolate: 5, 'peanut-butter': 0 };
   let selectedPortion   = 'full';
@@ -972,6 +997,25 @@
         console.warn('Formspree error (non-blocking):', err);
       }
     }
+
+    // ── Save order to Supabase ───────────────────────────────
+    try {
+      const { data: { session } } = await sb.auth.getSession();
+      await sb.from('orders').insert({
+        customer_id:    session?.user?.id || null,
+        customer_email: email,
+        customer_name:  name,
+        flavor:         flavorLabel,
+        portion:        portionLabel,
+        pack_size:      pack.cups,
+        order_type:     orderType,
+        total:          total,
+        delivery_date:  deliveryDate,
+        delivery_time:  deliveryTime,
+        referred_by:    referralSource || null,
+      });
+    } catch(e) { console.warn('Supabase save error:', e); }
+    // ─────────────────────────────────────────────────────────
 
     const stripeLink = stripeLinks[orderType]?.[`${selectedPortion}-${pack.cups}`];
     if (stripeLink && !stripeLink.includes('REPLACE')) {
