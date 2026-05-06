@@ -159,9 +159,6 @@
   if (urlTab === 'signup') showTab('signup');
 
   function showTab(tab) {
-    ['signin','signup','forgot'].forEach(t => {
-      document.getElementById('formSign' + (t === 'forgot' ? 'in' : '') + t === 'forgot' ? '' : t).style.display = 'none';
-    });
     document.getElementById('formSignin').style.display = tab === 'signin' ? 'block' : 'none';
     document.getElementById('formSignup').style.display = tab === 'signup' ? 'block' : 'none';
     document.getElementById('formForgot').style.display = tab === 'forgot' ? 'block' : 'none';
