@@ -303,6 +303,12 @@
                 <input type="email" id="dpEmail" placeholder="you@email.com" autocomplete="email" />
               </div>
             </div>
+            <div class="dp-row" style="margin-bottom:16px;">
+              <div class="dp-field">
+                <label>Phone Number</label>
+                <input type="tel" id="dpPhone" placeholder="(555) 123-4567" autocomplete="tel" />
+              </div>
+            </div>
             <div class="dp-field" style="margin-bottom:16px;">
               <label>Preferred Delivery Day</label>
               <div class="dp-days" id="dpDays">
@@ -424,8 +430,10 @@
     // Pre-fill delivery pref fields from profile
     const dpName  = document.getElementById('dpName');
     const dpEmail = document.getElementById('dpEmail');
+    const dpPhone = document.getElementById('dpPhone');
     if (dpName  && !dpName.value)  dpName.value  = data.name  || '';
     if (dpEmail && !dpEmail.value) dpEmail.value  = data.email || currentUser.email;
+    if (dpPhone && !dpPhone.value) dpPhone.value  = data.phone || '';
   }
 
   async function loadSubscription() {
@@ -619,8 +627,9 @@
     }
     const name  = document.getElementById('dpName').value.trim();
     const email = document.getElementById('dpEmail').value.trim();
-    if (!name || !email) {
-      alert('Please fill in your name and email address.');
+    const phone = document.getElementById('dpPhone').value.trim();
+    if (!name || !email || !phone) {
+      alert('Please fill in your name, email address, and phone number.');
       return false;
     }
     if (!selectedDeliveryDay) {
@@ -637,7 +646,8 @@
   async function saveCustomerInfo() {
     const name  = document.getElementById('dpName').value.trim();
     const email = document.getElementById('dpEmail').value.trim();
-    await sb.from('customers').upsert({ id: currentUser.id, name, email }, { onConflict: 'id' });
+    const phone = document.getElementById('dpPhone').value.trim();
+    await sb.from('customers').upsert({ id: currentUser.id, name, email, phone }, { onConflict: 'id' });
   }
 
   async function saveSubscription() {

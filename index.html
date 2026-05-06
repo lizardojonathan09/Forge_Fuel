@@ -514,6 +514,12 @@
           <input type="email" id="customerEmail" placeholder="you@email.com" autocomplete="email" />
         </div>
       </div>
+      <div class="scheduler-row" style="margin-bottom:16px;">
+        <div class="scheduler-field">
+          <label>Phone Number</label>
+          <input type="tel" id="customerPhone" placeholder="(555) 123-4567" autocomplete="tel" />
+        </div>
+      </div>
       <div class="scheduler-row">
         <div class="scheduler-field">
           <label>Preferred Delivery Date</label>
@@ -749,12 +755,14 @@
   (async () => {
     const { data: { session } } = await sb.auth.getSession();
     if (session) {
-      const { data: profile } = await sb.from('customers').select('name,email').eq('id', session.user.id).single();
+      const { data: profile } = await sb.from('customers').select('name,email,phone').eq('id', session.user.id).single();
       if (profile) {
         const nameEl  = document.getElementById('customerName');
         const emailEl = document.getElementById('customerEmail');
+        const phoneEl = document.getElementById('customerPhone');
         if (nameEl  && !nameEl.value)  nameEl.value  = profile.name  || '';
         if (emailEl && !emailEl.value) emailEl.value = profile.email || '';
+        if (phoneEl && !phoneEl.value) phoneEl.value = profile.phone || '';
       }
       const link = document.getElementById('navAccountLink');
       if (link) { link.textContent = 'My Dashboard'; link.href = 'dashboard.html'; }
@@ -937,6 +945,7 @@
 
     const name           = document.getElementById('customerName').value.trim();
     const email          = document.getElementById('customerEmail').value.trim();
+    const phone          = document.getElementById('customerPhone').value.trim();
     const deliveryDate   = document.getElementById('deliveryDate').value;
     const deliveryTime   = document.getElementById('deliveryTime').value;
     const referralSource = document.getElementById('referralSource').value.trim();
@@ -953,6 +962,7 @@
     const missing = [];
     if (!name)         missing.push('name');
     if (!email)        missing.push('email');
+    if (!phone)        missing.push('phone number');
     if (!deliveryDate) missing.push('delivery date');
     if (!deliveryTime) missing.push('delivery time');
     if (flavorTotal !== pack.cups) {
@@ -982,6 +992,7 @@
           body: JSON.stringify({
             customer_name:  name,
             customer_email: email,
+            customer_phone: phone,
             flavor:         flavorLabel,
             portion:        portionLabel,
             pack:           `${pack.cups}-Pack`,
@@ -1005,6 +1016,7 @@
         customer_id:    session?.user?.id || null,
         customer_email: email,
         customer_name:  name,
+        customer_phone: phone,
         flavor:         flavorLabel,
         portion:        portionLabel,
         pack_size:      pack.cups,
