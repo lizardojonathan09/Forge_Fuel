@@ -106,9 +106,21 @@
     .flavor-total-nums.matched { color: var(--green); }
     .flavor-check { color: var(--green); }
 
-    /* Frequency select */
-    .freq-select { width: 100%; max-width: 280px; background: var(--dark); border: 1px solid var(--border); border-radius: 6px; padding: 12px 16px; font-family: 'Oswald', sans-serif; font-size: 15px; letter-spacing: 1px; color: var(--cream); outline: none; transition: border-color 0.2s; appearance: none; -webkit-appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23888' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 14px center; }
-    .freq-select:focus { border-color: var(--orange); }
+    /* Delivery preferences */
+    .delivery-pref { background: var(--dark); border: 1px solid var(--border); border-radius: 12px; padding: 24px 24px 20px; }
+    .dp-title { font-family: 'Oswald', sans-serif; font-size: 14px; font-weight: 600; letter-spacing: 2px; text-transform: uppercase; color: var(--cream); margin-bottom: 20px; display: flex; align-items: center; gap: 8px; }
+    .dp-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 16px; }
+    .dp-field label { display: block; font-family: 'Oswald', sans-serif; font-size: 11px; letter-spacing: 3px; text-transform: uppercase; color: var(--muted); margin-bottom: 8px; }
+    .dp-field input, .dp-field select { width: 100%; background: var(--card); border: 1px solid var(--border); border-radius: 6px; padding: 12px 16px; font-family: 'Oswald', sans-serif; font-size: 14px; letter-spacing: 1px; color: var(--cream); outline: none; transition: border-color 0.2s; appearance: none; -webkit-appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23888' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 14px center; }
+    .dp-field input { background-image: none; }
+    .dp-field input:focus, .dp-field select:focus { border-color: var(--orange); }
+    .dp-field input::placeholder { color: var(--muted); }
+    .dp-days { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; }
+    .dp-day { padding: 10px 2px; background: var(--card); border: 1px solid var(--border); border-radius: 6px; font-family: 'Oswald', sans-serif; font-size: 11px; letter-spacing: 1px; text-transform: uppercase; color: var(--muted); cursor: pointer; transition: all 0.2s; text-align: center; }
+    .dp-day:hover { border-color: rgba(255,107,26,0.4); color: var(--cream); }
+    .dp-day.active { border-color: var(--orange); background: rgba(255,107,26,0.1); color: var(--orange); font-weight: 600; }
+    .dp-disclaimer { margin-top: 16px; font-size: 13px; color: var(--muted); display: flex; align-items: flex-start; gap: 6px; line-height: 1.5; }
+    .dp-disclaimer::before { content: "⚡"; flex-shrink: 0; }
 
     /* Save / Subscribe buttons */
     .btn-save { background: linear-gradient(135deg, var(--orange), var(--fire)); color: #fff; font-family: 'Oswald', sans-serif; font-size: 15px; font-weight: 600; letter-spacing: 2px; text-transform: uppercase; padding: 14px 36px; border-radius: 4px; border: none; cursor: pointer; box-shadow: 0 4px 20px rgba(255,107,26,0.3); transition: all 0.2s; }
@@ -277,14 +289,43 @@
           </div>
         </div>
 
-        <!-- Frequency -->
+        <!-- Delivery Preferences -->
         <div class="sub-section">
-          <div class="sub-label">Delivery Frequency</div>
-          <select class="freq-select" id="freqSelect">
-            <option value="weekly">Every Week</option>
-            <option value="biweekly">Every 2 Weeks</option>
-            <option value="monthly">Every Month</option>
-          </select>
+          <div class="sub-label">Your Info &amp; Delivery Preferences</div>
+          <div class="delivery-pref">
+            <div class="dp-row">
+              <div class="dp-field">
+                <label>Your Name</label>
+                <input type="text" id="dpName" placeholder="First &amp; last name" autocomplete="name" />
+              </div>
+              <div class="dp-field">
+                <label>Email Address</label>
+                <input type="email" id="dpEmail" placeholder="you@email.com" autocomplete="email" />
+              </div>
+            </div>
+            <div class="dp-field" style="margin-bottom:16px;">
+              <label>Preferred Delivery Day</label>
+              <div class="dp-days" id="dpDays">
+                <div class="dp-day" onclick="selectDeliveryDay('Monday')">Mon</div>
+                <div class="dp-day" onclick="selectDeliveryDay('Tuesday')">Tue</div>
+                <div class="dp-day" onclick="selectDeliveryDay('Wednesday')">Wed</div>
+                <div class="dp-day" onclick="selectDeliveryDay('Thursday')">Thu</div>
+                <div class="dp-day" onclick="selectDeliveryDay('Friday')">Fri</div>
+                <div class="dp-day" onclick="selectDeliveryDay('Saturday')">Sat</div>
+                <div class="dp-day" onclick="selectDeliveryDay('Sunday')">Sun</div>
+              </div>
+            </div>
+            <div class="dp-field">
+              <label>Preferred Time Window</label>
+              <select id="dpTime">
+                <option value="">Select a time window</option>
+                <option value="Morning (8am–12pm)">Morning (8am – 12pm)</option>
+                <option value="Afternoon (12pm–5pm)">Afternoon (12pm – 5pm)</option>
+                <option value="Evening (5pm–8pm)">Evening (5pm – 8pm)</option>
+              </select>
+            </div>
+            <p class="dp-disclaimer">Your subscription delivers every week on <strong id="dpDayText" style="color:var(--orange);">—</strong> during your selected time window. You can update your delivery day and time at any time.</p>
+          </div>
         </div>
 
         <!-- Save / Subscribe -->
@@ -354,9 +395,10 @@
 
   const PACK_BADGES = [null, 'Most Popular', 'Best Value'];
 
-  let currentUser     = null;
+  let currentUser       = null;
   let selectedPackIndex = 1; // default to Most Popular
-  let sub = { chocolate_cups: 5, peanut_butter_cups: 0, portion: 'full', frequency: 'weekly', status: 'active' };
+  let selectedDeliveryDay = '';
+  let sub = { chocolate_cups: 5, peanut_butter_cups: 0, portion: 'full', status: 'active', delivery_day: '', delivery_time: '' };
   let flavorCups = { chocolate: 5, 'peanut-butter': 0 };
 
   // ── Init ──────────────────────────────────────────────────
@@ -372,7 +414,6 @@
   async function loadProfile() {
     let { data } = await sb.from('customers').select('*').eq('id', currentUser.id).single();
     if (!data) {
-      // Create profile if missing (e.g. OAuth sign-in)
       await sb.from('customers').insert({ id: currentUser.id, email: currentUser.email, name: currentUser.email.split('@')[0] });
       data = { name: currentUser.email.split('@')[0], email: currentUser.email };
     }
@@ -380,6 +421,11 @@
     document.getElementById('heroName').textContent  = name.split(' ')[0].toUpperCase();
     document.getElementById('heroEmail').textContent = data.email || currentUser.email;
     document.getElementById('navUser').textContent   = 'Hi, ' + name.split(' ')[0];
+    // Pre-fill delivery pref fields from profile
+    const dpName  = document.getElementById('dpName');
+    const dpEmail = document.getElementById('dpEmail');
+    if (dpName  && !dpName.value)  dpName.value  = data.name  || '';
+    if (dpEmail && !dpEmail.value) dpEmail.value  = data.email || currentUser.email;
   }
 
   async function loadSubscription() {
@@ -391,6 +437,9 @@
     const opts = PACK_OPTIONS[sub.portion];
     const foundIdx = opts.findIndex(o => o.cups === loadedTotal);
     selectedPackIndex = foundIdx >= 0 ? foundIdx : 1;
+    // Restore delivery day & time
+    if (sub.delivery_day)  selectDeliveryDay(sub.delivery_day);
+    if (sub.delivery_time) document.getElementById('dpTime').value = sub.delivery_time;
     renderSubscription();
   }
 
@@ -409,8 +458,6 @@
     selectPortion(sub.portion, false);
     // Pack cards (render with current selectedPackIndex derived in loadSubscription)
     renderPackCards();
-    // Frequency
-    document.getElementById('freqSelect').value = sub.frequency || 'weekly';
     // Flavors
     updateFlavorDisplay();
     // Hero badge
@@ -460,6 +507,16 @@
       renderPackCards();
     }
     updateFlavorDisplay();
+  }
+
+  function selectDeliveryDay(day) {
+    selectedDeliveryDay = day;
+    const shortMap = { Monday:'Mon', Tuesday:'Tue', Wednesday:'Wed', Thursday:'Thu', Friday:'Fri', Saturday:'Sat', Sunday:'Sun' };
+    document.querySelectorAll('.dp-day').forEach(el => {
+      el.classList.toggle('active', el.textContent.trim() === shortMap[day]);
+    });
+    const txt = document.getElementById('dpDayText');
+    if (txt) txt.textContent = day || '—';
   }
 
   function renderPackCards() {
@@ -546,53 +603,80 @@
       chocolate_cups:     flavorCups.chocolate,
       peanut_butter_cups: flavorCups['peanut-butter'],
       portion:            sub.portion,
-      frequency:          document.getElementById('freqSelect').value,
       status:             sub.status,
+      delivery_day:       selectedDeliveryDay || null,
+      delivery_time:      document.getElementById('dpTime').value || null,
       updated_at:         new Date().toISOString(),
     };
   }
 
-  function validateFlavorMatch() {
+  function validateForm() {
     const packCups = PACK_OPTIONS[sub.portion][selectedPackIndex].cups;
     const total    = flavorCups.chocolate + flavorCups['peanut-butter'];
     if (total !== packCups) {
       alert(`Please set your flavor cups to exactly ${packCups} to match your selected pack.`);
       return false;
     }
+    const name  = document.getElementById('dpName').value.trim();
+    const email = document.getElementById('dpEmail').value.trim();
+    if (!name || !email) {
+      alert('Please fill in your name and email address.');
+      return false;
+    }
+    if (!selectedDeliveryDay) {
+      alert('Please select a preferred delivery day.');
+      return false;
+    }
+    if (!document.getElementById('dpTime').value) {
+      alert('Please select a preferred delivery time window.');
+      return false;
+    }
     return true;
   }
 
+  async function saveCustomerInfo() {
+    const name  = document.getElementById('dpName').value.trim();
+    const email = document.getElementById('dpEmail').value.trim();
+    await sb.from('customers').upsert({ id: currentUser.id, name, email }, { onConflict: 'id' });
+  }
+
   async function saveSubscription() {
-    if (!validateFlavorMatch()) return;
+    if (!validateForm()) return;
     const btn = document.getElementById('btnSave');
     btn.textContent = 'Saving…'; btn.disabled = true;
-    const { error } = await sb.from('subscriptions').upsert(buildSubPayload(), { onConflict: 'customer_id' });
+    await Promise.all([
+      sb.from('subscriptions').upsert(buildSubPayload(), { onConflict: 'customer_id' }),
+      saveCustomerInfo(),
+    ]);
     btn.textContent = 'Save Preferences'; btn.disabled = false;
     const msgEl = document.getElementById('saveMsg');
-    if (error) { msgEl.textContent = '✗ Error saving'; msgEl.style.color = 'var(--fire)'; }
-    else        { msgEl.textContent = '✓ Saved!';       msgEl.style.color = 'var(--green)'; }
+    msgEl.textContent = '✓ Saved!'; msgEl.style.color = 'var(--green)';
     msgEl.classList.add('show');
     setTimeout(() => msgEl.classList.remove('show'), 3000);
   }
 
   async function subscribeNow() {
-    if (!validateFlavorMatch()) return;
+    if (!validateForm()) return;
     const btn = document.getElementById('btnSubscribe');
     btn.textContent = 'Saving…'; btn.disabled = true;
-    // Save preferences to Supabase
-    await sb.from('subscriptions').upsert(buildSubPayload(), { onConflict: 'customer_id' });
+    // Save preferences + customer info to Supabase
+    await Promise.all([
+      sb.from('subscriptions').upsert(buildSubPayload(), { onConflict: 'customer_id' }),
+      saveCustomerInfo(),
+    ]);
     // Build Stripe URL
-    const packCups = PACK_OPTIONS[sub.portion][selectedPackIndex].cups;
-    const key      = `${sub.portion}-${packCups}`;
-    const stripeUrl= STRIPE_SUB_LINKS[key];
+    const packCups  = PACK_OPTIONS[sub.portion][selectedPackIndex].cups;
+    const key       = `${sub.portion}-${packCups}`;
+    const stripeUrl = STRIPE_SUB_LINKS[key];
     if (!stripeUrl) {
       alert('Could not find a Stripe link for this configuration. Please contact support.');
       btn.textContent = 'Subscribe Now →'; btn.disabled = false;
       return;
     }
+    const email = document.getElementById('dpEmail').value.trim();
     const params = new URLSearchParams({
-      prefilled_email:      currentUser.email,
-      client_reference_id:  currentUser.id,
+      prefilled_email:     email || currentUser.email,
+      client_reference_id: currentUser.id,
     });
     window.location.href = `${stripeUrl}?${params.toString()}`;
   }
