@@ -761,6 +761,7 @@
   (async () => {
     const { data: { session } } = await sb.auth.getSession();
     if (session) {
+      isLoggedIn = true;
       const { data: profile } = await sb.from('customers').select('name,email,phone').eq('id', session.user.id).single();
       if (profile) {
         const nameEl  = document.getElementById('customerName');
@@ -776,6 +777,7 @@
       const signupBtn = document.getElementById('navSignupBtn');
       if (signupBtn) signupBtn.style.display = 'none';
     }
+    updateCheckoutBtn();
   })();
   // ─────────────────────────────────────────────────────────────
 
@@ -784,6 +786,7 @@
   let selectedPortion   = 'full';
   let selectedPackIndex = 1;
   let orderType         = 'one-time';
+  let isLoggedIn        = false;
   const SUB_DISC        = 0.10;
 
   // Pack options per portion size
@@ -904,6 +907,7 @@
     document.getElementById('subNote').classList.toggle('visible', type === 'subscribe');
     renderPackCards();
     updateCheckout();
+    updateCheckoutBtn();
   }
 
   function renderPackCards() {
@@ -926,10 +930,37 @@
   function updateCheckout() {
     const disc  = orderType === 'subscribe' ? SUB_DISC : 0;
     const pack  = PACK_OPTIONS[selectedPortion][selectedPackIndex];
-    document.getElementById('checkoutTotal').textContent = '$' + (pack.total * (1 - disc)).toFixed(2);
+    const totalEl = document.getElementById('checkoutTotal');
+    if (totalEl) totalEl.textContent = '$' + (pack.total * (1 - disc)).toFixed(2);
+  }
+
+  function updateCheckoutBtn() {
+    const btn = document.getElementById('checkoutBtn');
+    if (!btn) return;
+    if (orderType === 'subscribe') {
+      if (isLoggedIn) {
+        btn.innerHTML = 'Set Up My Subscription &rarr;';
+      } else {
+        btn.innerHTML = 'Sign Up to Subscribe &rarr;';
+      }
+    } else {
+      const disc = 0;
+      const pack = PACK_OPTIONS[selectedPortion][selectedPackIndex];
+      btn.innerHTML = 'Add to Cart: <span id="checkoutTotal">$' + (pack.total * (1 - disc)).toFixed(2) + '</span>';
+    }
   }
 
   async function handleCheckout() {
+    // ── Subscription: redirect to sign up or dashboard ───────────────────
+    if (orderType === 'subscribe') {
+      if (isLoggedIn) {
+        window.location.href = 'dashboard.html';
+      } else {
+        window.location.href = 'profile.html?tab=signup';
+      }
+      return;
+    }
+
     // ── Stripe Payment Links (keyed by "portion-cups") ───────────────────
     const stripeLinks = {
       'one-time': {
