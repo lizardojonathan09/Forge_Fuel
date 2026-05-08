@@ -368,6 +368,7 @@
     <div class="delivery-badge"><span>🚚</span> Delivered in 1–2 Days · Pick Your Date &amp; Time</div>
     <div class="hero-cta-group">
       <a href="#order" class="btn-primary">Shop Now</a>
+      <a href="profile.html?tab=signup" class="btn-secondary" id="heroSignupBtn">Sign Up</a>
       <a href="#why" class="btn-secondary">Learn More</a>
     </div>
   </div>
@@ -773,9 +774,11 @@
       }
       const link = document.getElementById('navAccountLink');
       if (link) { link.textContent = 'My Dashboard'; link.href = 'dashboard.html'; }
-      // Hide Sign Up when already logged in
-      const signupBtn = document.getElementById('navSignupBtn');
-      if (signupBtn) signupBtn.style.display = 'none';
+      // Hide Sign Up buttons when already logged in
+      const signupBtn     = document.getElementById('navSignupBtn');
+      const heroSignupBtn = document.getElementById('heroSignupBtn');
+      if (signupBtn)     signupBtn.style.display     = 'none';
+      if (heroSignupBtn) heroSignupBtn.style.display = 'none';
     }
     updateCheckoutBtn();
   })();
@@ -905,6 +908,9 @@
     document.querySelectorAll('.toggle-btn').forEach(b => b.classList.remove('active'));
     btn.classList.add('active');
     document.getElementById('subNote').classList.toggle('visible', type === 'subscribe');
+    // Hide the info/delivery section for subscriptions — they fill that out on the dashboard
+    const scheduler = document.querySelector('.delivery-scheduler');
+    if (scheduler) scheduler.style.display = type === 'subscribe' ? 'none' : 'block';
     renderPackCards();
     updateCheckout();
     updateCheckoutBtn();
