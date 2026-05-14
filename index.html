@@ -1050,25 +1050,8 @@
       }
     }
 
-    // ── Save order to Supabase ───────────────────────────────
-    try {
-      const { data: { session } } = await sb.auth.getSession();
-      await sb.from('orders').insert({
-        customer_id:    session?.user?.id || null,
-        customer_email: email,
-        customer_name:  name,
-        customer_phone: phone,
-        flavor:         flavorLabel,
-        portion:        portionLabel,
-        pack_size:      pack.cups,
-        order_type:     orderType,
-        total:          total,
-        delivery_date:  deliveryDate,
-        delivery_time:  deliveryTime,
-        referred_by:    referralSource || null,
-      });
-    } catch(e) { console.warn('Supabase save error:', e); }
-    // ─────────────────────────────────────────────────────────
+    // Order is now written by the Stripe webhook (stripe-webhook Edge Function)
+    // after payment is confirmed — no pre-emptive insert here.
 
     const stripeLink = stripeLinks[orderType]?.[`${selectedPortion}-${pack.cups}`];
     if (stripeLink && !stripeLink.includes('REPLACE')) {
