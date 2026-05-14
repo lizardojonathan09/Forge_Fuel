@@ -40,6 +40,10 @@
     .status-pill.active  { background: rgba(92,184,92,0.15);  border: 1px solid rgba(92,184,92,0.4);  color: var(--green); }
     .status-pill.paused  { background: rgba(136,136,136,0.15); border: 1px solid rgba(136,136,136,0.3); color: var(--muted); }
     .status-dot { width: 7px; height: 7px; border-radius: 50%; background: currentColor; }
+    .next-delivery-badge { display: inline-flex; flex-direction: column; align-items: center; gap: 2px; padding: 10px 20px; background: rgba(255,107,26,0.08); border: 1px solid rgba(255,107,26,0.25); border-radius: 10px; margin-top: 10px; }
+    .next-delivery-label { font-family: 'Oswald', sans-serif; font-size: 10px; letter-spacing: 3px; text-transform: uppercase; color: var(--muted); }
+    .next-delivery-date { font-family: 'Bebas Neue', sans-serif; font-size: 22px; letter-spacing: 1px; color: var(--orange); line-height: 1.1; }
+    .next-delivery-day { font-family: 'Oswald', sans-serif; font-size: 12px; letter-spacing: 1px; color: rgba(237,232,220,0.6); }
 
     /* LAYOUT */
     .dash-body { max-width: 1000px; margin: 0 auto; padding: 60px 48px 100px; display: grid; grid-template-columns: 1fr 1fr; gap: 32px; align-items: start; }
@@ -198,7 +202,14 @@
         <h1 class="dash-title">WELCOME BACK, <span id="heroName">—</span></h1>
         <p class="dash-meta" id="heroEmail"></p>
       </div>
-      <div id="subStatusBadge"></div>
+      <div style="display:flex;flex-direction:column;align-items:flex-end;gap:0;">
+        <div id="subStatusBadge"></div>
+        <div id="nextDeliveryBadge" style="display:none;" class="next-delivery-badge">
+          <div class="next-delivery-label">Next Delivery</div>
+          <div class="next-delivery-date" id="nextDeliveryDate">—</div>
+          <div class="next-delivery-day" id="nextDeliveryDayName"></div>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -330,7 +341,7 @@
                 <option value="Evening (5pm–8pm)">Evening (5pm – 8pm)</option>
               </select>
             </div>
-            <p class="dp-disclaimer">Your subscription delivers every week on <strong id="dpDayText" style="color:var(--orange);">—</strong> during your selected time window. You can update your delivery day and time at any time.</p>
+            <p class="dp-disclaimer">Your subscription delivers every week on <strong id="dpDayText" style="color:var(--orange);">—</strong> during your selected time window. <span id="dpNextDateText" style="display:none;">Next delivery: <strong id="dpNextDate" style="color:var(--orange);"></strong>.</span> You can update your delivery day and time at any time.</p>
           </div>
         </div>
 
@@ -517,6 +528,43 @@
     updateFlavorDisplay();
   }
 
+  // Returns the next Date object for the given weekday name (today counts if it matches)
+  function getNextDeliveryDate(dayName) {
+    const days = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+    const target = days.indexOf(dayName);
+    if (target === -1) return null;
+    const today = new Date();
+    const todayDay = today.getDay();
+    let daysUntil = target - todayDay;
+    if (daysUntil < 0) daysUntil += 7;
+    const next = new Date(today);
+    next.setDate(today.getDate() + daysUntil);
+    return next;
+  }
+
+  function updateNextDeliveryDisplay(day) {
+    const date = getNextDeliveryDate(day);
+    const badge = document.getElementById('nextDeliveryBadge');
+    const dateEl = document.getElementById('nextDeliveryDate');
+    const dayEl  = document.getElementById('nextDeliveryDayName');
+    const dpNextDateText = document.getElementById('dpNextDateText');
+    const dpNextDate     = document.getElementById('dpNextDate');
+
+    if (date) {
+      const formatted = date.toLocaleDateString('en-US', { month: 'long', day: 'numeric' });
+      const dayOfWeek = date.toLocaleDateString('en-US', { weekday: 'long' });
+      const isToday   = date.toDateString() === new Date().toDateString();
+      dateEl.textContent = isToday ? 'Today' : formatted;
+      dayEl.textContent  = isToday ? dayOfWeek : dayOfWeek;
+      badge.style.display = 'inline-flex';
+      if (dpNextDate) dpNextDate.textContent = isToday ? 'Today' : formatted;
+      if (dpNextDateText) dpNextDateText.style.display = 'inline';
+    } else {
+      badge.style.display = 'none';
+      if (dpNextDateText) dpNextDateText.style.display = 'none';
+    }
+  }
+
   function selectDeliveryDay(day) {
     selectedDeliveryDay = day;
     const shortMap = { Monday:'Mon', Tuesday:'Tue', Wednesday:'Wed', Thursday:'Thu', Friday:'Fri', Saturday:'Sat', Sunday:'Sun' };
@@ -525,6 +573,7 @@
     });
     const txt = document.getElementById('dpDayText');
     if (txt) txt.textContent = day || '—';
+    updateNextDeliveryDisplay(day);
   }
 
   function renderPackCards() {
