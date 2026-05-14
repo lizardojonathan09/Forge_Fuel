@@ -774,11 +774,6 @@
       }
       const link = document.getElementById('navAccountLink');
       if (link) { link.textContent = 'My Dashboard'; link.href = 'dashboard.html'; }
-      // Hide Sign Up buttons when already logged in
-      const signupBtn     = document.getElementById('navSignupBtn');
-      const heroSignupBtn = document.getElementById('heroSignupBtn');
-      if (signupBtn)     signupBtn.style.display     = 'none';
-      if (heroSignupBtn) heroSignupBtn.style.display = 'none';
     }
     updateCheckoutBtn();
   })();
