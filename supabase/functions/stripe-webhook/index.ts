@@ -124,19 +124,19 @@ async function handleWebhook(req: Request, sig: string) {
 
 // ── API request from dashboard ────────────────────────────────────────────
 async function handleApiRequest(req: Request, auth: string) {
-  const sbUser = createClient(
-    Deno.env.get('SUPABASE_URL') ?? '',
-    Deno.env.get('SUPABASE_ANON_KEY') ?? '',
-    { global: { headers: { Authorization: auth } } }
-  )
-  const { data: { user }, error } = await sbUser.auth.getUser()
+  // Use service-role client to verify the user's JWT token
+  const token = auth.startsWith('Bearer ') ? auth.slice(7) : auth
+  const { data, error } = await sb.auth.getUser(token)
+  const user = data?.user
   if (error || !user) {
+    console.error('Auth error:', error)
     return new Response(JSON.stringify({ error: 'Unauthorized' }), {
       status: 401, headers: { ...CORS, 'Content-Type': 'application/json' },
     })
   }
 
   const body = await req.json()
+  console.log('API action:', body.action, 'user:', user.id)
   if (body.action === 'update-plan') return handleUpdatePlan(user.id, body)
 
   return new Response(JSON.stringify({ error: 'Unknown action' }), {
