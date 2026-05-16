@@ -417,6 +417,9 @@
   let selectedDeliveryDay = '';
   let sub = { chocolate_cups: 5, peanut_butter_cups: 0, portion: 'full', status: 'active', delivery_day: '', delivery_time: '' };
   let flavorCups = { chocolate: 5, 'peanut-butter': 0 };
+  // Track initial plan to detect changes that need Stripe updating
+  let initialPortion = 'full';
+  let initialCups    = 5;
 
   // ── Init ──────────────────────────────────────────────────
   (async () => {
@@ -459,6 +462,9 @@
     // Restore delivery day & time
     if (sub.delivery_day)  selectDeliveryDay(sub.delivery_day);
     if (sub.delivery_time) document.getElementById('dpTime').value = sub.delivery_time;
+    // Snapshot initial plan so we can detect changes later
+    initialPortion = sub.portion;
+    initialCups    = sub.chocolate_cups + sub.peanut_butter_cups;
     renderSubscription();
   }
 
@@ -699,19 +705,58 @@
     await sb.from('customers').upsert({ id: currentUser.id, name, email, phone }, { onConflict: 'id' });
   }
 
+  async function updateStripePlan(portion, cups) {
+    const { data: { session } } = await sb.auth.getSession();
+    const res = await fetch(`${SUPABASE_URL}/functions/v1/smart-api`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${session.access_token}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ action: 'update-plan', portion, cups }),
+    });
+    const json = await res.json();
+    if (!res.ok) throw new Error(json.error || 'Failed to update Stripe plan');
+    return json; // { success: true, noSubscription?: true }
+  }
+
   async function saveSubscription() {
     if (!validateForm()) return;
-    const btn = document.getElementById('btnSave');
-    btn.textContent = 'Saving…'; btn.disabled = true;
-    await Promise.all([
-      sb.from('subscriptions').upsert(buildSubPayload(), { onConflict: 'customer_id' }),
-      saveCustomerInfo(),
-    ]);
-    btn.textContent = 'Save Preferences'; btn.disabled = false;
+    const btn   = document.getElementById('btnSave');
     const msgEl = document.getElementById('saveMsg');
-    msgEl.textContent = '✓ Saved!'; msgEl.style.color = 'var(--green)';
-    msgEl.classList.add('show');
-    setTimeout(() => msgEl.classList.remove('show'), 3000);
+    btn.textContent = 'Saving…'; btn.disabled = true;
+
+    const currentCups  = flavorCups.chocolate + flavorCups['peanut-butter'];
+    const planChanged  = sub.portion !== initialPortion || currentCups !== initialCups;
+
+    try {
+      // Always save preferences to Supabase
+      await Promise.all([
+        sb.from('subscriptions').upsert(buildSubPayload(), { onConflict: 'customer_id' }),
+        saveCustomerInfo(),
+      ]);
+
+      let stripeUpdated = false;
+      if (planChanged) {
+        const result = await updateStripePlan(sub.portion, currentCups);
+        stripeUpdated = result.success && !result.noSubscription;
+        // Update snapshot so a second save doesn't re-trigger Stripe
+        initialPortion = sub.portion;
+        initialCups    = currentCups;
+      }
+
+      msgEl.textContent = stripeUpdated ? '✓ Saved & billing updated!' : '✓ Saved!';
+      msgEl.style.color = 'var(--green)';
+      msgEl.classList.add('show');
+      setTimeout(() => msgEl.classList.remove('show'), 3500);
+    } catch (err) {
+      msgEl.textContent = '✗ ' + err.message;
+      msgEl.style.color = '#e05';
+      msgEl.classList.add('show');
+      setTimeout(() => msgEl.classList.remove('show'), 4000);
+    }
+
+    btn.textContent = 'Save Preferences'; btn.disabled = false;
   }
 
   async function subscribeNow() {
