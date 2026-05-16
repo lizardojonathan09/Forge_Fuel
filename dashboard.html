@@ -462,9 +462,16 @@
     // Restore delivery day & time
     if (sub.delivery_day)  selectDeliveryDay(sub.delivery_day);
     if (sub.delivery_time) document.getElementById('dpTime').value = sub.delivery_time;
-    // Snapshot initial plan so we can detect changes later
-    initialPortion = sub.portion;
-    initialCups    = sub.chocolate_cups + sub.peanut_butter_cups;
+    // Use stripe_plan as source of truth for what Stripe is currently billing
+    // Falls back to Supabase cup counts if stripe_plan not yet set
+    if (sub.stripe_plan) {
+      const parts   = sub.stripe_plan.split('-');
+      initialPortion = parts[0];
+      initialCups    = parseInt(parts[1]);
+    } else {
+      initialPortion = sub.portion;
+      initialCups    = sub.chocolate_cups + sub.peanut_butter_cups;
+    }
     renderSubscription();
   }
 
