@@ -736,6 +736,10 @@
     const currentCups  = flavorCups.chocolate + flavorCups['peanut-butter'];
     const planChanged  = sub.portion !== initialPortion || currentCups !== initialCups;
 
+    console.log('[Save] initialPortion:', initialPortion, '| initialCups:', initialCups);
+    console.log('[Save] currentPortion:', sub.portion,    '| currentCups:', currentCups);
+    console.log('[Save] planChanged:', planChanged);
+
     try {
       // Always save preferences to Supabase
       await Promise.all([
@@ -745,7 +749,9 @@
 
       let stripeUpdated = false;
       if (planChanged) {
+        console.log('[Save] Calling updateStripePlan with', sub.portion, currentCups);
         const result = await updateStripePlan(sub.portion, currentCups);
+        console.log('[Save] updateStripePlan result:', result);
         stripeUpdated = result.success && !result.noSubscription;
         // Update snapshot so a second save doesn't re-trigger Stripe
         initialPortion = sub.portion;
