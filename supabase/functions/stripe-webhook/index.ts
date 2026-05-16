@@ -74,13 +74,21 @@ async function verifyStripeSignature(body: string, sig: string, secret: string):
 serve(async (req) => {
   if (req.method === 'OPTIONS') return new Response('ok', { headers: CORS })
 
-  const sig  = req.headers.get('stripe-signature')
-  const auth = req.headers.get('authorization')
+  try {
+    const sig  = req.headers.get('stripe-signature')
+    const auth = req.headers.get('authorization')
 
-  if (sig)  return handleWebhook(req, sig)
-  if (auth) return handleApiRequest(req, auth)
+    if (sig)  return await handleWebhook(req, sig)
+    if (auth) return await handleApiRequest(req, auth)
 
-  return new Response('Bad request', { status: 400 })
+    return new Response('Bad request', { status: 400, headers: CORS })
+  } catch (err) {
+    console.error('Unhandled error:', err)
+    return new Response(JSON.stringify({ error: String(err) }), {
+      status: 500,
+      headers: { ...CORS, 'Content-Type': 'application/json' },
+    })
+  }
 })
 
 // ── Stripe webhook ────────────────────────────────────────────────────────

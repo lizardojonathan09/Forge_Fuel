@@ -713,18 +713,12 @@
   }
 
   async function updateStripePlan(portion, cups) {
-    const { data: { session } } = await sb.auth.getSession();
-    const res = await fetch(`${SUPABASE_URL}/functions/v1/smart-api`, {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${session.access_token}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ action: 'update-plan', portion, cups }),
+    const { data, error } = await sb.functions.invoke('smart-api', {
+      body: { action: 'update-plan', portion, cups },
     });
-    const json = await res.json();
-    if (!res.ok) throw new Error(json.error || 'Failed to update Stripe plan');
-    return json; // { success: true, noSubscription?: true }
+    console.log('[updateStripePlan] data:', data, 'error:', error);
+    if (error) throw new Error(error.message || 'Failed to update Stripe plan');
+    return data;
   }
 
   async function saveSubscription() {
