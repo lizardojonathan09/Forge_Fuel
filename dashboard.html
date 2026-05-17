@@ -717,7 +717,16 @@
       body: { action: 'update-plan', portion, cups },
     });
     console.log('[updateStripePlan] data:', data, 'error:', error);
-    if (error) throw new Error(error.message || 'Failed to update Stripe plan');
+    if (error) {
+      // Try to read the actual error body from the function response
+      try {
+        const errBody = await error.context?.json?.();
+        console.log('[updateStripePlan] error body:', JSON.stringify(errBody));
+      } catch(e) {
+        console.log('[updateStripePlan] raw error text:', await error.context?.text?.());
+      }
+      throw new Error(error.message || 'Failed to update Stripe plan');
+    }
     return data;
   }
 
