@@ -716,15 +716,7 @@
     const { data, error } = await sb.functions.invoke('smart-api', {
       body: { action: 'update-plan', portion, cups },
     });
-    console.log('[updateStripePlan] data:', data, 'error:', error);
     if (error) {
-      // Try to read the actual error body from the function response
-      try {
-        const errBody = await error.context?.json?.();
-        console.log('[updateStripePlan] error body:', JSON.stringify(errBody));
-      } catch(e) {
-        console.log('[updateStripePlan] raw error text:', await error.context?.text?.());
-      }
       throw new Error(error.message || 'Failed to update Stripe plan');
     }
     return data;
@@ -739,10 +731,6 @@
     const currentCups  = flavorCups.chocolate + flavorCups['peanut-butter'];
     const planChanged  = sub.portion !== initialPortion || currentCups !== initialCups;
 
-    console.log('[Save] initialPortion:', initialPortion, '| initialCups:', initialCups);
-    console.log('[Save] currentPortion:', sub.portion,    '| currentCups:', currentCups);
-    console.log('[Save] planChanged:', planChanged);
-
     try {
       // Always save preferences to Supabase
       await Promise.all([
@@ -752,9 +740,7 @@
 
       let stripeUpdated = false;
       if (planChanged) {
-        console.log('[Save] Calling updateStripePlan with', sub.portion, currentCups);
         const result = await updateStripePlan(sub.portion, currentCups);
-        console.log('[Save] updateStripePlan result:', result);
         stripeUpdated = result.success && !result.noSubscription;
         // Update snapshot so a second save doesn't re-trigger Stripe
         initialPortion = sub.portion;
