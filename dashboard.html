@@ -320,6 +320,32 @@
                 <input type="tel" id="dpPhone" placeholder="(555) 123-4567" autocomplete="tel" />
               </div>
             </div>
+            <div class="dp-row" style="margin-bottom:16px;">
+              <div class="dp-field" style="grid-column:1/-1;">
+                <label>Street Address</label>
+                <input type="text" id="dpStreet" placeholder="123 Main St" autocomplete="street-address" />
+              </div>
+            </div>
+            <div class="dp-row" style="margin-bottom:16px;">
+              <div class="dp-field">
+                <label>Apt / Unit <span style="color:var(--muted);font-size:10px;">(optional)</span></label>
+                <input type="text" id="dpUnit" placeholder="Apt 4B" autocomplete="address-line2" />
+              </div>
+              <div class="dp-field">
+                <label>City</label>
+                <input type="text" id="dpCity" placeholder="Chicago" autocomplete="address-level2" />
+              </div>
+            </div>
+            <div class="dp-row" style="margin-bottom:16px;">
+              <div class="dp-field">
+                <label>State</label>
+                <input type="text" id="dpState" placeholder="IL" maxlength="2" autocomplete="address-level1" />
+              </div>
+              <div class="dp-field">
+                <label>ZIP Code</label>
+                <input type="text" id="dpZip" placeholder="60601" maxlength="10" autocomplete="postal-code" />
+              </div>
+            </div>
             <div class="dp-field" style="margin-bottom:16px;">
               <label>Preferred Delivery Day</label>
               <div class="dp-days" id="dpDays">
@@ -463,6 +489,15 @@
     // Restore delivery day & time
     if (sub.delivery_day)  selectDeliveryDay(sub.delivery_day);
     if (sub.delivery_time) document.getElementById('dpTime').value = sub.delivery_time;
+    // Pre-fill address fields
+    if (sub.name)            document.getElementById('dpName').value   = sub.name;
+    if (sub.email)           document.getElementById('dpEmail').value  = sub.email;
+    if (sub.phone)           document.getElementById('dpPhone').value  = sub.phone;
+    if (sub.delivery_street) document.getElementById('dpStreet').value = sub.delivery_street;
+    if (sub.delivery_unit)   document.getElementById('dpUnit').value   = sub.delivery_unit;
+    if (sub.delivery_city)   document.getElementById('dpCity').value   = sub.delivery_city;
+    if (sub.delivery_state)  document.getElementById('dpState').value  = sub.delivery_state;
+    if (sub.delivery_zip)    document.getElementById('dpZip').value    = sub.delivery_zip;
     // Use stripe_plan as source of truth for what Stripe is currently billing
     // Falls back to Supabase cup counts if stripe_plan not yet set
     if (sub.stripe_plan) {
@@ -698,6 +733,14 @@
       status:             sub.status,
       delivery_day:       selectedDeliveryDay || null,
       delivery_time:      document.getElementById('dpTime').value || null,
+      name:               document.getElementById('dpName').value.trim()   || null,
+      email:              document.getElementById('dpEmail').value.trim()  || null,
+      phone:              document.getElementById('dpPhone').value.trim()  || null,
+      delivery_street:    document.getElementById('dpStreet').value.trim() || null,
+      delivery_unit:      document.getElementById('dpUnit').value.trim()   || null,
+      delivery_city:      document.getElementById('dpCity').value.trim()   || null,
+      delivery_state:     document.getElementById('dpState').value.trim()  || null,
+      delivery_zip:       document.getElementById('dpZip').value.trim()    || null,
       updated_at:         new Date().toISOString(),
     };
   }
@@ -709,11 +752,19 @@
       alert(`Please set your flavor cups to exactly ${packCups} to match your selected pack.`);
       return false;
     }
-    const name  = document.getElementById('dpName').value.trim();
-    const email = document.getElementById('dpEmail').value.trim();
-    const phone = document.getElementById('dpPhone').value.trim();
+    const name   = document.getElementById('dpName').value.trim();
+    const email  = document.getElementById('dpEmail').value.trim();
+    const phone  = document.getElementById('dpPhone').value.trim();
+    const street = document.getElementById('dpStreet').value.trim();
+    const city   = document.getElementById('dpCity').value.trim();
+    const state  = document.getElementById('dpState').value.trim();
+    const zip    = document.getElementById('dpZip').value.trim();
     if (!name || !email || !phone) {
       alert('Please fill in your name, email address, and phone number.');
+      return false;
+    }
+    if (!street || !city || !state || !zip) {
+      alert('Please fill in your delivery address.');
       return false;
     }
     if (!selectedDeliveryDay) {
