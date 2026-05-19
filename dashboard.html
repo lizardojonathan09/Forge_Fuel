@@ -417,9 +417,10 @@
   let selectedDeliveryDay = '';
   let sub = { chocolate_cups: 5, peanut_butter_cups: 0, portion: 'full', status: 'active', delivery_day: '', delivery_time: '' };
   let flavorCups = { chocolate: 5, 'peanut-butter': 0 };
-  // Track initial plan to detect changes that need Stripe updating
+  // Track initial values to detect changes that need Stripe updating
   let initialPortion = 'full';
   let initialCups    = 5;
+  let initialStatus  = 'active';
 
   // ── Init ──────────────────────────────────────────────────
   (async () => {
@@ -472,6 +473,7 @@
       initialPortion = sub.portion;
       initialCups    = sub.chocolate_cups + sub.peanut_butter_cups;
     }
+    initialStatus = sub.status ?? 'active';
     renderSubscription();
   }
 
@@ -526,6 +528,24 @@
     document.getElementById('btnPaused').className = 'status-btn' + (status === 'paused' ? ' active-off' : '');
     const badge = document.getElementById('subStatusBadge');
     if (badge) badge.innerHTML = `<div class="status-pill ${status}"><div class="status-dot"></div>${status === 'active' ? 'Subscription Active' : 'Subscription Paused'}</div>`;
+    // Update delivery date display immediately when toggled
+    if (status === 'paused') {
+      showPausedDelivery();
+    } else if (selectedDeliveryDay) {
+      updateNextDeliveryDisplay(selectedDeliveryDay);
+    }
+  }
+
+  function showPausedDelivery() {
+    const badge  = document.getElementById('nextDeliveryBadge');
+    const dateEl = document.getElementById('nextDeliveryDate');
+    const dayEl  = document.getElementById('nextDeliveryDayName');
+    const dpNextDateText = document.getElementById('dpNextDateText');
+    dateEl.textContent = 'Paused';
+    dateEl.style.color = 'var(--muted)';
+    dayEl.textContent  = 'No upcoming delivery';
+    badge.style.display = 'inline-flex';
+    if (dpNextDateText) dpNextDateText.style.display = 'none';
   }
 
   function selectPortion(portion, update = true) {
@@ -556,6 +576,7 @@
   }
 
   function updateNextDeliveryDisplay(day) {
+    if (sub.status === 'paused') { showPausedDelivery(); return; }
     const date = getNextDeliveryDate(day);
     const badge = document.getElementById('nextDeliveryBadge');
     const dateEl = document.getElementById('nextDeliveryDate');
@@ -563,6 +584,7 @@
     const dpNextDateText = document.getElementById('dpNextDateText');
     const dpNextDate     = document.getElementById('dpNextDate');
 
+    dateEl.style.color = 'var(--orange)'; // reset from paused state
     if (date) {
       const formatted = date.toLocaleDateString('en-US', { month: 'long', day: 'numeric' });
       const dayOfWeek = date.toLocaleDateString('en-US', { weekday: 'long' });
@@ -716,9 +738,14 @@
     const { data, error } = await sb.functions.invoke('smart-api', {
       body: { action: 'update-plan', portion, cups },
     });
-    if (error) {
-      throw new Error(error.message || 'Failed to update Stripe plan');
-    }
+    if (error) throw new Error(error.message || 'Failed to update Stripe plan');
+    return data;
+  }
+
+  async function updateStripeStatus(status) {
+    const action = status === 'paused' ? 'pause-subscription' : 'resume-subscription';
+    const { data, error } = await sb.functions.invoke('smart-api', { body: { action } });
+    if (error) throw new Error(error.message || 'Failed to update subscription status');
     return data;
   }
 
@@ -728,8 +755,9 @@
     const msgEl = document.getElementById('saveMsg');
     btn.textContent = 'Saving…'; btn.disabled = true;
 
-    const currentCups  = flavorCups.chocolate + flavorCups['peanut-butter'];
-    const planChanged  = sub.portion !== initialPortion || currentCups !== initialCups;
+    const currentCups    = flavorCups.chocolate + flavorCups['peanut-butter'];
+    const planChanged    = sub.portion !== initialPortion || currentCups !== initialCups;
+    const statusChanged  = sub.status !== initialStatus;
 
     try {
       // Always save preferences to Supabase
@@ -742,12 +770,19 @@
       if (planChanged) {
         const result = await updateStripePlan(sub.portion, currentCups);
         stripeUpdated = result.success && !result.noSubscription;
-        // Update snapshot so a second save doesn't re-trigger Stripe
         initialPortion = sub.portion;
         initialCups    = currentCups;
       }
+      if (statusChanged) {
+        await updateStripeStatus(sub.status);
+        initialStatus = sub.status;
+        stripeUpdated = true;
+      }
 
-      msgEl.textContent = stripeUpdated ? '✓ Saved & billing updated!' : '✓ Saved!';
+      const msg = sub.status === 'paused' && statusChanged
+        ? '✓ Subscription paused!'
+        : stripeUpdated ? '✓ Saved & billing updated!' : '✓ Saved!';
+      msgEl.textContent = msg;
       msgEl.style.color = 'var(--green)';
       msgEl.classList.add('show');
       setTimeout(() => msgEl.classList.remove('show'), 3500);

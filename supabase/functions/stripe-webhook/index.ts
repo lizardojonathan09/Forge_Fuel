@@ -137,7 +137,9 @@ async function handleApiRequest(req: Request, auth: string) {
 
   const body = await req.json()
   console.log('API action:', body.action, 'user:', user.id)
-  if (body.action === 'update-plan') return handleUpdatePlan(user.id, body)
+  if (body.action === 'update-plan')         return handleUpdatePlan(user.id, body)
+  if (body.action === 'pause-subscription')  return handlePauseResume(user.id, true)
+  if (body.action === 'resume-subscription') return handlePauseResume(user.id, false)
 
   return new Response(JSON.stringify({ error: 'Unknown action' }), {
     status: 400, headers: { ...CORS, 'Content-Type': 'application/json' },
@@ -198,6 +200,38 @@ async function handleUpdatePlan(userId: string, body: { portion: string; cups: n
     .eq('customer_id', userId)
 
   console.log(`Plan updated for user ${userId}: ${planKey}`)
+  return new Response(JSON.stringify({ success: true }), {
+    headers: { ...CORS, 'Content-Type': 'application/json' },
+  })
+}
+
+// ── Pause or resume Stripe subscription ──────────────────────────────────
+async function handlePauseResume(userId: string, pause: boolean) {
+  const { data: sub } = await sb.from('subscriptions')
+    .select('stripe_subscription_id')
+    .eq('customer_id', userId)
+    .maybeSingle()
+
+  if (!sub?.stripe_subscription_id) {
+    return new Response(JSON.stringify({ success: true, noSubscription: true }), {
+      headers: { ...CORS, 'Content-Type': 'application/json' },
+    })
+  }
+
+  const params = pause
+    ? new URLSearchParams({ 'pause_collection[behavior]': 'void' })
+    : new URLSearchParams({ 'pause_collection': '' })
+
+  const updated = await stripeReq(`/subscriptions/${sub.stripe_subscription_id}`, 'POST', params)
+
+  if (updated.error) {
+    console.error('Stripe pause/resume failed:', updated.error)
+    return new Response(JSON.stringify({ error: updated.error.message || 'Stripe update failed' }), {
+      status: 500, headers: { ...CORS, 'Content-Type': 'application/json' },
+    })
+  }
+
+  console.log(`Subscription ${pause ? 'paused' : 'resumed'} for user ${userId}`)
   return new Response(JSON.stringify({ success: true }), {
     headers: { ...CORS, 'Content-Type': 'application/json' },
   })
