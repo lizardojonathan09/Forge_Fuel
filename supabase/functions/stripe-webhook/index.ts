@@ -250,7 +250,16 @@ async function handleCheckoutComplete(session: any) {
     await insertSubOrder({ customerId, email, sessionId: session.id, amountTotal: session.amount_total })
 
   } else if (session.mode === 'payment') {
-    const ref    = decodeURIComponent(rawRef)
+    // Decode base64url (set by website) — fallback to plain string for legacy events
+    let ref = rawRef
+    try {
+      const b64     = rawRef.replace(/-/g, '+').replace(/_/g, '/')
+      const padded  = b64 + '='.repeat((4 - b64.length % 4) % 4)
+      const decoded = atob(padded)
+      ref = new TextDecoder().decode(new Uint8Array(decoded.split('').map(c => c.charCodeAt(0))))
+    } catch {
+      ref = decodeURIComponent(rawRef)
+    }
     const parsed = parseRef(ref)
 
     const { data: customer } = await sb.from('customers')

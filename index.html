@@ -1055,7 +1055,11 @@
 
     const stripeLink = stripeLinks[orderType]?.[`${selectedPortion}-${pack.cups}`];
     if (stripeLink && !stripeLink.includes('REPLACE')) {
-      const ref = `${pack.cups}pack|flavor:${flavorLabel}|portion:${portionLabel}|price:${total}|date:${deliveryDate}|time:${deliveryTime}|name:${name}${referralSource ? '|ref:' + referralSource : ''}`;
+      const rawRef = `${pack.cups}pack|flavor:${flavorLabel}|portion:${portionLabel}|price:${total}|date:${deliveryDate}|time:${deliveryTime}|name:${name}${referralSource ? '|ref:' + referralSource : ''}`;
+      // Base64url encode so only A-Za-z0-9-_ chars are used (Stripe-safe)
+      const bytes  = new TextEncoder().encode(rawRef);
+      const binary = String.fromCharCode(...bytes);
+      const ref    = btoa(binary).replace(/\+/g, '-').replace(/\//g, '_').replace(/=/g, '');
       const url = new URL(stripeLink);
       url.searchParams.set('client_reference_id', ref);
       url.searchParams.set('prefilled_email', email);
