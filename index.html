@@ -1055,15 +1055,10 @@
 
     const stripeLink = stripeLinks[orderType]?.[`${selectedPortion}-${pack.cups}`];
     if (stripeLink && !stripeLink.includes('REPLACE')) {
-      const perCup = '$' + pack.perCup.toFixed(2);
-      const ref = encodeURIComponent(
-        `${pack.cups}pack|${orderType}|flavor:${flavorLabel}|portion:${portionLabel}|price:${total}|perCup:${perCup}|date:${deliveryDate}|time:${deliveryTime}|name:${name}${referralSource ? '|ref:' + referralSource : ''}`
-      );
-      const successUrl = encodeURIComponent(window.location.origin + window.location.pathname.replace('index.html', '') + 'success.html?client_reference_id=' + ref);
+      const ref = `${pack.cups}pack|flavor:${flavorLabel}|portion:${portionLabel}|price:${total}|date:${deliveryDate}|time:${deliveryTime}|name:${name}${referralSource ? '|ref:' + referralSource : ''}`;
       const url = new URL(stripeLink);
       url.searchParams.set('client_reference_id', ref);
       url.searchParams.set('prefilled_email', email);
-      url.searchParams.set('success_url', successUrl);
       window.location.href = url.toString();
     } else {
       btn.textContent = '⚡ Add your Stripe links to activate checkout';
