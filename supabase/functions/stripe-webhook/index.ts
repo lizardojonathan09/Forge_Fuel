@@ -239,6 +239,12 @@ async function handlePauseResume(userId: string, pause: boolean) {
 
 // ── Checkout completed ────────────────────────────────────────────────────
 async function handleCheckoutComplete(session: any) {
+  // Only process sessions where payment was actually collected
+  if (session.payment_status !== 'paid') {
+    console.warn('Skipping checkout.session.completed — payment_status:', session.payment_status)
+    return
+  }
+
   const email  = session.customer_details?.email ?? ''
   const rawRef = session.client_reference_id ?? ''
 
