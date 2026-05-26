@@ -137,10 +137,11 @@ async function handleApiRequest(req: Request, auth: string) {
 
   const body = await req.json()
   console.log('API action:', body.action, 'user:', user.id)
-  if (body.action === 'update-plan')           return handleUpdatePlan(user.id, body)
-  if (body.action === 'pause-subscription')    return handlePauseResume(user.id, true)
-  if (body.action === 'resume-subscription')   return handlePauseResume(user.id, false)
-  if (body.action === 'create-portal-session') return handlePortalSession(user.id, body)
+  if (body.action === 'update-plan')             return handleUpdatePlan(user.id, body)
+  if (body.action === 'pause-subscription')      return handlePauseResume(user.id, true)
+  if (body.action === 'resume-subscription')     return handlePauseResume(user.id, false)
+  if (body.action === 'create-portal-session')   return handlePortalSession(user.id, body)
+  if (body.action === 'fix-payment-links')       return handleFixPaymentLinks()
 
   return new Response(JSON.stringify({ error: 'Unknown action' }), {
     status: 400, headers: { ...CORS, 'Content-Type': 'application/json' },
@@ -234,6 +235,49 @@ async function handlePauseResume(userId: string, pause: boolean) {
 
   console.log(`Subscription ${pause ? 'paused' : 'resumed'} for user ${userId}`)
   return new Response(JSON.stringify({ success: true }), {
+    headers: { ...CORS, 'Content-Type': 'application/json' },
+  })
+}
+
+// ── One-time: fix all payment links ──────────────────────────────────────
+async function handleFixPaymentLinks() {
+  const results: { id: string; ok: boolean; error?: string }[] = []
+
+  // Fetch all payment links
+  let hasMore = true
+  let startingAfter = ''
+  const links: any[] = []
+
+  while (hasMore) {
+    const qs = new URLSearchParams({ limit: '100' })
+    if (startingAfter) qs.set('starting_after', startingAfter)
+    const res = await stripeReq(`/payment_links?${qs}`)
+    if (res.error) {
+      return new Response(JSON.stringify({ error: res.error.message }), {
+        status: 500, headers: { ...CORS, 'Content-Type': 'application/json' },
+      })
+    }
+    links.push(...res.data)
+    hasMore = res.has_more
+    if (hasMore) startingAfter = res.data[res.data.length - 1].id
+  }
+
+  // Update each link
+  for (const link of links) {
+    const params = new URLSearchParams({
+      'allow_promotion_codes': 'true',
+      'custom_fields':         '',
+    })
+    const updated = await stripeReq(`/payment_links/${link.id}`, 'POST', params)
+    if (updated.error) {
+      results.push({ id: link.id, ok: false, error: updated.error.message })
+    } else {
+      results.push({ id: link.id, ok: true })
+    }
+  }
+
+  console.log('fix-payment-links results:', JSON.stringify(results))
+  return new Response(JSON.stringify({ results }), {
     headers: { ...CORS, 'Content-Type': 'application/json' },
   })
 }
