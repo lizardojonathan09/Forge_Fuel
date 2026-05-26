@@ -398,17 +398,24 @@ async function handleCheckoutComplete(session: any) {
     await insertSubOrder({ customerId, email, sessionId: session.id, amountTotal: session.amount_total })
 
   } else if (session.mode === 'payment') {
-    // Decode base64url (set by website) — fallback to plain string for legacy events
-    let ref = rawRef
-    try {
-      const b64     = rawRef.replace(/-/g, '+').replace(/_/g, '/')
-      const padded  = b64 + '='.repeat((4 - b64.length % 4) % 4)
-      const decoded = atob(padded)
-      ref = new TextDecoder().decode(new Uint8Array(decoded.split('').map(c => c.charCodeAt(0))))
-    } catch {
-      ref = decodeURIComponent(rawRef)
+    let parsed: Record<string, any> = {}
+
+    if (rawRef) {
+      // Decode base64url (set by website) — fallback to plain string for legacy events
+      try {
+        const b64     = rawRef.replace(/-/g, '+').replace(/_/g, '/')
+        const padded  = b64 + '='.repeat((4 - b64.length % 4) % 4)
+        const decoded = atob(padded)
+        const str     = new TextDecoder().decode(new Uint8Array(decoded.split('').map(c => c.charCodeAt(0))))
+        parsed = parseRef(str)
+      } catch {
+        parsed = parseRef(decodeURIComponent(rawRef))
+      }
+    } else {
+      // No client_reference_id — customer came directly via payment link.
+      // Extract what we can from the session itself.
+      parsed = extractFromSession(session)
     }
-    const parsed = parseRef(ref)
 
     const { data: customer } = await sb.from('customers')
       .select('id').eq('email', email).maybeSingle()
@@ -417,6 +424,7 @@ async function handleCheckoutComplete(session: any) {
       customer_id:       customer?.id ?? null,
       customer_email:    email,
       customer_name:     parsed.name ?? session.customer_details?.name ?? '',
+      customer_phone:    parsed.phone ?? session.customer_details?.phone ?? null,
       flavor:            parsed.flavor ?? '',
       portion:           parsed.portion ?? '',
       pack_size:         parsed.pack_size ?? null,
@@ -494,6 +502,46 @@ async function insertSubOrder({ customerId, email, sessionId, invoiceId, amountT
     stripe_session_id: sessionId ?? null,
     stripe_invoice_id: invoiceId ?? null,
   })
+}
+
+// ── Extract order data from session when client_reference_id is absent ────
+// Used when a customer purchases directly via a Stripe payment link
+// (bypassing the website), so no encoded data was attached.
+function extractFromSession(session: any): Record<string, any> {
+  const parsed: Record<string, any> = {}
+
+  // Name & phone from customer_details
+  parsed.name  = session.customer_details?.name  ?? ''
+  parsed.phone = session.customer_details?.phone ?? null
+
+  // Delivery time from custom fields (if still present on the link)
+  const fields: any[] = session.custom_fields ?? []
+  const dtField = fields.find((f: any) => f.key === 'preferreddeliverydateandtime')
+  if (dtField?.text?.value) parsed.time = dtField.text.value
+
+  // Infer portion & pack_size from amount_subtotal (unique per plan, discount-independent)
+  const cents = session.amount_subtotal ?? session.amount_total ?? 0
+  const PLAN_BY_CENTS: Record<number, { portion: string; pack_size: number }> = {
+    2400: { portion: 'Full Serving', pack_size: 3 },
+    3750: { portion: 'Full Serving', pack_size: 5 },
+    4900: { portion: 'Full Serving', pack_size: 7 },
+    2500: { portion: 'Half Serving', pack_size: 5 },
+    3150: { portion: 'Half Serving', pack_size: 7 },
+    3600: { portion: 'Half Serving', pack_size: 9 },
+  }
+  const plan = PLAN_BY_CENTS[cents]
+  if (plan) {
+    parsed.portion   = plan.portion
+    parsed.pack_size = plan.pack_size
+  }
+
+  // Total from session
+  parsed.price = formatAmount(session.amount_total)
+
+  // Flavor cannot be determined from the payment link alone — left blank
+  parsed.flavor = ''
+
+  return parsed
 }
 
 // ── Helpers ───────────────────────────────────────────────────────────────
