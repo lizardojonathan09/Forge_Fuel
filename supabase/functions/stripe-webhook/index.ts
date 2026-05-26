@@ -108,9 +108,9 @@ async function handleWebhook(req: Request, sig: string) {
     if (event.type === 'checkout.session.completed') {
       await handleCheckoutComplete(event.data.object)
     } else if (event.type === 'invoice.payment_succeeded') {
-      if (event.data.object.billing_reason === 'subscription_cycle') {
-        await handleRenewal(event.data.object)
-      }
+      await handleInvoicePaid(event.data.object)
+    } else if (event.type === 'invoice.payment_failed') {
+      await handleInvoiceFailed(event.data.object)
     }
   } catch (err) {
     console.error('Handler error:', err)
@@ -137,9 +137,10 @@ async function handleApiRequest(req: Request, auth: string) {
 
   const body = await req.json()
   console.log('API action:', body.action, 'user:', user.id)
-  if (body.action === 'update-plan')         return handleUpdatePlan(user.id, body)
-  if (body.action === 'pause-subscription')  return handlePauseResume(user.id, true)
-  if (body.action === 'resume-subscription') return handlePauseResume(user.id, false)
+  if (body.action === 'update-plan')           return handleUpdatePlan(user.id, body)
+  if (body.action === 'pause-subscription')    return handlePauseResume(user.id, true)
+  if (body.action === 'resume-subscription')   return handlePauseResume(user.id, false)
+  if (body.action === 'create-portal-session') return handlePortalSession(user.id, body)
 
   return new Response(JSON.stringify({ error: 'Unknown action' }), {
     status: 400, headers: { ...CORS, 'Content-Type': 'application/json' },
@@ -235,6 +236,69 @@ async function handlePauseResume(userId: string, pause: boolean) {
   return new Response(JSON.stringify({ success: true }), {
     headers: { ...CORS, 'Content-Type': 'application/json' },
   })
+}
+
+// ── Stripe Customer Portal session ───────────────────────────────────────
+async function handlePortalSession(userId: string, body: { returnUrl: string }) {
+  const { data: cust } = await sb.from('customers')
+    .select('stripe_customer_id')
+    .eq('id', userId)
+    .maybeSingle()
+
+  if (!cust?.stripe_customer_id) {
+    return new Response(JSON.stringify({ error: 'No Stripe customer found' }), {
+      status: 404, headers: { ...CORS, 'Content-Type': 'application/json' },
+    })
+  }
+
+  const session = await stripeReq('/billing_portal/sessions', 'POST', new URLSearchParams({
+    customer:   cust.stripe_customer_id,
+    return_url: body.returnUrl,
+  }))
+
+  if (session.error) {
+    console.error('Portal session error:', session.error)
+    return new Response(JSON.stringify({ error: session.error.message || 'Failed to create portal session' }), {
+      status: 500, headers: { ...CORS, 'Content-Type': 'application/json' },
+    })
+  }
+
+  return new Response(JSON.stringify({ url: session.url }), {
+    headers: { ...CORS, 'Content-Type': 'application/json' },
+  })
+}
+
+// ── Invoice paid — clear payment_failed flag + handle renewal ─────────────
+async function handleInvoicePaid(invoice: any) {
+  // Clear payment_failed flag for this subscription
+  const stripeSub  = await stripeReq(`/subscriptions/${invoice.subscription}`)
+  const customerId = stripeSub.metadata?.supabase_customer_id
+  if (customerId) {
+    await sb.from('subscriptions')
+      .update({ payment_failed: false })
+      .eq('customer_id', customerId)
+  }
+
+  // Create renewal order for billing cycle payments
+  if (invoice.billing_reason === 'subscription_cycle') {
+    await handleRenewal(invoice)
+  }
+}
+
+// ── Invoice failed — set payment_failed flag ──────────────────────────────
+async function handleInvoiceFailed(invoice: any) {
+  const stripeSub  = await stripeReq(`/subscriptions/${invoice.subscription}`)
+  const customerId = stripeSub.metadata?.supabase_customer_id
+  if (!customerId) {
+    console.warn('No supabase_customer_id in subscription metadata, skipping')
+    return
+  }
+
+  await sb.from('subscriptions')
+    .update({ payment_failed: true })
+    .eq('customer_id', customerId)
+
+  console.log(`Payment failed flagged for customer ${customerId}`)
 }
 
 // ── Checkout completed ────────────────────────────────────────────────────

@@ -136,6 +136,16 @@
     .save-msg { display: inline-block; font-family: 'Oswald', sans-serif; font-size: 13px; letter-spacing: 1px; margin-left: 14px; opacity: 0; transition: opacity 0.3s; }
     .save-msg.show { opacity: 1; color: var(--green); }
 
+    /* PAYMENT FAILED BANNER */
+    .payment-failed-banner { grid-column: 1 / -1; background: rgba(220,53,69,0.1); border: 1px solid rgba(220,53,69,0.4); border-radius: 12px; padding: 20px 28px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px; }
+    .payment-failed-text { display: flex; align-items: center; gap: 14px; }
+    .payment-failed-icon { font-size: 24px; flex-shrink: 0; }
+    .payment-failed-msg { font-family: 'Oswald', sans-serif; }
+    .payment-failed-msg strong { display: block; font-size: 15px; letter-spacing: 1px; color: #ff6b6b; margin-bottom: 4px; }
+    .payment-failed-msg span { font-size: 13px; color: var(--muted); font-family: 'Inter', sans-serif; font-weight: 400; }
+    .btn-update-payment { background: #dc3545; color: #fff; font-family: 'Oswald', sans-serif; font-size: 13px; font-weight: 600; letter-spacing: 2px; text-transform: uppercase; padding: 12px 24px; border-radius: 6px; border: none; cursor: pointer; transition: background 0.2s; white-space: nowrap; }
+    .btn-update-payment:hover { background: #c82333; }
+
     /* REFERRAL */
     .referral-card { grid-column: 1 / -1; }
     .referral-inner { display: flex; flex-wrap: wrap; gap: 32px; align-items: flex-start; }
@@ -231,6 +241,18 @@
 
   <!-- BODY -->
   <div class="dash-body">
+
+    <!-- PAYMENT FAILED BANNER -->
+    <div class="payment-failed-banner" id="paymentFailedBanner" style="display:none;">
+      <div class="payment-failed-text">
+        <div class="payment-failed-icon">⚠️</div>
+        <div class="payment-failed-msg">
+          <strong>Payment Failed</strong>
+          <span>Your last payment didn't go through. Please update your payment method to keep your subscription active.</span>
+        </div>
+      </div>
+      <button class="btn-update-payment" onclick="openCustomerPortal()">Update Payment Method</button>
+    </div>
 
     <!-- SUBSCRIPTION CARD -->
     <div class="dash-card sub-card">
@@ -553,6 +575,7 @@
     }
     initialStatus = sub.status ?? 'active';
     renderSubscription();
+    checkPaymentFailed();
   }
 
   async function loadOrders() {
@@ -914,6 +937,33 @@
       client_reference_id: currentUser.id,
     });
     window.location.href = `${stripeUrl}?${params.toString()}`;
+  }
+
+  // ── Payment failed banner & Customer Portal ───────────────
+  function checkPaymentFailed() {
+    if (sub.payment_failed) {
+      document.getElementById('paymentFailedBanner').style.display = 'flex';
+    }
+  }
+
+  async function openCustomerPortal() {
+    const btn = document.querySelector('.btn-update-payment');
+    btn.textContent = 'Loading…';
+    btn.disabled = true;
+
+    const returnUrl = window.location.href;
+    const { data, error } = await sb.functions.invoke('smart-api', {
+      body: { action: 'create-portal-session', returnUrl },
+    });
+
+    if (error || !data?.url) {
+      btn.textContent = 'Update Payment Method';
+      btn.disabled = false;
+      alert('Could not open payment portal. Please try again.');
+      return;
+    }
+
+    window.location.href = data.url;
   }
 
   // ── Referral ───────────────────────────────────────────────
