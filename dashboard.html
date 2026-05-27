@@ -987,7 +987,8 @@
     }
 
     referralCode = profile.referral_code;
-    const link = `${window.location.origin}/index.html?ref=${referralCode}`;
+    // Build URL relative to the current page so it works on any host/subdirectory
+    const link = new URL(`index.html?ref=${referralCode}`, window.location.href).href;
     document.getElementById('referralLinkInput').value = link;
 
     // Count referred orders
