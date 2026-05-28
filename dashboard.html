@@ -158,9 +158,21 @@
     .referral-share-btns { display: flex; gap: 8px; flex-wrap: wrap; }
     .btn-share { display: inline-flex; align-items: center; gap: 6px; background: transparent; border: 1px solid var(--border); color: var(--muted); font-family: 'Oswald', sans-serif; font-size: 12px; letter-spacing: 1.5px; text-transform: uppercase; padding: 10px 16px; border-radius: 6px; cursor: pointer; transition: all 0.2s; text-decoration: none; }
     .btn-share:hover { border-color: var(--orange); color: var(--orange); }
-    .referral-right { min-width: 160px; text-align: center; background: rgba(255,107,26,0.06); border: 1px solid rgba(255,107,26,0.2); border-radius: 12px; padding: 24px 32px; }
-    .referral-count { font-family: 'Bebas Neue', sans-serif; font-size: 52px; color: var(--orange); line-height: 1; }
-    .referral-count-label { font-family: 'Oswald', sans-serif; font-size: 11px; letter-spacing: 3px; text-transform: uppercase; color: var(--muted); margin-top: 4px; }
+
+    /* Referral progress bar */
+    .referral-progress-section { margin-bottom: 32px; }
+    .referral-progress-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+    .referral-track-wrap { position: relative; padding-bottom: 54px; }
+    .referral-track { height: 8px; background: rgba(255,255,255,0.06); border-radius: 4px; position: relative; overflow: visible; }
+    .referral-track-fill { height: 100%; background: linear-gradient(90deg, var(--fire), var(--orange)); border-radius: 4px; width: 0%; transition: width 1s cubic-bezier(0.4,0,0.2,1); }
+    .referral-ms-dot { position: absolute; top: 50%; width: 20px; height: 20px; border-radius: 50%; background: var(--dark); border: 2px solid #3a3a3a; transform: translate(-50%, -50%); z-index: 2; transition: all 0.5s; }
+    .referral-ms-dot.achieved { background: var(--orange); border-color: var(--orange); box-shadow: 0 0 14px rgba(255,107,26,0.55); }
+    .referral-ms-label { position: absolute; top: 20px; transform: translateX(-50%); text-align: center; display: flex; flex-direction: column; align-items: center; }
+    .referral-ms-num { font-family: 'Bebas Neue', sans-serif; font-size: 17px; color: var(--cream); line-height: 1; }
+    .referral-ms-reward { font-family: 'Oswald', sans-serif; font-size: 10px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--muted); white-space: nowrap; margin-top: 3px; transition: color 0.4s; }
+    .referral-ms-reward.achieved { color: var(--orange); }
+    .referral-next-goal { font-family: 'Oswald', sans-serif; font-size: 13px; letter-spacing: 1px; color: var(--muted); }
+    .referral-next-goal.complete { color: var(--orange); }
 
     /* ORDER HISTORY */
     .orders-card { grid-column: 1 / -1; }
@@ -252,6 +264,64 @@
         </div>
       </div>
       <button class="btn-update-payment" onclick="openCustomerPortal()">Update Payment Method</button>
+    </div>
+
+    <!-- REFERRAL -->
+    <div class="dash-card referral-card">
+      <div class="dash-card-header">
+        <span class="dash-card-title">🔗 Refer a Friend</span>
+        <div style="display:flex;align-items:center;gap:8px;">
+          <span style="font-family:'Bebas Neue',sans-serif;font-size:28px;color:var(--orange);line-height:1;" id="referralCount">—</span>
+          <span style="font-family:'Oswald',sans-serif;font-size:11px;letter-spacing:2px;color:var(--muted);text-transform:uppercase;">Referred</span>
+        </div>
+      </div>
+      <div class="dash-card-body">
+
+        <!-- Rewards progress bar -->
+        <div class="referral-progress-section">
+          <div class="referral-progress-header">
+            <span class="sub-label" style="margin:0;">Rewards Progress</span>
+            <span class="referral-next-goal" id="referralNextGoal"></span>
+          </div>
+          <div class="referral-track-wrap">
+            <div class="referral-track">
+              <div class="referral-track-fill" id="referralTrackFill"></div>
+              <div class="referral-ms-dot" style="left:30%" id="msDot3"></div>
+              <div class="referral-ms-dot" style="left:50%" id="msDot5"></div>
+              <div class="referral-ms-dot" style="left:100%" id="msDot10"></div>
+            </div>
+            <div class="referral-ms-label" style="left:30%">
+              <span class="referral-ms-num">3</span>
+              <span class="referral-ms-reward" id="msReward3">Free 3-Pack</span>
+            </div>
+            <div class="referral-ms-label" style="left:50%">
+              <span class="referral-ms-num">5</span>
+              <span class="referral-ms-reward" id="msReward5">Free 5-Pack</span>
+            </div>
+            <div class="referral-ms-label" style="left:100%">
+              <span class="referral-ms-num">10</span>
+              <span class="referral-ms-reward" id="msReward10">Free T-Shirt 🔥</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Link + share -->
+        <div class="referral-inner">
+          <div class="referral-left">
+            <p class="referral-desc">Share your unique link. Every order placed through it counts toward free rewards — 3 referrals gets you a free 3-pack, 5 a free 5-pack, and 10 a free Forge T-shirt.</p>
+            <div class="referral-link-box">
+              <input class="referral-link-input" id="referralLinkInput" type="text" readonly value="Loading…" onclick="this.select()" />
+              <button class="btn-copy" onclick="copyReferralLink()">Copy</button>
+            </div>
+            <div class="referral-share-btns">
+              <button class="btn-share" onclick="shareReferral('sms')">💬 Text</button>
+              <button class="btn-share" onclick="shareReferral('email')">✉️ Email</button>
+              <button class="btn-share" onclick="shareReferral('native')">↑ Share</button>
+            </div>
+          </div>
+        </div>
+
+      </div>
     </div>
 
     <!-- SUBSCRIPTION CARD -->
@@ -416,33 +486,6 @@
           <span class="save-msg" id="saveMsg">✓ Saved!</span>
         </div>
 
-      </div>
-    </div>
-
-    <!-- REFERRAL -->
-    <div class="dash-card referral-card">
-      <div class="dash-card-header">
-        <span class="dash-card-title">🔗 Refer a Friend</span>
-      </div>
-      <div class="dash-card-body">
-        <div class="referral-inner">
-          <div class="referral-left">
-            <p class="referral-desc">Share your unique link with friends. When they place an order, it'll be tracked back to you automatically.</p>
-            <div class="referral-link-box">
-              <input class="referral-link-input" id="referralLinkInput" type="text" readonly value="Loading…" onclick="this.select()" />
-              <button class="btn-copy" onclick="copyReferralLink()">Copy</button>
-            </div>
-            <div class="referral-share-btns">
-              <button class="btn-share" onclick="shareReferral('sms')">💬 Text</button>
-              <button class="btn-share" onclick="shareReferral('email')">✉️ Email</button>
-              <button class="btn-share" onclick="shareReferral('native')">↑ Share</button>
-            </div>
-          </div>
-          <div class="referral-right">
-            <div class="referral-count" id="referralCount">—</div>
-            <div class="referral-count-label">Orders<br>Referred</div>
-          </div>
-        </div>
       </div>
     </div>
 
@@ -995,7 +1038,43 @@
     const { count } = await sb.from('orders')
       .select('id', { count: 'exact', head: true })
       .eq('referred_by', referralCode);
-    document.getElementById('referralCount').textContent = count ?? 0;
+    const n = count ?? 0;
+    document.getElementById('referralCount').textContent = n;
+    updateReferralProgress(n);
+  }
+
+  function updateReferralProgress(count) {
+    const MILESTONES = [
+      { n: 3,  dotId: 'msDot3',  rewardId: 'msReward3' },
+      { n: 5,  dotId: 'msDot5',  rewardId: 'msReward5' },
+      { n: 10, dotId: 'msDot10', rewardId: 'msReward10' },
+    ];
+    const MAX = 10;
+
+    // Animate the fill bar
+    const pct = Math.min((count / MAX) * 100, 100);
+    document.getElementById('referralTrackFill').style.width = pct + '%';
+
+    // Light up achieved milestones
+    MILESTONES.forEach(ms => {
+      const achieved = count >= ms.n;
+      document.getElementById(ms.dotId)?.classList.toggle('achieved', achieved);
+      document.getElementById(ms.rewardId)?.classList.toggle('achieved', achieved);
+    });
+
+    // "X more for next reward" hint
+    const goalEl = document.getElementById('referralNextGoal');
+    const rewards = ['Free 3-Pack', 'Free 5-Pack', 'Free T-Shirt'];
+    const counts  = [3, 5, 10];
+    const nextIdx = counts.findIndex(c => count < c);
+    if (nextIdx === -1) {
+      goalEl.textContent = '🏆 All milestones achieved!';
+      goalEl.classList.add('complete');
+    } else {
+      const rem = counts[nextIdx] - count;
+      goalEl.textContent = `${rem} more for ${rewards[nextIdx]}`;
+      goalEl.classList.remove('complete');
+    }
   }
 
   function copyReferralLink() {
