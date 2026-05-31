@@ -197,8 +197,7 @@
     if (data.user) {
       await sb.from('customers').upsert({ id: data.user.id, name, email });
     }
-    showMsg('Account created! Check your email to confirm, then sign in.', 'success');
-    btn.textContent = 'Create Account'; btn.disabled = false;
+    window.location.href = 'dashboard.html';
   }
 
   async function handleForgotPassword() {
