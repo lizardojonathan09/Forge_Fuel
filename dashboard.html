@@ -1088,7 +1088,7 @@
 
   function shareReferral(type) {
     const link = document.getElementById('referralLinkInput').value;
-    const msg  = `Hey! Try Forge Oats — fresh oatmeal delivered to your door. Use my link: ${link}`;
+    const msg  = `Click link to buy deliciously healthy overnight oats. Chocolate or Peanut Butter flavors available. ${link}`;
     if (type === 'sms') {
       window.open(`sms:?body=${encodeURIComponent(msg)}`);
     } else if (type === 'email') {
