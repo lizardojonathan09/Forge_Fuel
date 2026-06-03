@@ -1,4 +1,3 @@
-import { serve } from 'https://deno.land/std@0.208.0/http/server.ts'
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 
 // No Stripe SDK — all Stripe calls use native fetch to avoid Deno compatibility issues
@@ -72,7 +71,7 @@ async function verifyStripeSignature(body: string, sig: string, secret: string):
 }
 
 // ── Router ────────────────────────────────────────────────────────────────
-serve(async (req) => {
+Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') return new Response('ok', { headers: CORS })
 
   try {
