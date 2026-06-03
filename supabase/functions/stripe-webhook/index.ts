@@ -564,6 +564,9 @@ async function handleCheckoutComplete(session: any) {
       )
     }
 
+    // Use cart's chosen delivery date as the first next_delivery_date
+    const nextDeliveryDate = meta.delivery_date || null
+
     await Promise.all([
       sb.from('subscriptions').upsert(
         {
@@ -576,6 +579,7 @@ async function handleCheckoutComplete(session: any) {
           chocolate_cups:         qtyFc + qtyHc,   // legacy
           peanut_butter_cups:     qtyFp + qtyHp,   // legacy
           portion,                                  // legacy
+          next_delivery_date:     nextDeliveryDate,
           ...(totalCups > 0 ? { stripe_plan: `${portion}-${totalCups}` } : {}),
         },
         { onConflict: 'customer_id' }

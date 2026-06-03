@@ -993,6 +993,18 @@
       // Save quantities + delivery schedule to Supabase
       const deliveryDay  = selectedDeliveryDay || null;
       const deliveryTime = document.getElementById('dpTime').value || null;
+      // Calculate next delivery date from chosen day of week
+      const nextDeliveryDate = deliveryDay ? (() => {
+        const days = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+        const target = days.indexOf(deliveryDay);
+        if (target === -1) return null;
+        const today = new Date();
+        let diff = target - today.getDay();
+        if (diff <= 0) diff += 7;
+        const d = new Date(today);
+        d.setDate(today.getDate() + diff);
+        return d.toISOString().split('T')[0]; // YYYY-MM-DD
+      })() : null;
       const payload = {
         customer_id:        currentUser.id,
         // New 4-product model
@@ -1006,6 +1018,7 @@
         portion,
         delivery_day:       deliveryDay,
         delivery_time:      deliveryTime,
+        next_delivery_date: nextDeliveryDate,
         updated_at:         new Date().toISOString(),
       };
       await sb.from('subscriptions').upsert(payload, { onConflict: 'customer_id' });

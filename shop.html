@@ -768,7 +768,6 @@
     qtys[id] = Math.max(0, qtys[id] + delta);
     saveCart();
     updateAll();
-    if (delta > 0 && totalCups() > 0) openCart();
   }
 
   function setOrderType(type) {
@@ -910,6 +909,12 @@
       showCartErr(`Please fill in: ${missing.join(', ')}.`);
       return;
     }
+
+    // Chicago zip code validation (606xx or 607xx)
+    if (!/^60[67]\d{2}$/.test(fields.zip)) {
+      showCartErr('We currently only deliver within Chicago. Please enter a valid Chicago zip code (606xx–607xx).');
+      return;
+    }
     showCartErr('');
     saveFields();
 
@@ -979,7 +984,8 @@
         .replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
 
       // Persist delivery info to customer profile so it pre-fills next time
-      sb.from('customers').upsert({
+      // Awaited so the upsert completes before the page navigates away
+      await sb.from('customers').upsert({
         id:               userId,
         name:             delivery.name,
         phone:            delivery.phone,
@@ -989,7 +995,7 @@
         delivery_city:    delivery.city,
         delivery_state:   delivery.state,
         delivery_zip:     delivery.zip,
-      }, { onConflict: 'id' }); // fire-and-forget, don't await
+      }, { onConflict: 'id' });
 
       // Navigate → edge function returns 302 → Stripe checkout (no fetch/CORS)
       localStorage.removeItem(CART_KEY);
