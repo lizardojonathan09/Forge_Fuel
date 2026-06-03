@@ -668,6 +668,14 @@
       if (profile) prefillFromProfile(profile);
     }
 
+    // Show error if redirected back from a failed checkout
+    const checkoutErr = new URLSearchParams(window.location.search).get('checkout_error');
+    if (checkoutErr) {
+      showCartErr('Checkout failed: ' + decodeURIComponent(checkoutErr));
+      openCart();
+      window.history.replaceState({}, '', window.location.pathname);
+    }
+
     // Capture referral code from URL
     const urlRef = new URLSearchParams(window.location.search).get('ref');
     if (urlRef) {
@@ -950,39 +958,28 @@
       const { data: { session: authSession } } = await sb.auth.getSession();
       if (!authSession) throw new Error('Session expired — please sign in again.');
 
-      const res = await fetch(EDGE_URL, {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${authSession.access_token}`,
-          'apikey':         SUPABASE_ANON_KEY,
-          'Content-Type':  'application/json',
-        },
-        body: JSON.stringify({
-          action:     'create-checkout-session',
-          userId,
-          orderType,
-          cartItems,
-          totalCups:  cups,
-          subtotal:   getSubtotal(),
-          delivery,
-          referral,
-          successUrl: window.location.origin + '/success.html',
-          cancelUrl:  window.location.href,
-        }),
+      // Encode cart payload as base64url — passed as a GET param so the
+      // browser navigates directly (no CORS preflight at all).
+      const payload = JSON.stringify({
+        orderType,
+        cartItems,
+        totalCups:  cups,
+        subtotal:   getSubtotal(),
+        delivery,
+        referral,
+        successUrl: window.location.origin + '/success.html',
+        cancelUrl:  window.location.href,
       });
+      const encoded = btoa(payload)
+        .replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
 
-      let resData;
-      try { resData = await res.json(); } catch (_) { resData = {}; }
+      // Navigate → edge function returns 302 → Stripe checkout (no fetch/CORS)
+      localStorage.removeItem(CART_KEY);
+      window.location.href =
+        `${EDGE_URL}?action=create-checkout-session` +
+        `&token=${encodeURIComponent(authSession.access_token)}` +
+        `&data=${encoded}`;
 
-      if (!res.ok) {
-        throw new Error(resData?.error || `Server error (${res.status})`);
-      }
-      if (resData?.url) {
-        localStorage.removeItem(CART_KEY);
-        window.location.href = resData.url;
-      } else {
-        throw new Error(resData?.error || 'No checkout URL returned');
-      }
     } catch (err) {
       showCartErr(err.message);
       btn.textContent = 'Proceed to Checkout →';

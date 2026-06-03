@@ -74,6 +74,15 @@ async function verifyStripeSignature(body: string, sig: string, secret: string):
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') return new Response('ok', { headers: CORS })
 
+  // ── GET: browser-redirect checkout (no CORS preflight needed) ────────────
+  if (req.method === 'GET') {
+    const url = new URL(req.url)
+    if (url.searchParams.get('action') === 'create-checkout-session') {
+      return handleCheckoutRedirect(url)
+    }
+    return new Response('Not found', { status: 404 })
+  }
+
   try {
     const sig  = req.headers.get('stripe-signature')
     const auth = req.headers.get('authorization')
@@ -90,6 +99,52 @@ Deno.serve(async (req) => {
     })
   }
 })
+
+// ── Browser-redirect checkout ─────────────────────────────────────────────
+// Called via window.location.href — no CORS preflight, function returns 302
+// redirect directly to Stripe's hosted checkout page.
+async function handleCheckoutRedirect(url: URL) {
+  const token       = url.searchParams.get('token') ?? ''
+  const dataEncoded = url.searchParams.get('data')  ?? ''
+
+  // Verify JWT
+  const { data, error } = await sb.auth.getUser(token)
+  const user = data?.user
+  if (error || !user) {
+    console.error('Checkout redirect auth error:', error)
+    return new Response('Unauthorized — please sign in and try again.', { status: 401 })
+  }
+
+  // Decode base64url cart payload
+  let body: any
+  try {
+    const b64    = dataEncoded.replace(/-/g, '+').replace(/_/g, '/')
+    const padded = b64 + '='.repeat((4 - b64.length % 4) % 4)
+    body = JSON.parse(atob(padded))
+  } catch (err) {
+    console.error('Failed to decode checkout data:', err)
+    return new Response('Invalid checkout data', { status: 400 })
+  }
+
+  // Reuse existing checkout-session logic
+  const checkoutRes  = await handleCreateCheckoutSession(user.id, body)
+  const checkoutData = await checkoutRes.json()
+
+  if (!checkoutRes.ok || !checkoutData.url) {
+    console.error('Checkout session error:', checkoutData.error)
+    const cancelUrl = body.cancelUrl ?? 'https://getforgefuel.com/shop.html'
+    return new Response(null, {
+      status: 302,
+      headers: { Location: `${cancelUrl}?checkout_error=${encodeURIComponent(checkoutData.error ?? 'Unknown error')}` },
+    })
+  }
+
+  console.log(`Checkout redirect → Stripe for user ${user.id}`)
+  return new Response(null, {
+    status: 302,
+    headers: { Location: checkoutData.url },
+  })
+}
 
 // ── Stripe webhook ────────────────────────────────────────────────────────
 async function handleWebhook(req: Request, sig: string) {
