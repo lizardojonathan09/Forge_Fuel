@@ -946,8 +946,18 @@
     const referral = document.getElementById('cartRef').value.trim();
 
     try {
-      const { data, error } = await sb.functions.invoke('stripe-webhook', {
-        body: {
+      // Get fresh auth token
+      const { data: { session: authSession } } = await sb.auth.getSession();
+      if (!authSession) throw new Error('Session expired — please sign in again.');
+
+      const res = await fetch(EDGE_URL, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${authSession.access_token}`,
+          'apikey':         SUPABASE_ANON_KEY,
+          'Content-Type':  'application/json',
+        },
+        body: JSON.stringify({
           action:     'create-checkout-session',
           userId,
           orderType,
@@ -958,15 +968,20 @@
           referral,
           successUrl: window.location.origin + '/success.html',
           cancelUrl:  window.location.href,
-        },
+        }),
       });
 
-      if (error) throw new Error(error.message || 'Failed to create checkout session');
-      if (data?.url) {
+      let resData;
+      try { resData = await res.json(); } catch (_) { resData = {}; }
+
+      if (!res.ok) {
+        throw new Error(resData?.error || `Server error (${res.status})`);
+      }
+      if (resData?.url) {
         localStorage.removeItem(CART_KEY);
-        window.location.href = data.url;
+        window.location.href = resData.url;
       } else {
-        throw new Error(data?.error || 'No checkout URL returned');
+        throw new Error(resData?.error || 'No checkout URL returned');
       }
     } catch (err) {
       showCartErr(err.message);
