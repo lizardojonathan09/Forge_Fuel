@@ -118,9 +118,12 @@ async function handleCheckoutRedirect(url: URL) {
   // Decode base64url cart payload
   let body: any
   try {
-    const b64    = dataEncoded.replace(/-/g, '+').replace(/_/g, '/')
-    const padded = b64 + '='.repeat((4 - b64.length % 4) % 4)
-    body = JSON.parse(atob(padded))
+    const b64     = dataEncoded.replace(/-/g, '+').replace(/_/g, '/')
+    const padded  = b64 + '='.repeat((4 - b64.length % 4) % 4)
+    const binStr  = atob(padded)
+    const bytes   = new Uint8Array(binStr.length)
+    for (let i = 0; i < binStr.length; i++) bytes[i] = binStr.charCodeAt(i)
+    body = JSON.parse(new TextDecoder().decode(bytes))
   } catch (err) {
     console.error('Failed to decode checkout data:', err)
     return new Response('Invalid checkout data', { status: 400 })
