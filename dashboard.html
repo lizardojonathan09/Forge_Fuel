@@ -190,6 +190,8 @@
     .order-type-tag { display: inline-block; font-family: 'Oswald', sans-serif; font-size: 11px; letter-spacing: 1px; text-transform: uppercase; padding: 3px 10px; border-radius: 4px; }
     .order-type-tag.subscribe { background: rgba(92,184,92,0.15); color: var(--green); border: 1px solid rgba(92,184,92,0.3); }
     .order-type-tag.one-time  { background: rgba(201,160,74,0.15); color: var(--gold);  border: 1px solid rgba(201,160,74,0.3); }
+    .btn-reorder { background: transparent; border: 1px solid var(--border); color: var(--muted); font-family: 'Oswald', sans-serif; font-size: 11px; letter-spacing: 1.5px; text-transform: uppercase; padding: 6px 14px; border-radius: 6px; cursor: pointer; transition: all 0.2s; white-space: nowrap; }
+    .btn-reorder:hover { border-color: var(--orange); color: var(--orange); background: rgba(255,107,26,0.06); }
     .empty-state { text-align: center; padding: 48px 24px; color: var(--muted); }
     .empty-state p { font-family: 'Oswald', sans-serif; font-size: 14px; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 16px; }
     .empty-state a { color: var(--orange); text-decoration: none; }
@@ -873,30 +875,50 @@
       <div style="overflow-x:auto;">
         <table class="orders-table">
           <thead><tr>
-            <th>Date</th><th>Items</th><th>Type</th><th style="text-align:right">Total</th>
+            <th>Date</th><th>Items</th><th>Type</th><th style="text-align:right">Total</th><th></th>
           </tr></thead>
           <tbody>
-            ${orders.map(o => `<tr>
+            ${orders.map((o, i) => `<tr>
               <td>${fmt(o.created_at)}</td>
               <td style="color:var(--cream);">${buildOrderItemsLabel(o)}</td>
               <td><span class="order-type-tag ${o.order_type === 'subscribe' ? 'subscribe' : 'one-time'}">${o.order_type === 'subscribe' ? 'Subscribe' : 'One-Time'}</span></td>
-              <td style="text-align:right;font-family:'Bebas Neue',sans-serif;font-size:18px;color:var(--orange);">${o.total ? '$'+o.total : '—'}</td>
+              <td style="text-align:right;font-family:'Bebas Neue',sans-serif;font-size:18px;color:var(--orange);">${o.total ? o.total.replace(/^\$/, '$') : '—'}</td>
+              <td style="text-align:right;padding-left:12px;">${canReorder(o) ? `<button class="btn-reorder" onclick="reorder(window._orders[${i}])">Reorder</button>` : ''}</td>
             </tr>`).join('')}
           </tbody>
         </table>
       </div>`;
+    window._orders = orders; // store for reorder button access
+  }
+
+  function canReorder(o) {
+    return (o.qty_fc || 0) + (o.qty_fp || 0) + (o.qty_hc || 0) + (o.qty_hp || 0) > 0;
+  }
+
+  function reorder(o) {
+    const cart = {
+      qtys: {
+        fc: o.qty_fc || 0,
+        fp: o.qty_fp || 0,
+        hc: o.qty_hc || 0,
+        hp: o.qty_hp || 0,
+      },
+      orderType: o.order_type === 'subscribe' ? 'subscribe' : 'onetime',
+    };
+    localStorage.setItem('forgeFuelCart', JSON.stringify(cart));
+    window.location.href = '/shop.html';
   }
 
   function buildOrderItemsLabel(o) {
-    // Prefer new per-product fields; fall back to old flavor/portion/pack_size format
     const parts = [];
-    if (o.full_choc_qty   > 0) parts.push(`${o.full_choc_qty}× Full Choc`);
-    if (o.full_pb_qty     > 0) parts.push(`${o.full_pb_qty}× Full PB`);
-    if (o.half_choc_qty   > 0) parts.push(`${o.half_choc_qty}× Half Choc`);
-    if (o.half_pb_qty     > 0) parts.push(`${o.half_pb_qty}× Half PB`);
+    if ((o.qty_fc || 0) > 0) parts.push(`${o.qty_fc}× Full Choc`);
+    if ((o.qty_fp || 0) > 0) parts.push(`${o.qty_fp}× Full PB`);
+    if ((o.qty_hc || 0) > 0) parts.push(`${o.qty_hc}× Half Choc`);
+    if ((o.qty_hp || 0) > 0) parts.push(`${o.qty_hp}× Half PB`);
     if (parts.length > 0) return parts.join(' · ');
-    // Fallback
-    if (o.flavor && o.pack_size) return `${o.pack_size}× ${o.portion === 'half' ? 'Half' : 'Full'} ${o.flavor}`;
+    // Fallback for legacy orders without per-product qtys
+    if (o.flavor && o.pack_size) return `${o.pack_size}× ${o.portion === 'half' ? 'Half' : 'Full'} (${o.flavor})`;
+    if (o.flavor) return o.flavor;
     return '—';
   }
 
