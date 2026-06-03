@@ -237,7 +237,9 @@ async function handleCreateCheckoutSession(userId: string, body: any) {
     if (delivery?.time) refParts.push(`time:${delivery.time}`)
     if (delivery?.name) refParts.push(`name:${delivery.name}`)
 
-    const encoded = btoa(unescape(encodeURIComponent(refParts.join('|'))))
+    const refStr  = refParts.join('|')
+    const refBytes = new TextEncoder().encode(refStr)
+    const encoded  = btoa(String.fromCharCode(...refBytes))
       .replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '')
     params.set('client_reference_id', encoded)
 
