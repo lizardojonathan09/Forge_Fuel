@@ -1,0 +1,1103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Shop – Forge Oats</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Oswald:wght@300;400;500;600;700&family=Inter:wght@300;400;500&display=swap" rel="stylesheet" />
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --black:  #080808; --dark: #111111; --card: #181818;
+    --orange: #FF6B1A; --fire: #FF3D00; --gold: #C9A04A;
+    --cream:  #EDE8DC; --muted: #777777; --border: #262626;
+    --green: #5CB85C;
+  }
+  html { scroll-behavior: smooth; }
+  body { background: var(--black); color: var(--cream); font-family: 'Oswald', sans-serif; overflow-x: hidden; }
+
+  /* ── NAV ── */
+  nav {
+    position: sticky; top: 0; z-index: 50;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 48px; height: 68px;
+    background: rgba(8,8,8,0.97); backdrop-filter: blur(14px);
+    border-bottom: 1px solid var(--border);
+  }
+  .nav-logo { display: flex; align-items: center; gap: 12px; text-decoration: none; }
+  .nav-logo img { height: 46px; width: auto; }
+  .nav-logo-text { font-family: 'Bebas Neue', sans-serif; font-size: 20px; letter-spacing: 3px; color: var(--cream); line-height: 1; }
+  .nav-logo-text span { display: block; font-family: 'Oswald', sans-serif; font-size: 9px; letter-spacing: 4px; color: var(--orange); font-weight: 500; }
+  .nav-links { display: flex; gap: 28px; }
+  .nav-links a { color: var(--muted); text-decoration: none; font-size: 13px; letter-spacing: 2px; text-transform: uppercase; transition: color 0.2s; }
+  .nav-links a:hover { color: var(--orange); }
+  .nav-right { display: flex; align-items: center; gap: 12px; }
+  .nav-cart-btn {
+    display: flex; align-items: center; gap: 10px;
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 8px; padding: 9px 18px; cursor: pointer;
+    font-family: 'Oswald', sans-serif; font-size: 13px; letter-spacing: 2px;
+    text-transform: uppercase; color: var(--cream); transition: all 0.2s;
+  }
+  .nav-cart-btn:hover { border-color: var(--orange); color: var(--orange); }
+  .nav-cart-count {
+    background: var(--orange); color: #fff; border-radius: 50%;
+    width: 20px; height: 20px; display: flex; align-items: center; justify-content: center;
+    font-size: 11px; font-weight: 700; line-height: 1;
+  }
+  .nav-cart-count.hidden { display: none; }
+  .btn-nav { background: var(--orange); color: #fff; font-family: 'Oswald', sans-serif; font-size: 12px; font-weight: 600; letter-spacing: 2px; text-transform: uppercase; padding: 9px 20px; border-radius: 4px; border: none; cursor: pointer; text-decoration: none; transition: background 0.2s; }
+  .btn-nav:hover { background: var(--fire); }
+  .btn-nav-ghost { background: transparent; color: var(--cream); font-family: 'Oswald', sans-serif; font-size: 12px; font-weight: 500; letter-spacing: 2px; text-transform: uppercase; padding: 8px 16px; border-radius: 4px; border: 1px solid var(--border); text-decoration: none; transition: all 0.2s; }
+  .btn-nav-ghost:hover { border-color: var(--orange); color: var(--orange); }
+
+  /* ── SHOP SECTION ── */
+  .shop-section { background: var(--dark); padding: 72px 48px 100px; }
+  .shop-header { text-align: center; margin-bottom: 40px; }
+  .section-label { font-size: 11px; letter-spacing: 5px; text-transform: uppercase; color: var(--orange); margin-bottom: 10px; }
+  .section-title { font-family: 'Bebas Neue', sans-serif; font-size: 56px; letter-spacing: 3px; line-height: 1; margin-bottom: 14px; }
+  .section-desc { font-size: 15px; color: var(--muted); max-width: 460px; margin: 0 auto; line-height: 1.6; font-family: 'Inter', sans-serif; }
+
+  /* ── TIER BAR ── */
+  .tier-bar {
+    display: flex; align-items: stretch; max-width: 860px; margin: 0 auto 40px;
+    background: var(--card); border: 1px solid var(--border); border-radius: 10px; overflow: hidden;
+  }
+  .tier-item { flex: 1; padding: 14px 18px; text-align: center; border-right: 1px solid var(--border); transition: all 0.3s; }
+  .tier-item:last-child { border-right: none; }
+  .tier-item.active { background: rgba(255,107,26,0.09); }
+  .tier-label { font-size: 11px; letter-spacing: 2.5px; text-transform: uppercase; color: var(--muted); margin-bottom: 4px; }
+  .tier-item.active .tier-label { color: var(--orange); }
+  .tier-prices { font-size: 13px; color: var(--muted); font-family: 'Inter', sans-serif; }
+  .tier-item.active .tier-prices { color: var(--cream); }
+  .tier-badge { display: inline-block; background: rgba(92,184,92,0.15); color: var(--green); font-size: 9px; letter-spacing: 1.5px; text-transform: uppercase; padding: 2px 7px; border-radius: 10px; margin-top: 4px; font-family: 'Inter', sans-serif; }
+
+  /* ── PRODUCT GRID ── */
+  .product-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; max-width: 860px; margin: 0 auto; }
+  .product-card {
+    background: var(--card); border: 2px solid var(--border); border-radius: 16px;
+    overflow: hidden; transition: all 0.25s;
+  }
+  .product-card:hover { border-color: #333; transform: translateY(-2px); }
+  .product-card.in-cart { border-color: var(--orange); }
+  .product-hero {
+    height: 260px; display: flex; align-items: center; justify-content: center;
+    position: relative; overflow: hidden;
+  }
+  .product-hero.full-flavor { background: linear-gradient(135deg, #1c0a00, #301400, #1a0800); }
+  .product-hero.half-flavor { background: linear-gradient(135deg, #0a0a1c, #121230, #0a0a18); }
+  .product-hero-glow { position: absolute; inset: 0; pointer-events: none; }
+  .product-hero.full-flavor .product-hero-glow { background: radial-gradient(ellipse 80% 60% at 50% 110%, rgba(255,107,26,0.3), transparent); }
+  .product-hero.half-flavor .product-hero-glow { background: radial-gradient(ellipse 80% 60% at 50% 110%, rgba(139,92,246,0.25), transparent); }
+  .product-emoji { font-size: 60px; position: relative; z-index: 1; line-height: 1; filter: drop-shadow(0 4px 16px rgba(0,0,0,0.5)); }
+  .product-hero img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; object-position: center bottom; z-index: 0; }
+  .product-serving-badge {
+    position: absolute; top: 12px; left: 12px; z-index: 2;
+    font-size: 10px; letter-spacing: 2px; text-transform: uppercase; padding: 4px 10px; border-radius: 20px;
+  }
+  .full-badge { background: rgba(255,107,26,0.18); border: 1px solid rgba(255,107,26,0.35); color: var(--orange); }
+  .half-badge { background: rgba(139,92,246,0.18); border: 1px solid rgba(139,92,246,0.35); color: #A78BFA; }
+  .product-body { padding: 20px 22px 22px; }
+  .product-name { font-family: 'Bebas Neue', sans-serif; font-size: 26px; letter-spacing: 1.5px; line-height: 1; margin-bottom: 3px; }
+  .product-flavor { font-size: 12px; letter-spacing: 2px; text-transform: uppercase; color: var(--muted); margin-bottom: 16px; }
+  .nutr-row { display: flex; gap: 6px; margin-bottom: 18px; }
+  .nutr-pill { background: var(--dark); border: 1px solid var(--border); border-radius: 7px; padding: 7px 10px; text-align: center; flex: 1; }
+  .nutr-val { font-family: 'Bebas Neue', sans-serif; font-size: 20px; color: var(--orange); line-height: 1; }
+  .nutr-lbl { font-size: 9px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--muted); margin-top: 1px; }
+  .product-footer { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding-top: 16px; border-top: 1px solid var(--border); }
+  .product-price-block { flex: 1; }
+  .product-price { font-family: 'Bebas Neue', sans-serif; font-size: 30px; color: var(--cream); line-height: 1; }
+  .product-price-per { font-size: 11px; letter-spacing: 1px; color: var(--muted); margin-top: 1px; font-family: 'Inter', sans-serif; }
+  .qty-stepper { display: flex; align-items: center; gap: 12px; }
+  .qty-btn {
+    width: 38px; height: 38px; border-radius: 50%;
+    background: var(--dark); border: 1px solid var(--border);
+    color: var(--cream); font-size: 22px; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: all 0.18s; line-height: 1; font-family: 'Inter', sans-serif; font-weight: 300;
+  }
+  .qty-btn:hover { background: var(--orange); border-color: var(--orange); transform: scale(1.08); }
+  .qty-num { font-family: 'Bebas Neue', sans-serif; font-size: 36px; min-width: 28px; text-align: center; line-height: 1; transition: color 0.2s; }
+  .qty-num.nonzero { color: var(--orange); }
+
+  /* ── SUB TOGGLE ── */
+  .sub-toggle-wrap { max-width: 860px; margin: 28px auto 0; }
+  .sub-toggle { display: flex; background: var(--card); border: 1px solid var(--border); border-radius: 10px; overflow: hidden; }
+  .sub-btn { flex: 1; padding: 13px 20px; font-family: 'Oswald', sans-serif; font-size: 13px; letter-spacing: 2px; text-transform: uppercase; background: transparent; border: none; color: var(--muted); cursor: pointer; transition: all 0.2s; text-align: center; }
+  .sub-btn.active { background: var(--orange); color: #fff; }
+  .sub-btn .sub-badge { background: rgba(255,255,255,0.2); font-size: 10px; letter-spacing: 1px; padding: 2px 8px; border-radius: 10px; margin-left: 8px; }
+
+  /* ── CART DRAWER ── */
+  .cart-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.65); z-index: 200; opacity: 0; pointer-events: none; transition: opacity 0.3s; }
+  .cart-overlay.open { opacity: 1; pointer-events: all; }
+  .cart-drawer {
+    position: fixed; top: 0; right: 0; bottom: 0; width: 480px; max-width: 100vw;
+    background: var(--card); border-left: 1px solid var(--border); z-index: 201;
+    display: flex; flex-direction: column;
+    transform: translateX(100%); transition: transform 0.35s cubic-bezier(0.4,0,0.2,1);
+  }
+  .cart-drawer.open { transform: translateX(0); }
+  .cart-hdr { padding: 20px 24px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; flex-shrink: 0; }
+  .cart-hdr-left { display: flex; align-items: baseline; gap: 10px; }
+  .cart-title { font-family: 'Bebas Neue', sans-serif; font-size: 28px; letter-spacing: 2px; }
+  .cart-count-badge { background: var(--orange); color: #fff; font-family: 'Bebas Neue', sans-serif; font-size: 16px; border-radius: 20px; padding: 1px 9px; line-height: 1.4; }
+  .cart-close { background: none; border: none; color: var(--muted); font-size: 20px; cursor: pointer; padding: 4px; transition: color 0.2s; }
+  .cart-close:hover { color: var(--cream); }
+  .cart-scroll { flex: 1; overflow-y: auto; display: flex; flex-direction: column; }
+
+  /* Cart items */
+  .cart-items { padding: 16px 24px; border-bottom: 1px solid var(--border); }
+  .cart-item { display: flex; align-items: center; gap: 12px; padding: 12px 0; border-bottom: 1px solid rgba(255,255,255,0.04); }
+  .cart-item:last-child { border-bottom: none; }
+  .ci-emoji { font-size: 28px; width: 36px; text-align: center; flex-shrink: 0; }
+  .ci-info { flex: 1; }
+  .ci-name { font-size: 13px; font-weight: 600; letter-spacing: 1px; color: var(--cream); line-height: 1.2; margin-bottom: 2px; }
+  .ci-meta { font-size: 11px; letter-spacing: 1px; color: var(--muted); font-family: 'Inter', sans-serif; }
+  .ci-qty { display: flex; align-items: center; gap: 8px; }
+  .ci-qbtn { width: 28px; height: 28px; border-radius: 6px; background: var(--dark); border: 1px solid var(--border); color: var(--cream); font-size: 16px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.15s; font-family: 'Inter', sans-serif; }
+  .ci-qbtn:hover { border-color: var(--orange); color: var(--orange); }
+  .ci-qnum { font-family: 'Bebas Neue', sans-serif; font-size: 22px; min-width: 18px; text-align: center; }
+  .ci-price { font-family: 'Bebas Neue', sans-serif; font-size: 22px; color: var(--orange); width: 60px; text-align: right; flex-shrink: 0; }
+
+  /* Cart tier progress */
+  .cart-tier { padding: 14px 24px; border-bottom: 1px solid var(--border); background: rgba(255,107,26,0.04); }
+  .cart-tier-lbl { font-size: 10px; letter-spacing: 2.5px; text-transform: uppercase; color: var(--orange); margin-bottom: 8px; }
+  .cart-tier-track { position: relative; height: 6px; background: var(--border); border-radius: 3px; margin-bottom: 10px; }
+  .cart-tier-fill { height: 100%; background: linear-gradient(90deg, var(--fire), var(--orange)); border-radius: 3px; transition: width 0.6s ease; }
+  .cart-tier-dot { position: absolute; width: 16px; height: 16px; border-radius: 50%; background: var(--dark); border: 2px solid var(--border); top: -5px; transition: all 0.3s; }
+  .cart-tier-dot.reached { background: var(--orange); border-color: var(--orange); }
+  .cart-tier-hint { font-size: 11px; color: var(--muted); letter-spacing: 0.5px; font-family: 'Inter', sans-serif; line-height: 1.4; }
+  .cart-tier-hint strong { color: var(--cream); }
+
+  /* Cart order type */
+  .cart-order-type { padding: 14px 24px; border-bottom: 1px solid var(--border); display: flex; gap: 8px; }
+  .cot-btn { flex: 1; padding: 11px 10px; background: var(--dark); border: 1px solid var(--border); border-radius: 8px; font-family: 'Oswald', sans-serif; font-size: 12px; letter-spacing: 2px; text-transform: uppercase; color: var(--muted); cursor: pointer; transition: all 0.2s; text-align: center; }
+  .cot-btn.active { background: rgba(255,107,26,0.1); border-color: var(--orange); color: var(--cream); }
+  .cot-btn .cot-save { display: block; font-size: 10px; color: var(--green); letter-spacing: 1px; margin-top: 2px; font-family: 'Inter', sans-serif; }
+
+  /* Cart fields */
+  .cart-fields { padding: 18px 24px; border-bottom: 1px solid var(--border); }
+  .cart-fields-title { font-size: 11px; letter-spacing: 3px; text-transform: uppercase; color: var(--cream); margin-bottom: 14px; display: flex; align-items: center; gap: 8px; }
+  .field-row { display: grid; gap: 10px; margin-bottom: 10px; }
+  .field-row.c2 { grid-template-columns: 1fr 1fr; }
+  .field-row.c3 { grid-template-columns: 3fr 1fr; }
+  .field-group label { display: block; font-size: 9px; letter-spacing: 2.5px; text-transform: uppercase; color: var(--muted); margin-bottom: 5px; }
+  .field-group input,
+  .field-group select {
+    width: 100%; background: var(--dark); border: 1px solid var(--border);
+    border-radius: 6px; padding: 10px 12px;
+    font-family: 'Oswald', sans-serif; font-size: 13px; letter-spacing: 0.5px;
+    color: var(--cream); outline: none; transition: border-color 0.2s;
+    -webkit-appearance: none; appearance: none;
+  }
+  .field-group input:focus, .field-group select:focus { border-color: var(--orange); }
+  .field-group select { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%23666' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 12px center; }
+  input[type="date"] { color-scheme: dark; background-image: none !important; }
+  ::placeholder { color: #444; }
+
+  /* Cart footer */
+  .cart-ftr { padding: 18px 24px; flex-shrink: 0; border-top: 1px solid var(--border); background: var(--card); }
+  .cart-min-warn { text-align: center; font-size: 12px; color: var(--fire); letter-spacing: 1px; margin-bottom: 10px; padding: 8px; background: rgba(255,61,0,0.08); border-radius: 6px; border: 1px solid rgba(255,61,0,0.15); font-family: 'Inter', sans-serif; }
+  .cart-total-row { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 4px; }
+  .cart-total-lbl { font-size: 11px; letter-spacing: 3px; text-transform: uppercase; color: var(--muted); }
+  .cart-total-amt { font-family: 'Bebas Neue', sans-serif; font-size: 34px; color: var(--cream); }
+  .cart-save-note { font-size: 11px; color: var(--green); text-align: right; margin-bottom: 14px; letter-spacing: 0.5px; font-family: 'Inter', sans-serif; }
+  .btn-checkout {
+    width: 100%; padding: 16px; background: linear-gradient(135deg, var(--orange), var(--fire));
+    color: #fff; font-family: 'Oswald', sans-serif; font-size: 15px; font-weight: 600;
+    letter-spacing: 2.5px; text-transform: uppercase; border: none; border-radius: 8px;
+    cursor: pointer; transition: all 0.2s; box-shadow: 0 4px 20px rgba(255,107,26,0.3);
+  }
+  .btn-checkout:hover:not(:disabled) { box-shadow: 0 8px 28px rgba(255,107,26,0.5); transform: translateY(-1px); }
+  .btn-checkout:disabled { opacity: 0.45; cursor: not-allowed; transform: none; box-shadow: none; }
+  .cart-err { font-size: 12px; color: var(--fire); text-align: center; margin-bottom: 10px; padding: 8px; background: rgba(255,61,0,0.08); border-radius: 6px; border: 1px solid rgba(255,61,0,0.15); font-family: 'Inter', sans-serif; display: none; }
+  .cart-err.show { display: block; }
+
+  /* ── AUTH MODAL ── */
+  .auth-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 300; display: flex; align-items: center; justify-content: center; padding: 20px; opacity: 0; pointer-events: none; transition: opacity 0.3s; }
+  .auth-overlay.open { opacity: 1; pointer-events: all; }
+  .auth-modal {
+    background: var(--card); border: 1px solid var(--border); border-radius: 18px;
+    padding: 40px 36px; width: 100%; max-width: 420px; position: relative; overflow: hidden;
+  }
+  .auth-modal::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: linear-gradient(90deg, var(--fire), var(--orange)); }
+  .auth-modal-x { position: absolute; top: 16px; right: 16px; background: none; border: none; color: var(--muted); font-size: 18px; cursor: pointer; transition: color 0.2s; }
+  .auth-modal-x:hover { color: var(--cream); }
+  .auth-eyebrow { font-size: 10px; letter-spacing: 4px; text-transform: uppercase; color: var(--orange); text-align: center; margin-bottom: 6px; }
+  .auth-modal-title { font-family: 'Bebas Neue', sans-serif; font-size: 34px; letter-spacing: 2px; text-align: center; margin-bottom: 6px; }
+  .auth-modal-sub { font-size: 13px; color: var(--muted); text-align: center; margin-bottom: 24px; line-height: 1.5; font-family: 'Inter', sans-serif; }
+  .auth-tabs { display: flex; background: var(--dark); border: 1px solid var(--border); border-radius: 8px; overflow: hidden; margin-bottom: 24px; }
+  .auth-tab { flex: 1; padding: 11px; font-family: 'Oswald', sans-serif; font-size: 13px; letter-spacing: 2px; text-transform: uppercase; background: transparent; border: none; color: var(--muted); cursor: pointer; transition: all 0.2s; }
+  .auth-tab.active { background: var(--orange); color: #fff; }
+  .auth-field { margin-bottom: 12px; }
+  .auth-field label { display: block; font-size: 9px; letter-spacing: 2.5px; text-transform: uppercase; color: var(--muted); margin-bottom: 5px; }
+  .auth-field input { width: 100%; background: var(--dark); border: 1px solid var(--border); border-radius: 6px; padding: 12px 14px; font-family: 'Oswald', sans-serif; font-size: 14px; color: var(--cream); outline: none; transition: border-color 0.2s; letter-spacing: 0.5px; }
+  .auth-field input:focus { border-color: var(--orange); }
+  .btn-auth { width: 100%; padding: 14px; background: linear-gradient(135deg, var(--orange), var(--fire)); color: #fff; font-family: 'Oswald', sans-serif; font-size: 15px; font-weight: 600; letter-spacing: 2px; text-transform: uppercase; border: none; border-radius: 8px; cursor: pointer; margin-top: 8px; box-shadow: 0 4px 20px rgba(255,107,26,0.3); transition: all 0.2s; }
+  .btn-auth:hover:not(:disabled) { box-shadow: 0 8px 28px rgba(255,107,26,0.5); }
+  .btn-auth:disabled { opacity: 0.6; cursor: not-allowed; }
+  .auth-switch { text-align: center; margin-top: 14px; font-size: 13px; color: var(--muted); font-family: 'Inter', sans-serif; }
+  .auth-switch button { background: none; border: none; color: var(--orange); cursor: pointer; font-size: 13px; text-decoration: underline; font-family: 'Inter', sans-serif; }
+  .auth-cart-preview { background: var(--dark); border: 1px solid var(--border); border-radius: 8px; padding: 12px 14px; margin-bottom: 20px; display: flex; align-items: center; gap: 10px; }
+  .auth-cart-icon { font-size: 24px; }
+  .auth-cart-text { font-size: 12px; color: var(--muted); letter-spacing: 0.5px; line-height: 1.5; font-family: 'Inter', sans-serif; }
+  .auth-cart-text strong { color: var(--cream); }
+  .auth-msg { font-size: 13px; padding: 10px 14px; border-radius: 6px; margin-top: 12px; text-align: center; display: none; font-family: 'Inter', sans-serif; }
+  .auth-msg.error   { background: rgba(255,61,0,0.12); border: 1px solid rgba(255,61,0,0.3); color: #FF6060; display: block; }
+  .auth-msg.success { background: rgba(92,184,92,0.12); border: 1px solid rgba(92,184,92,0.3); color: #5CB85C; display: block; }
+
+  /* ── FOOTER ── */
+  footer { background: var(--black); border-top: 1px solid var(--border); padding: 36px 48px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px; }
+  .footer-brand { font-family: 'Bebas Neue', sans-serif; font-size: 24px; letter-spacing: 4px; color: var(--cream); }
+  .footer-brand span { color: var(--orange); }
+  .footer-tagline { font-size: 10px; letter-spacing: 3px; text-transform: uppercase; color: var(--muted); margin-top: 2px; }
+  .footer-links { display: flex; gap: 24px; }
+  .footer-links a { color: var(--muted); text-decoration: none; font-size: 12px; letter-spacing: 1px; text-transform: uppercase; transition: color 0.2s; }
+  .footer-links a:hover { color: var(--orange); }
+  .footer-copy { font-size: 11px; color: var(--muted); font-family: 'Inter', sans-serif; }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 860px) {
+    nav { padding: 0 20px; }
+    .nav-links { display: none; }
+    .shop-section { padding: 48px 20px 80px; }
+    .product-grid { grid-template-columns: 1fr; }
+    .tier-bar { flex-direction: column; }
+    .tier-item { border-right: none; border-bottom: 1px solid var(--border); }
+    .tier-item:last-child { border-bottom: none; }
+    .cart-drawer { width: 100vw; }
+    .field-row.c2, .field-row.c3 { grid-template-columns: 1fr; }
+    footer { flex-direction: column; text-align: center; }
+    .footer-links { justify-content: center; flex-wrap: wrap; }
+  }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <a href="index.html" class="nav-logo">
+    <img src="forge-logo.png" alt="Forge Oats" />
+    <div class="nav-logo-text">FORGE OATS<span>FUEL THE WORK</span></div>
+  </a>
+  <div class="nav-links">
+    <a href="index.html#why">Why Forge</a>
+    <a href="index.html#ingredients">Ingredients</a>
+    <a href="index.html#nutrition">Nutrition</a>
+    <a href="index.html#faq">FAQ</a>
+  </div>
+  <div class="nav-right">
+    <button class="nav-cart-btn" onclick="openCart()">
+      🛒 Cart <span class="nav-cart-count hidden" id="navCartCount">0</span>
+    </button>
+    <a href="profile.html?tab=signup" class="btn-nav-ghost" id="navSignupBtn">Sign Up</a>
+    <a href="dashboard.html" class="btn-nav" id="navDashBtn" style="display:none;">My Dashboard</a>
+  </div>
+</nav>
+
+<!-- SHOP SECTION -->
+<section class="shop-section">
+  <div class="shop-header">
+    <p class="section-label">Build Your Order</p>
+    <h2 class="section-title">FORGE YOUR PACK</h2>
+    <p class="section-desc">Mix &amp; match any combination. $24 minimum. Free delivery on all orders.</p>
+  </div>
+
+  <!-- Volume Tier Bar -->
+  <div class="tier-bar">
+    <div class="tier-item active" id="tierItem0">
+      <div class="tier-label">1–4 cups</div>
+      <div class="tier-prices">Full $8.00 &middot; Half $5.00 / cup</div>
+    </div>
+    <div class="tier-item" id="tierItem1">
+      <div class="tier-label">5–6 cups</div>
+      <div class="tier-prices">Full $7.50 &middot; Half $4.50 / cup</div>
+      <div class="tier-badge">Save more</div>
+    </div>
+    <div class="tier-item" id="tierItem2">
+      <div class="tier-label">7+ cups</div>
+      <div class="tier-prices">Full $7.00 &middot; Half $4.00 / cup</div>
+      <div class="tier-badge">Best value</div>
+    </div>
+  </div>
+
+  <!-- Product Grid -->
+  <div class="product-grid">
+
+    <!-- Full Serving - Chocolate -->
+    <div class="product-card" id="card-fc">
+      <div class="product-hero full-flavor">
+        <div class="product-hero-glow"></div>
+        <div class="product-serving-badge full-badge">Full Serving</div>
+        <img src="chocofull.png" alt="Full Serving Chocolate" />
+      </div>
+      <div class="product-body">
+        <div class="product-name">Chocolate</div>
+        <div class="product-flavor">Full Serving · 40g Protein</div>
+        <div class="nutr-row">
+          <div class="nutr-pill"><div class="nutr-val">40g</div><div class="nutr-lbl">Protein</div></div>
+          <div class="nutr-pill"><div class="nutr-val">10g</div><div class="nutr-lbl">Fiber</div></div>
+          <div class="nutr-pill"><div class="nutr-val">~450</div><div class="nutr-lbl">Calories</div></div>
+        </div>
+        <div class="product-footer">
+          <div class="product-price-block">
+            <div class="product-price" id="price-fc">$8.00</div>
+            <div class="product-price-per">per cup</div>
+          </div>
+          <div class="qty-stepper">
+            <button class="qty-btn" onclick="adjust('fc',-1)">−</button>
+            <span class="qty-num" id="qty-fc">0</span>
+            <button class="qty-btn" onclick="adjust('fc',1)">+</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Full Serving - Peanut Butter -->
+    <div class="product-card" id="card-fp">
+      <div class="product-hero full-flavor">
+        <div class="product-hero-glow"></div>
+        <div class="product-serving-badge full-badge">Full Serving</div>
+        <img src="pbfull.png" alt="Full Serving Peanut Butter" />
+      </div>
+      <div class="product-body">
+        <div class="product-name">Peanut Butter</div>
+        <div class="product-flavor">Full Serving · 40g Protein</div>
+        <div class="nutr-row">
+          <div class="nutr-pill"><div class="nutr-val">40g</div><div class="nutr-lbl">Protein</div></div>
+          <div class="nutr-pill"><div class="nutr-val">10g</div><div class="nutr-lbl">Fiber</div></div>
+          <div class="nutr-pill"><div class="nutr-val">460</div><div class="nutr-lbl">Calories</div></div>
+        </div>
+        <div class="product-footer">
+          <div class="product-price-block">
+            <div class="product-price" id="price-fp">$8.00</div>
+            <div class="product-price-per">per cup</div>
+          </div>
+          <div class="qty-stepper">
+            <button class="qty-btn" onclick="adjust('fp',-1)">−</button>
+            <span class="qty-num" id="qty-fp">0</span>
+            <button class="qty-btn" onclick="adjust('fp',1)">+</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Half Serving - Chocolate -->
+    <div class="product-card" id="card-hc">
+      <div class="product-hero half-flavor">
+        <div class="product-hero-glow"></div>
+        <div class="product-serving-badge half-badge">Half Serving</div>
+        <img src="chochalf.png" alt="Half Serving Chocolate" />
+      </div>
+      <div class="product-body">
+        <div class="product-name">Chocolate</div>
+        <div class="product-flavor">Half Serving · 20g Protein</div>
+        <div class="nutr-row">
+          <div class="nutr-pill"><div class="nutr-val">20g</div><div class="nutr-lbl">Protein</div></div>
+          <div class="nutr-pill"><div class="nutr-val">5g</div><div class="nutr-lbl">Fiber</div></div>
+          <div class="nutr-pill"><div class="nutr-val">~225</div><div class="nutr-lbl">Calories</div></div>
+        </div>
+        <div class="product-footer">
+          <div class="product-price-block">
+            <div class="product-price" id="price-hc">$5.00</div>
+            <div class="product-price-per">per cup</div>
+          </div>
+          <div class="qty-stepper">
+            <button class="qty-btn" onclick="adjust('hc',-1)">−</button>
+            <span class="qty-num" id="qty-hc">0</span>
+            <button class="qty-btn" onclick="adjust('hc',1)">+</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Half Serving - Peanut Butter -->
+    <div class="product-card" id="card-hp">
+      <div class="product-hero half-flavor">
+        <div class="product-hero-glow"></div>
+        <div class="product-serving-badge half-badge">Half Serving</div>
+        <img src="pbhalf.png" alt="Half Serving Peanut Butter" />
+      </div>
+      <div class="product-body">
+        <div class="product-name">Peanut Butter</div>
+        <div class="product-flavor">Half Serving · 20g Protein</div>
+        <div class="nutr-row">
+          <div class="nutr-pill"><div class="nutr-val">20g</div><div class="nutr-lbl">Protein</div></div>
+          <div class="nutr-pill"><div class="nutr-val">5g</div><div class="nutr-lbl">Fiber</div></div>
+          <div class="nutr-pill"><div class="nutr-val">230</div><div class="nutr-lbl">Calories</div></div>
+        </div>
+        <div class="product-footer">
+          <div class="product-price-block">
+            <div class="product-price" id="price-hp">$5.00</div>
+            <div class="product-price-per">per cup</div>
+          </div>
+          <div class="qty-stepper">
+            <button class="qty-btn" onclick="adjust('hp',-1)">−</button>
+            <span class="qty-num" id="qty-hp">0</span>
+            <button class="qty-btn" onclick="adjust('hp',1)">+</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /product-grid -->
+
+  <!-- Subscribe toggle -->
+  <div class="sub-toggle-wrap">
+    <div class="sub-toggle">
+      <button class="sub-btn active" id="subOnetime" onclick="setOrderType('onetime')">One-Time Order</button>
+      <button class="sub-btn" id="subSubscribe" onclick="setOrderType('subscribe')">Subscribe &amp; Save<span class="sub-badge">10% OFF</span></button>
+    </div>
+  </div>
+
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div>
+    <div class="footer-brand">FORGE <span>OATS</span></div>
+    <div class="footer-tagline">Fuel The Work</div>
+  </div>
+  <div class="footer-links">
+    <a href="index.html">Home</a>
+    <a href="index.html#why">Why Forge</a>
+    <a href="index.html#ingredients">Ingredients</a>
+    <a href="index.html#nutrition">Nutrition</a>
+    <a href="index.html#faq">FAQ</a>
+  </div>
+  <div class="footer-copy">© 2025 Forge Oats. All rights reserved.</div>
+</footer>
+
+
+<!-- CART OVERLAY + DRAWER -->
+<div class="cart-overlay" id="cartOverlay" onclick="closeCart()"></div>
+<div class="cart-drawer" id="cartDrawer">
+
+  <div class="cart-hdr">
+    <div class="cart-hdr-left">
+      <span class="cart-title">Your Cart</span>
+      <span class="cart-count-badge" id="cartCountBadge">0</span>
+    </div>
+    <button class="cart-close" onclick="closeCart()">✕</button>
+  </div>
+
+  <div class="cart-scroll">
+
+    <!-- Items -->
+    <div class="cart-items" id="cartItems">
+      <div style="text-align:center;padding:24px 0;font-size:12px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);" id="cartEmptyMsg">Add items to get started</div>
+    </div>
+
+    <!-- Volume tier progress -->
+    <div class="cart-tier" id="cartTierSection" style="display:none;">
+      <div class="cart-tier-lbl" id="cartTierLabel">Tier 1 — Full $8.00 · Half $5.00 / cup</div>
+      <div class="cart-tier-track" style="position:relative;">
+        <div class="cart-tier-fill" id="cartTierFill" style="width:0%"></div>
+        <div class="cart-tier-dot" id="ctDot0" style="left:calc(33% - 8px);"></div>
+        <div class="cart-tier-dot" id="ctDot1" style="left:calc(66% - 8px);"></div>
+        <div class="cart-tier-dot" id="ctDot2" style="right:-8px;"></div>
+      </div>
+      <div class="cart-tier-hint" id="cartTierHint" style="margin-top:8px;">Add <strong>5 more cups</strong> to unlock better pricing</div>
+    </div>
+
+    <!-- Order type -->
+    <div class="cart-order-type">
+      <button class="cot-btn active" id="cotOnetime" onclick="setCartOT('onetime')">One-Time</button>
+      <button class="cot-btn" id="cotSubscribe" onclick="setCartOT('subscribe')">
+        Subscribe
+        <span class="cot-save">Save 10% every order</span>
+      </button>
+    </div>
+
+    <!-- Checkout fields -->
+    <div class="cart-fields">
+      <div class="cart-fields-title">🚚 Delivery Details</div>
+
+      <div class="field-row c2">
+        <div class="field-group"><label>Name</label><input type="text" id="cartName" placeholder="Full name" autocomplete="name" /></div>
+        <div class="field-group"><label>Phone</label><input type="tel" id="cartPhone" placeholder="(555) 123-4567" autocomplete="tel" /></div>
+      </div>
+      <div class="field-row">
+        <div class="field-group"><label>Email</label><input type="email" id="cartEmail" placeholder="you@email.com" autocomplete="email" /></div>
+      </div>
+      <div class="field-row c3">
+        <div class="field-group"><label>Street Address</label><input type="text" id="cartStreet" placeholder="123 Main St" autocomplete="street-address" /></div>
+        <div class="field-group"><label>Unit (opt.)</label><input type="text" id="cartUnit" placeholder="Apt 2B" /></div>
+      </div>
+      <div class="field-row c2">
+        <div class="field-group"><label>City</label><input type="text" id="cartCity" placeholder="Miami" autocomplete="address-level2" /></div>
+        <div class="field-group"><label>State</label><input type="text" id="cartState" placeholder="FL" maxlength="2" autocomplete="address-level1" /></div>
+      </div>
+      <div class="field-row c2">
+        <div class="field-group"><label>ZIP Code</label><input type="text" id="cartZip" placeholder="33101" autocomplete="postal-code" /></div>
+        <div class="field-group"><label>Referral Code <span style="color:#444;font-size:9px;">(opt.)</span></label><input type="text" id="cartRef" placeholder="e.g. jon4821" /></div>
+      </div>
+      <div class="field-row c2">
+        <div class="field-group"><label>Delivery Date</label><input type="date" id="cartDate" /></div>
+        <div class="field-group"><label>Delivery Window</label>
+          <select id="cartTime">
+            <option value="">Select window</option>
+            <option value="Morning (8–11AM)">Morning (8–11AM)</option>
+            <option value="Afternoon (12–4PM)">Afternoon (12–4PM)</option>
+            <option value="Evening (5–9PM)">Evening (5–9PM)</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /cart-scroll -->
+
+  <!-- Cart footer -->
+  <div class="cart-ftr">
+    <div class="cart-min-warn" id="cartMinWarn" style="display:none;">Minimum order is $24.00 — add more items</div>
+    <div class="cart-err" id="cartErr"></div>
+    <div class="cart-total-row">
+      <span class="cart-total-lbl">Total</span>
+      <span class="cart-total-amt" id="cartTotal">$0.00</span>
+    </div>
+    <div class="cart-save-note" id="cartSaveNote" style="display:none;">✓ Subscribe &amp; Save 10% applied</div>
+    <button class="btn-checkout" id="btnCheckout" disabled onclick="handleCheckout()">Proceed to Checkout →</button>
+  </div>
+
+</div><!-- /cart-drawer -->
+
+
+<!-- AUTH MODAL -->
+<div class="auth-overlay" id="authOverlay">
+  <div class="auth-modal">
+    <button class="auth-modal-x" onclick="closeAuth()">✕</button>
+    <p class="auth-eyebrow">Almost There</p>
+    <h2 class="auth-modal-title">SIGN IN TO ORDER</h2>
+    <p class="auth-modal-sub">Create an account or sign in to complete your order. Your cart is saved.</p>
+
+    <div class="auth-cart-preview">
+      <span class="auth-cart-icon">🛒</span>
+      <div class="auth-cart-text">
+        <strong id="authCartSummary">0 cups · $0.00</strong><br>
+        Your cart will be ready to check out after signing in.
+      </div>
+    </div>
+
+    <div class="auth-tabs">
+      <button class="auth-tab active" id="authTabSI" onclick="switchAuthTab('signin')">Sign In</button>
+      <button class="auth-tab" id="authTabSU" onclick="switchAuthTab('signup')">Create Account</button>
+    </div>
+
+    <!-- Sign in -->
+    <div id="authSigninForm">
+      <div class="auth-field"><label>Email</label><input type="email" id="authSIEmail" placeholder="you@email.com" /></div>
+      <div class="auth-field"><label>Password</label><input type="password" id="authSIPass" placeholder="••••••••" /></div>
+      <button class="btn-auth" id="btnAuthSI" onclick="doSignIn()">Sign In &amp; Continue →</button>
+      <div class="auth-switch"><button onclick="switchAuthTab('forgot')">Forgot password?</button></div>
+    </div>
+
+    <!-- Sign up -->
+    <div id="authSignupForm" style="display:none;">
+      <div class="auth-field"><label>Name</label><input type="text" id="authSUName" placeholder="Full name" /></div>
+      <div class="auth-field"><label>Email</label><input type="email" id="authSUEmail" placeholder="you@email.com" /></div>
+      <div class="auth-field"><label>Password</label><input type="password" id="authSUPass" placeholder="At least 8 characters" /></div>
+      <button class="btn-auth" id="btnAuthSU" onclick="doSignUp()">Create Account &amp; Continue →</button>
+    </div>
+
+    <!-- Forgot -->
+    <div id="authForgotForm" style="display:none;">
+      <div class="auth-field"><label>Email</label><input type="email" id="authForgotEmail" placeholder="you@email.com" /></div>
+      <button class="btn-auth" onclick="doForgot()">Send Reset Link</button>
+      <div class="auth-switch"><button onclick="switchAuthTab('signin')">← Back to sign in</button></div>
+    </div>
+
+    <div id="authMsg" class="auth-msg"></div>
+  </div>
+</div>
+
+
+<script>
+  // ── Supabase ──────────────────────────────────────────────────────────
+  const SUPABASE_URL      = 'https://eskyqpgtymtshmfepkqc.supabase.co';
+  const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVza3lxcGd0eW10c2htZmVwa3FjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgwMjc3NzgsImV4cCI6MjA5MzYwMzc3OH0.-BQfnmRthKOgcz0AExXAygikkz17s_uYERAzGONtG3Y';
+  const { createClient }  = supabase;
+  const sb = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+  const EDGE_URL = SUPABASE_URL + '/functions/v1/stripe-webhook';
+
+  // ── Cart state ──────────────────────────────────────────────────────────
+  const CART_KEY = 'forgeFuelCart';
+  const FIELDS_KEY = 'forgeDeliveryFields';
+  const qtys = { fc: 0, fp: 0, hc: 0, hp: 0 };
+  const PRODUCTS = {
+    fc: { name: 'Full Serving — Chocolate',     type: 'full', emoji: '🍫', protein: '40g', cal: '~450' },
+    fp: { name: 'Full Serving — Peanut Butter', type: 'full', emoji: '🥜', protein: '40g', cal: '460' },
+    hc: { name: 'Half Serving — Chocolate',     type: 'half', emoji: '🍫', protein: '20g', cal: '~225' },
+    hp: { name: 'Half Serving — Peanut Butter', type: 'half', emoji: '🥜', protein: '20g', cal: '230' },
+  };
+  const FULL_PRICES = [8.00, 7.50, 7.00];
+  const HALF_PRICES = [5.00, 4.50, 4.00];
+  let orderType  = 'onetime';
+  let isLoggedIn = false;
+  let userId     = null;
+
+  // ── Init ──────────────────────────────────────────────────────────────
+  (async () => {
+    // Set min delivery date to tomorrow
+    const tomorrow = new Date();
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    const minDate = tomorrow.toISOString().split('T')[0];
+    document.getElementById('cartDate').min   = minDate;
+    document.getElementById('cartDate').value = minDate;
+
+    // Load cart from localStorage
+    loadCart();
+    restoreFields();
+
+    // Check auth
+    const { data: { session } } = await sb.auth.getSession();
+    if (session) {
+      isLoggedIn = true;
+      userId = session.user.id;
+
+      // Update nav
+      document.getElementById('navSignupBtn').style.display = 'none';
+      document.getElementById('navDashBtn').style.display   = 'inline-block';
+
+      // Pre-populate fields from profile
+      const { data: profile } = await sb.from('customers')
+        .select('name,email,phone,delivery_address')
+        .eq('id', userId)
+        .single();
+      if (profile) prefillFromProfile(profile);
+    }
+
+    // Capture referral code from URL
+    const urlRef = new URLSearchParams(window.location.search).get('ref');
+    if (urlRef) {
+      localStorage.setItem('forge_ref', urlRef);
+      document.getElementById('cartRef').value = urlRef;
+    } else {
+      const storedRef = localStorage.getItem('forge_ref');
+      if (storedRef && !document.getElementById('cartRef').value) {
+        document.getElementById('cartRef').value = storedRef;
+      }
+    }
+
+    updateAll();
+  })();
+
+  // ── Helpers ────────────────────────────────────────────────────────────
+  function getTier(cups) { return cups >= 7 ? 2 : cups >= 5 ? 1 : 0; }
+  function totalCups()   { return Object.values(qtys).reduce((s,v) => s+v, 0); }
+  function getPrice(type, cups) {
+    const tier = getTier(cups);
+    return type === 'full' ? FULL_PRICES[tier] : HALF_PRICES[tier];
+  }
+  function getSubtotal() {
+    const cups = totalCups();
+    const disc = orderType === 'subscribe' ? 0.1 : 0;
+    let total = 0;
+    for (const [id, qty] of Object.entries(qtys)) {
+      if (!qty) continue;
+      total += getPrice(PRODUCTS[id].type, cups) * (1 - disc) * qty;
+    }
+    return total;
+  }
+
+  function saveCart() {
+    localStorage.setItem(CART_KEY, JSON.stringify({ qtys, orderType }));
+  }
+  function loadCart() {
+    try {
+      const saved = localStorage.getItem(CART_KEY);
+      if (!saved) return;
+      const parsed = JSON.parse(saved);
+      if (parsed.qtys) Object.assign(qtys, parsed.qtys);
+      if (parsed.orderType) {
+        orderType = parsed.orderType;
+        document.getElementById('subOnetime').classList.toggle('active', orderType === 'onetime');
+        document.getElementById('subSubscribe').classList.toggle('active', orderType === 'subscribe');
+        document.getElementById('cotOnetime').classList.toggle('active', orderType === 'onetime');
+        document.getElementById('cotSubscribe').classList.toggle('active', orderType === 'subscribe');
+      }
+    } catch(e) {}
+  }
+
+  const FIELD_IDS = ['cartName','cartPhone','cartEmail','cartStreet','cartUnit','cartCity','cartState','cartZip','cartRef','cartDate','cartTime'];
+  function saveFields() {
+    const data = {};
+    FIELD_IDS.forEach(id => { data[id] = document.getElementById(id)?.value || ''; });
+    localStorage.setItem(FIELDS_KEY, JSON.stringify(data));
+  }
+  function restoreFields() {
+    try {
+      const saved = localStorage.getItem(FIELDS_KEY);
+      if (!saved) return;
+      const data = JSON.parse(saved);
+      FIELD_IDS.forEach(id => {
+        const el = document.getElementById(id);
+        if (el && data[id]) el.value = data[id];
+      });
+    } catch(e) {}
+  }
+  function prefillFromProfile(profile) {
+    const set = (id, val) => { const el = document.getElementById(id); if (el && !el.value && val) el.value = val; };
+    set('cartName',  profile.name);
+    set('cartEmail', profile.email);
+    set('cartPhone', profile.phone);
+    if (profile.delivery_address) {
+      set('cartStreet', profile.delivery_address);
+    }
+  }
+
+  // Save fields on any change
+  FIELD_IDS.forEach(id => {
+    document.getElementById(id)?.addEventListener('change', saveFields);
+    document.getElementById(id)?.addEventListener('input',  saveFields);
+  });
+
+  // ── Core functions ─────────────────────────────────────────────────────
+  function adjust(id, delta) {
+    qtys[id] = Math.max(0, qtys[id] + delta);
+    saveCart();
+    updateAll();
+    if (delta > 0 && totalCups() > 0) openCart();
+  }
+
+  function setOrderType(type) {
+    orderType = type;
+    document.getElementById('subOnetime').classList.toggle('active', type === 'onetime');
+    document.getElementById('subSubscribe').classList.toggle('active', type === 'subscribe');
+    document.getElementById('cotOnetime').classList.toggle('active', type === 'onetime');
+    document.getElementById('cotSubscribe').classList.toggle('active', type === 'subscribe');
+    saveCart();
+    updateAll();
+  }
+  function setCartOT(type) { setOrderType(type); }
+
+  function updateAll() {
+    const cups = totalCups();
+    const tier = getTier(cups);
+    const disc = orderType === 'subscribe' ? 0.1 : 0;
+
+    // Product cards
+    for (const [id, info] of Object.entries(PRODUCTS)) {
+      const perCup = getPrice(info.type, cups) * (1 - disc);
+      const numEl = document.getElementById(`qty-${id}`);
+      numEl.textContent = qtys[id];
+      numEl.className   = 'qty-num' + (qtys[id] > 0 ? ' nonzero' : '');
+      document.getElementById(`price-${id}`).textContent = `$${perCup.toFixed(2)}`;
+      document.getElementById(`card-${id}`).classList.toggle('in-cart', qtys[id] > 0);
+    }
+
+    // Tier bar
+    document.getElementById('tierItem0').classList.toggle('active', tier === 0);
+    document.getElementById('tierItem1').classList.toggle('active', tier === 1);
+    document.getElementById('tierItem2').classList.toggle('active', tier === 2);
+
+    // Nav count
+    const cartCount = document.getElementById('navCartCount');
+    cartCount.textContent = cups;
+    cartCount.classList.toggle('hidden', cups === 0);
+
+    // Cart items
+    renderCartItems();
+
+    // Cart tier section
+    const tierSec = document.getElementById('cartTierSection');
+    tierSec.style.display = cups > 0 ? 'block' : 'none';
+    if (cups > 0) {
+      const labels = [
+        `Tier 1 — Full $${(FULL_PRICES[0]*(1-disc)).toFixed(2)} · Half $${(HALF_PRICES[0]*(1-disc)).toFixed(2)} / cup`,
+        `Tier 2 — Full $${(FULL_PRICES[1]*(1-disc)).toFixed(2)} · Half $${(HALF_PRICES[1]*(1-disc)).toFixed(2)} / cup`,
+        `Tier 3 (Best) — Full $${(FULL_PRICES[2]*(1-disc)).toFixed(2)} · Half $${(HALF_PRICES[2]*(1-disc)).toFixed(2)} / cup`,
+      ];
+      document.getElementById('cartTierLabel').textContent = labels[tier];
+      const pct = tier === 0 ? Math.min((cups/4)*33, 33)
+                : tier === 1 ? 33 + Math.min(((cups-4)/2)*33, 33)
+                : 100;
+      document.getElementById('cartTierFill').style.width = pct + '%';
+      ['ctDot0','ctDot1','ctDot2'].forEach((dotId, i) => {
+        document.getElementById(dotId)?.classList.toggle('reached', tier > i || (tier === 2));
+      });
+      const hints = [
+        `Add <strong>${5-cups} more cup${5-cups!==1?'s':''}</strong> to unlock Tier 2 pricing`,
+        `Add <strong>${7-cups} more cup${7-cups!==1?'s':''}</strong> to unlock best pricing`,
+        `🏆 <strong>Best value unlocked!</strong> You're on Tier 3 pricing.`,
+      ];
+      document.getElementById('cartTierHint').innerHTML = tier < 3 ? hints[tier] : hints[2];
+    }
+
+    // Total
+    const sub = getSubtotal();
+    document.getElementById('cartTotal').textContent = `$${sub.toFixed(2)}`;
+    document.getElementById('cartCountBadge').textContent = cups;
+
+    // Min warn
+    document.getElementById('cartMinWarn').style.display = (cups > 0 && sub < 24) ? 'block' : 'none';
+
+    // Save note
+    document.getElementById('cartSaveNote').style.display = orderType === 'subscribe' ? 'block' : 'none';
+
+    // Checkout btn
+    document.getElementById('btnCheckout').disabled = (cups === 0 || sub < 24);
+
+    // Auth cart summary
+    document.getElementById('authCartSummary').textContent = `${cups} cup${cups!==1?'s':''} · $${sub.toFixed(2)}`;
+  }
+
+  function renderCartItems() {
+    const section  = document.getElementById('cartItems');
+    const emptyMsg = document.getElementById('cartEmptyMsg');
+    const cups     = totalCups();
+    const disc     = orderType === 'subscribe' ? 0.1 : 0;
+    const filled   = Object.entries(qtys).filter(([,q]) => q > 0);
+
+    section.querySelectorAll('.cart-item').forEach(el => el.remove());
+
+    if (filled.length === 0) { emptyMsg.style.display = 'block'; return; }
+    emptyMsg.style.display = 'none';
+
+    for (const [id, qty] of filled) {
+      const info   = PRODUCTS[id];
+      const perCup = getPrice(info.type, cups) * (1 - disc);
+      const sub    = (perCup * qty).toFixed(2);
+      const el     = document.createElement('div');
+      el.className = 'cart-item';
+      el.innerHTML = `
+        <span class="ci-emoji">${info.emoji}</span>
+        <div class="ci-info">
+          <div class="ci-name">${info.name}</div>
+          <div class="ci-meta">$${perCup.toFixed(2)}/cup · ${info.protein} protein · ${info.cal} cal</div>
+        </div>
+        <div class="ci-qty">
+          <button class="ci-qbtn" onclick="adjust('${id}',-1)">−</button>
+          <span class="ci-qnum">${qty}</span>
+          <button class="ci-qbtn" onclick="adjust('${id}',1)">+</button>
+        </div>
+        <span class="ci-price">$${sub}</span>
+      `;
+      section.appendChild(el);
+    }
+  }
+
+  // ── Checkout ────────────────────────────────────────────────────────────
+  async function handleCheckout() {
+    // Validate required fields
+    const fields = {
+      name:   document.getElementById('cartName').value.trim(),
+      phone:  document.getElementById('cartPhone').value.trim(),
+      email:  document.getElementById('cartEmail').value.trim(),
+      street: document.getElementById('cartStreet').value.trim(),
+      city:   document.getElementById('cartCity').value.trim(),
+      state:  document.getElementById('cartState').value.trim(),
+      zip:    document.getElementById('cartZip').value.trim(),
+      date:   document.getElementById('cartDate').value,
+      time:   document.getElementById('cartTime').value,
+    };
+    const missing = Object.entries(fields)
+      .filter(([k,v]) => !v && k !== 'unit')
+      .map(([k]) => k);
+
+    if (missing.length) {
+      showCartErr(`Please fill in: ${missing.join(', ')}.`);
+      return;
+    }
+    showCartErr('');
+    saveFields();
+
+    // Auth gate — if not logged in, show sign in modal
+    if (!isLoggedIn) {
+      openAuth();
+      return;
+    }
+
+    // All clear — proceed to Stripe
+    await createStripeSession();
+  }
+
+  async function createStripeSession() {
+    const btn = document.getElementById('btnCheckout');
+    btn.textContent = 'Processing…';
+    btn.disabled = true;
+
+    const cups = totalCups();
+    const disc = orderType === 'subscribe' ? 0.1 : 0;
+
+    const cartItems = Object.entries(qtys)
+      .filter(([,q]) => q > 0)
+      .map(([id, qty]) => ({
+        productId: id,
+        name:      PRODUCTS[id].name,
+        type:      PRODUCTS[id].type,
+        qty,
+        unitPrice: Math.round(getPrice(PRODUCTS[id].type, cups) * (1 - disc) * 100),
+      }));
+
+    const delivery = {
+      name:   document.getElementById('cartName').value.trim(),
+      phone:  document.getElementById('cartPhone').value.trim(),
+      email:  document.getElementById('cartEmail').value.trim(),
+      street: document.getElementById('cartStreet').value.trim(),
+      unit:   document.getElementById('cartUnit').value.trim(),
+      city:   document.getElementById('cartCity').value.trim(),
+      state:  document.getElementById('cartState').value.trim(),
+      zip:    document.getElementById('cartZip').value.trim(),
+      date:   document.getElementById('cartDate').value,
+      time:   document.getElementById('cartTime').value,
+    };
+    const referral = document.getElementById('cartRef').value.trim();
+
+    try {
+      const { data: { session: authSession } } = await sb.auth.getSession();
+      const token = authSession?.access_token;
+
+      const res = await fetch(EDGE_URL, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          action: 'create-checkout-session',
+          userId,
+          orderType,
+          cartItems,
+          totalCups: cups,
+          subtotal: getSubtotal(),
+          delivery,
+          referral,
+          successUrl: window.location.origin + '/success.html',
+          cancelUrl:  window.location.href,
+        }),
+      });
+
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Failed to create checkout session');
+      if (data.url) {
+        localStorage.removeItem(CART_KEY);
+        window.location.href = data.url;
+      } else {
+        throw new Error('No checkout URL returned');
+      }
+    } catch (err) {
+      showCartErr(err.message);
+      btn.textContent = 'Proceed to Checkout →';
+      btn.disabled = false;
+    }
+  }
+
+  function showCartErr(msg) {
+    const el = document.getElementById('cartErr');
+    el.textContent = msg;
+    el.classList.toggle('show', !!msg);
+  }
+
+  // ── Cart drawer ─────────────────────────────────────────────────────────
+  function openCart()  {
+    document.getElementById('cartOverlay').classList.add('open');
+    document.getElementById('cartDrawer').classList.add('open');
+  }
+  function closeCart() {
+    document.getElementById('cartOverlay').classList.remove('open');
+    document.getElementById('cartDrawer').classList.remove('open');
+  }
+
+  // ── Auth modal ──────────────────────────────────────────────────────────
+  function openAuth()  { document.getElementById('authOverlay').classList.add('open'); }
+  function closeAuth() { document.getElementById('authOverlay').classList.remove('open'); clearAuthMsg(); }
+
+  function switchAuthTab(tab) {
+    document.getElementById('authSigninForm').style.display = tab === 'signin' ? 'block' : 'none';
+    document.getElementById('authSignupForm').style.display = tab === 'signup' ? 'block' : 'none';
+    document.getElementById('authForgotForm').style.display = tab === 'forgot'  ? 'block' : 'none';
+    document.getElementById('authTabSI').classList.toggle('active', tab === 'signin');
+    document.getElementById('authTabSU').classList.toggle('active', tab === 'signup');
+    clearAuthMsg();
+  }
+
+  function showAuthMsg(text, type) {
+    const el = document.getElementById('authMsg');
+    el.textContent = text;
+    el.className = 'auth-msg' + (type ? ' ' + type : '');
+  }
+  function clearAuthMsg() {
+    const el = document.getElementById('authMsg');
+    el.textContent = '';
+    el.className = 'auth-msg';
+  }
+
+  async function doSignIn() {
+    const email = document.getElementById('authSIEmail').value.trim();
+    const pass  = document.getElementById('authSIPass').value;
+    if (!email || !pass) return showAuthMsg('Please fill in all fields.', 'error');
+    const btn = document.getElementById('btnAuthSI');
+    btn.textContent = 'Signing in…'; btn.disabled = true;
+    const { error } = await sb.auth.signInWithPassword({ email, password: pass });
+    if (error) {
+      showAuthMsg(error.message, 'error');
+      btn.textContent = 'Sign In & Continue →'; btn.disabled = false;
+    } else {
+      const { data: { session } } = await sb.auth.getSession();
+      isLoggedIn = true;
+      userId     = session.user.id;
+      closeAuth();
+      // Pre-fill from profile if fields are still empty
+      const { data: profile } = await sb.from('customers').select('name,email,phone,delivery_address').eq('id', userId).single();
+      if (profile) prefillFromProfile(profile);
+      document.getElementById('navSignupBtn').style.display = 'none';
+      document.getElementById('navDashBtn').style.display   = 'inline-block';
+      await createStripeSession();
+    }
+  }
+
+  async function doSignUp() {
+    const name  = document.getElementById('authSUName').value.trim();
+    const email = document.getElementById('authSUEmail').value.trim();
+    const pass  = document.getElementById('authSUPass').value;
+    if (!name || !email || !pass) return showAuthMsg('Please fill in all fields.', 'error');
+    if (pass.length < 8) return showAuthMsg('Password must be at least 8 characters.', 'error');
+    const btn = document.getElementById('btnAuthSU');
+    btn.textContent = 'Creating account…'; btn.disabled = true;
+    const { data, error } = await sb.auth.signUp({ email, password: pass });
+    if (error) {
+      showAuthMsg(error.message, 'error');
+      btn.textContent = 'Create Account & Continue →'; btn.disabled = false;
+      return;
+    }
+    if (data.user) {
+      await sb.from('customers').upsert({ id: data.user.id, name, email });
+    }
+    isLoggedIn = true;
+    userId     = data.user.id;
+    closeAuth();
+    document.getElementById('navSignupBtn').style.display = 'none';
+    document.getElementById('navDashBtn').style.display   = 'inline-block';
+    // Pre-fill name/email in cart fields if empty
+    if (!document.getElementById('cartName').value)  document.getElementById('cartName').value  = name;
+    if (!document.getElementById('cartEmail').value) document.getElementById('cartEmail').value = email;
+    await createStripeSession();
+  }
+
+  async function doForgot() {
+    const email = document.getElementById('authForgotEmail').value.trim();
+    if (!email) return showAuthMsg('Please enter your email.', 'error');
+    const { error } = await sb.auth.resetPasswordForEmail(email, {
+      redirectTo: window.location.origin + '/shop.html'
+    });
+    if (error) showAuthMsg(error.message, 'error');
+    else showAuthMsg('Reset link sent! Check your inbox.', 'success');
+  }
+
+  // Allow Enter key in auth forms
+  document.addEventListener('keydown', e => {
+    if (e.key !== 'Enter') return;
+    const overlay = document.getElementById('authOverlay');
+    if (!overlay.classList.contains('open')) return;
+    const siVisible = document.getElementById('authSigninForm').style.display !== 'none';
+    const suVisible = document.getElementById('authSignupForm').style.display !== 'none';
+    if (siVisible) doSignIn();
+    else if (suVisible) doSignUp();
+  });
+
+  updateAll();
+</script>
+</body>
+</html>

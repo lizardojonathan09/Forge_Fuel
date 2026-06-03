@@ -137,6 +137,7 @@ async function handleApiRequest(req: Request, auth: string) {
 
   const body = await req.json()
   console.log('API action:', body.action, 'user:', user.id)
+  if (body.action === 'create-checkout-session') return handleCreateCheckoutSession(user.id, body)
   if (body.action === 'update-plan')             return handleUpdatePlan(user.id, body)
   if (body.action === 'pause-subscription')      return handlePauseResume(user.id, true)
   if (body.action === 'resume-subscription')     return handlePauseResume(user.id, false)
@@ -145,6 +146,124 @@ async function handleApiRequest(req: Request, auth: string) {
 
   return new Response(JSON.stringify({ error: 'Unknown action' }), {
     status: 400, headers: { ...CORS, 'Content-Type': 'application/json' },
+  })
+}
+
+// ── Create Stripe Checkout Session ───────────────────────────────────────
+async function handleCreateCheckoutSession(userId: string, body: any) {
+  const { orderType, cartItems, totalCups, delivery, referral, successUrl, cancelUrl } = body
+
+  if (!cartItems || cartItems.length === 0) {
+    return new Response(JSON.stringify({ error: 'Cart is empty' }), {
+      status: 400, headers: { ...CORS, 'Content-Type': 'application/json' },
+    })
+  }
+
+  // Look up existing Stripe customer
+  const { data: cust } = await sb.from('customers')
+    .select('stripe_customer_id')
+    .eq('id', userId)
+    .maybeSingle()
+
+  const params = new URLSearchParams()
+
+  // ── Common: metadata ─────────────────────────────────────────────────────
+  const meta: Record<string, string> = { supabase_customer_id: userId }
+  if (referral)        meta.referral        = referral
+  if (delivery?.date)  meta.delivery_date   = delivery.date
+  if (delivery?.time)  meta.delivery_time   = delivery.time
+  if (delivery?.name)  meta.customer_name   = delivery.name
+  if (delivery?.phone) meta.customer_phone  = delivery.phone
+
+  // Per-product qtys in metadata so webhook can read them
+  for (const item of cartItems) {
+    meta[`qty_${item.productId}`] = String(item.qty)
+  }
+  meta.flavor = cartItems.map((i: any) => `${i.qty} ${i.name}`).join(' + ')
+
+  Object.entries(meta).forEach(([k, v]) => params.set(`metadata[${k}]`, v))
+
+  // ── Customer attachment ──────────────────────────────────────────────────
+  if (cust?.stripe_customer_id) {
+    params.set('customer', cust.stripe_customer_id)
+  } else if (delivery?.email) {
+    params.set('customer_email', delivery.email)
+  }
+
+  params.set('allow_promotion_codes', 'true')
+  params.set('success_url', successUrl)
+  params.set('cancel_url',  cancelUrl)
+
+  if (orderType === 'subscribe') {
+    // ── SUBSCRIPTION MODE ────────────────────────────────────────────────
+    params.set('mode', 'subscription')
+    params.set('client_reference_id', userId)  // UUID signals subscription mode to webhook
+
+    const fullQty = cartItems.filter((i: any) => i.type === 'full').reduce((s: number, i: any) => s + i.qty, 0)
+    const halfQty = cartItems.filter((i: any) => i.type === 'half').reduce((s: number, i: any) => s + i.qty, 0)
+    const cups    = totalCups as number
+
+    // Use a pre-created price ID when the cart is a pure full or pure half order
+    let priceId: string | undefined
+    if (halfQty === 0) {
+      priceId = cups >= 7 ? STRIPE_PRICE_IDS['full-7'] : cups >= 5 ? STRIPE_PRICE_IDS['full-5'] : STRIPE_PRICE_IDS['full-3']
+    } else if (fullQty === 0) {
+      priceId = cups >= 9 ? STRIPE_PRICE_IDS['half-9'] : cups >= 7 ? STRIPE_PRICE_IDS['half-7'] : STRIPE_PRICE_IDS['half-5']
+    }
+
+    if (priceId) {
+      params.set('line_items[0][price]',    priceId)
+      params.set('line_items[0][quantity]', '1')
+    } else {
+      // Mixed cart — create an ad-hoc recurring price from the cart total
+      const totalCents = cartItems.reduce((s: number, i: any) => s + i.unitPrice * i.qty, 0)
+      params.set('line_items[0][price_data][currency]',                         'usd')
+      params.set('line_items[0][price_data][unit_amount]',                      String(totalCents))
+      params.set('line_items[0][price_data][product_data][name]',               'Forge Oats Weekly Pack')
+      params.set('line_items[0][price_data][product_data][description]',        meta.flavor)
+      params.set('line_items[0][price_data][recurring][interval]',              'week')
+      params.set('line_items[0][quantity]', '1')
+    }
+
+  } else {
+    // ── ONE-TIME PAYMENT MODE ────────────────────────────────────────────
+    params.set('mode', 'payment')
+
+    // Encode client_reference_id for webhook parseRef compatibility
+    const refParts = [`${totalCups}pack`]
+    for (const item of cartItems) refParts.push(`${item.productId}:${item.qty}`)
+    if (referral)       refParts.push(`ref:${referral}`)
+    if (delivery?.date) refParts.push(`date:${delivery.date}`)
+    if (delivery?.time) refParts.push(`time:${delivery.time}`)
+    if (delivery?.name) refParts.push(`name:${delivery.name}`)
+
+    const encoded = btoa(unescape(encodeURIComponent(refParts.join('|'))))
+      .replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '')
+    params.set('client_reference_id', encoded)
+
+    // One line item per product
+    cartItems.forEach((item: any, idx: number) => {
+      const serving = item.type === 'full' ? 'Full Serving' : 'Half Serving'
+      params.set(`line_items[${idx}][price_data][currency]`,                  'usd')
+      params.set(`line_items[${idx}][price_data][unit_amount]`,               String(item.unitPrice))
+      params.set(`line_items[${idx}][price_data][product_data][name]`,        item.name)
+      params.set(`line_items[${idx}][price_data][product_data][description]`, `${serving} — Forge Performance Oats`)
+      params.set(`line_items[${idx}][quantity]`,                              String(item.qty))
+    })
+  }
+
+  const session = await stripeReq('/checkout/sessions', 'POST', params)
+
+  if (session.error) {
+    console.error('Checkout session error:', session.error)
+    return new Response(JSON.stringify({ error: session.error.message || 'Failed to create checkout session' }), {
+      status: 500, headers: { ...CORS, 'Content-Type': 'application/json' },
+    })
+  }
+
+  console.log(`Checkout session created for user ${userId}: ${session.id} (${orderType})`)
+  return new Response(JSON.stringify({ url: session.url }), {
+    headers: { ...CORS, 'Content-Type': 'application/json' },
   })
 }
 
@@ -367,6 +486,18 @@ async function handleCheckoutComplete(session: any) {
     const stripeSubId      = session.subscription
     const stripeCustomerId = session.customer
 
+    // Extract per-product qtys and referral from session metadata
+    const meta      = session.metadata ?? {}
+    const qtyFc     = parseInt(meta.qty_fc ?? '0') || 0
+    const qtyFp     = parseInt(meta.qty_fp ?? '0') || 0
+    const qtyHc     = parseInt(meta.qty_hc ?? '0') || 0
+    const qtyHp     = parseInt(meta.qty_hp ?? '0') || 0
+    const referral  = meta.referral ?? null
+    const fullCups  = qtyFc + qtyFp
+    const halfCups  = qtyHc + qtyHp
+    const portion   = fullCups >= halfCups ? 'full' : 'half'
+    const totalCups = qtyFc + qtyFp + qtyHc + qtyHp
+
     if (stripeSubId) {
       await stripeReq(`/subscriptions/${stripeSubId}`, 'POST',
         new URLSearchParams({ 'metadata[supabase_customer_id]': customerId })
@@ -375,7 +506,18 @@ async function handleCheckoutComplete(session: any) {
 
     await Promise.all([
       sb.from('subscriptions').upsert(
-        { customer_id: customerId, stripe_subscription_id: stripeSubId },
+        {
+          customer_id:            customerId,
+          stripe_subscription_id: stripeSubId,
+          qty_fc:                 qtyFc,
+          qty_fp:                 qtyFp,
+          qty_hc:                 qtyHc,
+          qty_hp:                 qtyHp,
+          chocolate_cups:         qtyFc + qtyHc,   // legacy
+          peanut_butter_cups:     qtyFp + qtyHp,   // legacy
+          portion,                                  // legacy
+          ...(totalCups > 0 ? { stripe_plan: `${portion}-${totalCups}` } : {}),
+        },
         { onConflict: 'customer_id' }
       ),
       sb.from('customers').upsert(
@@ -384,18 +526,20 @@ async function handleCheckoutComplete(session: any) {
       ),
     ])
 
-    // Record the starting stripe_plan so dashboard change-detection works correctly
-    const { data: subSettings } = await sb.from('subscriptions')
-      .select('portion, chocolate_cups, peanut_butter_cups')
-      .eq('customer_id', customerId).maybeSingle()
-    if (subSettings) {
-      const cups = (subSettings.chocolate_cups ?? 0) + (subSettings.peanut_butter_cups ?? 0)
-      await sb.from('subscriptions')
-        .update({ stripe_plan: `${subSettings.portion}-${cups}` })
-        .eq('customer_id', customerId)
+    // If qtys weren't in metadata (legacy flow), fall back to reading existing row
+    if (totalCups === 0) {
+      const { data: subSettings } = await sb.from('subscriptions')
+        .select('portion, chocolate_cups, peanut_butter_cups')
+        .eq('customer_id', customerId).maybeSingle()
+      if (subSettings) {
+        const cups = (subSettings.chocolate_cups ?? 0) + (subSettings.peanut_butter_cups ?? 0)
+        await sb.from('subscriptions')
+          .update({ stripe_plan: `${subSettings.portion}-${cups}` })
+          .eq('customer_id', customerId)
+      }
     }
 
-    await insertSubOrder({ customerId, email, sessionId: session.id, amountTotal: session.amount_total })
+    await insertSubOrder({ customerId, email, sessionId: session.id, amountTotal: session.amount_total, referredBy: referral })
 
   } else if (session.mode === 'payment') {
     let parsed: Record<string, any> = {}
@@ -420,19 +564,30 @@ async function handleCheckoutComplete(session: any) {
     const { data: customer } = await sb.from('customers')
       .select('id').eq('email', email).maybeSingle()
 
+    // Per-product qtys — prefer metadata, fall back to encoded ref fields
+    const meta  = session.metadata ?? {}
+    const qtyFc = parseInt(meta.qty_fc ?? parsed.fc ?? '0') || 0
+    const qtyFp = parseInt(meta.qty_fp ?? parsed.fp ?? '0') || 0
+    const qtyHc = parseInt(meta.qty_hc ?? parsed.hc ?? '0') || 0
+    const qtyHp = parseInt(meta.qty_hp ?? parsed.hp ?? '0') || 0
+
     await sb.from('orders').insert({
       customer_id:       customer?.id ?? null,
       customer_email:    email,
-      customer_name:     parsed.name ?? session.customer_details?.name ?? '',
-      customer_phone:    parsed.phone ?? session.customer_details?.phone ?? null,
-      flavor:            parsed.flavor ?? '',
+      customer_name:     parsed.name ?? meta.customer_name ?? session.customer_details?.name ?? '',
+      customer_phone:    parsed.phone ?? meta.customer_phone ?? session.customer_details?.phone ?? null,
+      qty_fc:            qtyFc,
+      qty_fp:            qtyFp,
+      qty_hc:            qtyHc,
+      qty_hp:            qtyHp,
+      flavor:            meta.flavor || parsed.flavor || '',
       portion:           parsed.portion ?? '',
       pack_size:         parsed.pack_size ?? null,
       order_type:        'one-time',
       total:             parsed.price ?? formatAmount(session.amount_total),
-      delivery_date:     parsed.date ?? '',
-      delivery_time:     parsed.time ?? '',
-      referred_by:       parsed.ref ?? null,
+      delivery_date:     parsed.date ?? meta.delivery_date ?? '',
+      delivery_time:     parsed.time ?? meta.delivery_time ?? '',
+      referred_by:       parsed.ref ?? meta.referral ?? null,
       stripe_session_id: session.id,
     })
   }
@@ -460,12 +615,13 @@ async function handleRenewal(invoice: any) {
 }
 
 // ── Build and insert a subscription order ────────────────────────────────
-async function insertSubOrder({ customerId, email, sessionId, invoiceId, amountTotal }: {
+async function insertSubOrder({ customerId, email, sessionId, invoiceId, amountTotal, referredBy }: {
   customerId:   string
   email:        string
   sessionId?:   string
   invoiceId?:   string
   amountTotal?: number | null
+  referredBy?:  string | null
 }) {
   const [{ data: sub }, { data: cust }] = await Promise.all([
     sb.from('subscriptions').select('*').eq('customer_id', customerId).maybeSingle(),
@@ -476,12 +632,33 @@ async function insertSubOrder({ customerId, email, sessionId, invoiceId, amountT
     return
   }
 
-  const cups    = (sub.chocolate_cups ?? 0) + (sub.peanut_butter_cups ?? 0)
-  const flavors: string[] = []
-  if ((sub.chocolate_cups ?? 0) > 0)     flavors.push(`${sub.chocolate_cups} Chocolate`)
-  if ((sub.peanut_butter_cups ?? 0) > 0) flavors.push(`${sub.peanut_butter_cups} Peanut Butter`)
+  // Read per-product qtys — prefer new columns, fall back to old schema
+  let fc = sub.qty_fc ?? 0
+  let fp = sub.qty_fp ?? 0
+  let hc = sub.qty_hc ?? 0
+  let hp = sub.qty_hp ?? 0
 
-  const basePerCup = PER_CUP[`${sub.portion}-${cups}`] ?? 7.50
+  if (fc + fp + hc + hp === 0) {
+    // Legacy fallback: derive from chocolate_cups + peanut_butter_cups + portion
+    const choc = sub.chocolate_cups ?? 0
+    const pb   = sub.peanut_butter_cups ?? 0
+    if (sub.portion === 'half') { hc = choc; hp = pb }
+    else                         { fc = choc; fp = pb }
+  }
+
+  const cups     = fc + fp + hc + hp
+  const flavors: string[] = []
+  if (fc > 0) flavors.push(`${fc} Full Chocolate`)
+  if (fp > 0) flavors.push(`${fp} Full Peanut Butter`)
+  if (hc > 0) flavors.push(`${hc} Half Chocolate`)
+  if (hp > 0) flavors.push(`${hp} Half Peanut Butter`)
+
+  // Determine dominant portion for price-tier lookup
+  const fullCups = fc + fp
+  const halfCups = hc + hp
+  const portion  = fullCups >= halfCups ? 'full' : 'half'
+
+  const basePerCup = PER_CUP[`${portion}-${cups}`] ?? 7.50
   const total = amountTotal != null
     ? formatAmount(amountTotal)
     : '$' + (basePerCup * cups * (1 - SUB_DISC)).toFixed(2)
@@ -491,14 +668,18 @@ async function insertSubOrder({ customerId, email, sessionId, invoiceId, amountT
     customer_email:    email,
     customer_name:     cust?.name ?? '',
     customer_phone:    cust?.phone ?? null,
+    qty_fc:            fc,
+    qty_fp:            fp,
+    qty_hc:            hc,
+    qty_hp:            hp,
     flavor:            flavors.join(' + ') || 'Chocolate',
-    portion:           sub.portion === 'half' ? 'Half Serving' : 'Full Serving',
+    portion:           portion === 'half' ? 'Half Serving' : 'Full Serving',
     pack_size:         cups,
     order_type:        'subscribe',
     total,
     delivery_date:     sub.delivery_day  ?? '',
     delivery_time:     sub.delivery_time ?? '',
-    referred_by:       null,
+    referred_by:       referredBy ?? null,
     stripe_session_id: sessionId ?? null,
     stripe_invoice_id: invoiceId ?? null,
   })

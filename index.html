@@ -112,123 +112,63 @@
     }
     .delivery-badge span { font-size: 16px; }
 
-    /* ── ORDER SECTION ── */
-    #order { background:var(--dark); padding:100px 48px; }
-    .order-header { text-align:center; margin-bottom:48px; }
-    .order-header .section-desc { margin:0 auto; }
-    .pack-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:24px; max-width:900px; margin:0 auto 40px; }
-    .pack-card { background:var(--card); border:2px solid var(--border); border-radius:12px; padding:36px 28px; text-align:center; cursor:pointer; transition:all 0.25s; position:relative; overflow:hidden; }
-    .pack-card::before { content:''; position:absolute; top:0; left:0; right:0; height:3px; background:var(--border); transition:background 0.25s; }
-    .pack-card:hover { border-color:rgba(255,107,26,0.5); transform:translateY(-4px); }
-    .pack-card:hover::before { background:linear-gradient(90deg,var(--fire),var(--orange)); }
-    .pack-card.active { border-color:var(--orange); background:linear-gradient(180deg,rgba(255,107,26,0.08) 0%,var(--card) 100%); transform:translateY(-6px); box-shadow:0 16px 48px rgba(255,107,26,0.2); }
-    .pack-card.active::before { background:linear-gradient(90deg,var(--fire),var(--orange)); }
-    .pack-badge { display:inline-block; background:linear-gradient(135deg,var(--fire),var(--orange)); color:#fff; font-family:'Oswald',sans-serif; font-size:11px; font-weight:600; letter-spacing:2px; text-transform:uppercase; padding:4px 12px; border-radius:20px; margin-bottom:20px; }
-    .pack-badge.hidden { visibility:hidden; }
-    .pack-cups { font-family:'Bebas Neue',sans-serif; font-size:72px; line-height:1; color:var(--cream); }
-    .pack-cups span { font-family:'Oswald',sans-serif; font-size:20px; color:var(--muted); font-weight:400; display:block; letter-spacing:2px; text-transform:uppercase; }
-    .pack-price-per { font-family:'Inter',sans-serif; font-size:14px; color:var(--muted); margin:8px 0; }
-    .pack-total { font-family:'Bebas Neue',sans-serif; font-size:40px; background:linear-gradient(135deg,var(--orange),var(--gold)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; margin:12px 0; }
-    .pack-savings { font-size:12px; color:#5CB85C; font-family:'Oswald',sans-serif; letter-spacing:1px; }
-    .order-type-toggle { display:flex; max-width:480px; margin:0 auto 32px; background:var(--card); border:1px solid var(--border); border-radius:8px; overflow:hidden; }
-    .toggle-btn { flex:1; padding:14px; font-family:'Oswald',sans-serif; font-size:14px; letter-spacing:2px; text-transform:uppercase; cursor:pointer; background:transparent; border:none; color:var(--muted); transition:all 0.2s; }
-    .toggle-btn.active { background:var(--orange); color:#fff; }
-    .sub-note { text-align:center; font-size:13px; color:var(--muted); margin-bottom:28px; display:none; }
-    .sub-note.visible { display:block; }
-    .sub-note strong { color:#5CB85C; }
-
-    /* ── ORDER STEPS ── */
-    .order-step { margin-bottom: 48px; }
-    .step-label { font-family:'Oswald',sans-serif; font-size:18px; font-weight:600; letter-spacing:2px; text-transform:uppercase; color:var(--cream); margin-bottom:20px; display:flex; align-items:center; justify-content:center; gap:12px; }
-    .step-num { display:inline-flex; align-items:center; justify-content:center; width:32px; height:32px; border-radius:50%; background:linear-gradient(135deg,var(--fire),var(--orange)); font-family:'Bebas Neue',sans-serif; font-size:18px; color:#fff; flex-shrink:0; }
-    .option-grid-2 { display:grid; grid-template-columns:1fr 1fr; gap:20px; max-width:700px; margin:0 auto; }
-    .option-card { background:var(--card); border:2px solid var(--border); border-radius:12px; padding:28px 24px; cursor:pointer; transition:all 0.25s; text-align:center; position:relative; overflow:hidden; }
-    .option-card::before { content:''; position:absolute; top:0; left:0; right:0; height:3px; background:var(--border); transition:background 0.25s; }
-    .option-card:hover { border-color:rgba(255,107,26,0.5); transform:translateY(-3px); }
-    .option-card:hover::before { background:linear-gradient(90deg,var(--fire),var(--orange)); }
-    .option-card.active { border-color:var(--orange); background:linear-gradient(180deg,rgba(255,107,26,0.08) 0%,var(--card) 100%); transform:translateY(-4px); box-shadow:0 12px 40px rgba(255,107,26,0.18); }
-    .option-card.active::before { background:linear-gradient(90deg,var(--fire),var(--orange)); }
-    .option-icon { font-size:40px; margin-bottom:12px; line-height:1; }
-    .portion-img-wrap { width:100%; aspect-ratio:1/1; overflow:hidden; border-radius:8px; margin-bottom:16px; background:var(--dark); }
-    .portion-img { width:100%; height:100%; object-fit:cover; display:block; transition:transform 0.4s ease; }
-    .option-card:hover .portion-img { transform:scale(1.04); }
-    .option-name { font-family:'Oswald',sans-serif; font-size:20px; font-weight:600; letter-spacing:1px; color:var(--cream); margin-bottom:8px; }
-    .option-desc { font-size:14px; color:rgba(237,232,220,0.6); line-height:1.5; }
-    .portion-macros { display:flex; justify-content:center; gap:16px; margin:12px 0; }
-    .pm-item { text-align:center; }
-    .pm-num { font-family:'Bebas Neue',sans-serif; font-size:28px; background:linear-gradient(135deg,var(--orange),var(--gold)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; line-height:1; }
-    .pm-label { font-family:'Oswald',sans-serif; font-size:10px; letter-spacing:2px; text-transform:uppercase; color:var(--muted); }
-
-    /* ── FLAVOR QUANTITY PICKER ── */
-    .flavor-qty-grid { display:grid; grid-template-columns:1fr 1fr; gap:20px; max-width:700px; margin:0 auto; }
-    .flavor-qty-card { background:var(--card); border:2px solid var(--border); border-radius:12px; padding:32px 24px; text-align:center; position:relative; overflow:hidden; transition:all 0.25s; }
-    .flavor-qty-card::before { content:''; position:absolute; top:0; left:0; right:0; height:3px; background:var(--border); transition:background 0.25s; }
-    .flavor-qty-card.has-qty { border-color:var(--orange); background:linear-gradient(180deg,rgba(255,107,26,0.08) 0%,var(--card) 100%); }
-    .flavor-qty-card.has-qty::before { background:linear-gradient(90deg,var(--fire),var(--orange)); }
-    .flavor-qty-icon { font-size:36px; margin-bottom:10px; line-height:1; }
-    .flavor-qty-name { font-family:'Oswald',sans-serif; font-size:20px; font-weight:600; letter-spacing:1px; color:var(--cream); margin-bottom:6px; }
-    .flavor-qty-desc { font-size:13px; color:rgba(237,232,220,0.55); line-height:1.4; margin-bottom:20px; }
-    .qty-control { display:flex; align-items:center; justify-content:center; gap:18px; }
-    .qty-btn { width:42px; height:42px; border-radius:50%; background:var(--dark); border:1px solid var(--border); color:var(--cream); font-size:22px; cursor:pointer; display:flex; align-items:center; justify-content:center; transition:all 0.2s; line-height:1; padding:0; font-family:'Inter',sans-serif; font-weight:300; }
-    .qty-btn:hover:not(:disabled) { background:var(--orange); border-color:var(--orange); transform:scale(1.1); }
-    .qty-btn:disabled { opacity:0.25; cursor:not-allowed; transform:none; }
-    .qty-display { text-align:center; }
-    .qty-num { font-family:'Bebas Neue',sans-serif; font-size:64px; color:var(--cream); line-height:1; min-width:52px; display:block; }
-    .qty-cups-label { font-family:'Oswald',sans-serif; font-size:11px; letter-spacing:3px; text-transform:uppercase; color:var(--muted); margin-top:2px; }
-    .flavor-total-bar { display:flex; align-items:center; justify-content:center; gap:10px; max-width:700px; margin:20px auto 0; padding:14px 24px; background:var(--card); border:1px solid var(--border); border-radius:8px; font-family:'Oswald',sans-serif; font-size:14px; letter-spacing:2px; text-transform:uppercase; color:var(--muted); transition:border-color 0.3s; }
-    .flavor-total-bar.matched { border-color:rgba(92,184,92,0.5); background:rgba(92,184,92,0.06); }
-    .flavor-total-bar.over { border-color:rgba(255,61,0,0.5); }
-    .flavor-total-nums { font-family:'Bebas Neue',sans-serif; font-size:22px; color:var(--cream); }
-    .flavor-total-nums.matched { color:#5CB85C; }
-    .flavor-total-nums.over { color:var(--fire); }
-    .flavor-total-hint { font-size:12px; color:var(--muted); margin-left:4px; }
-    .flavor-total-check { color:#5CB85C; font-size:18px; }
-
-    /* ── DELIVERY SCHEDULER ── */
-    .delivery-scheduler {
-      max-width: 600px; margin: 0 auto 40px;
+    /* ── SHOP CTA SECTION ── */
+    #order { background: var(--dark); padding: 100px 48px; }
+    .shop-cta-inner { max-width: 1000px; margin: 0 auto; }
+    .shop-cta-header { text-align: center; margin-bottom: 56px; }
+    .shop-cta-header .section-desc { margin: 0 auto; }
+    .shop-product-preview { display: grid; grid-template-columns: repeat(4,1fr); gap: 16px; margin-bottom: 48px; }
+    .spp-card {
       background: var(--card); border: 1px solid var(--border);
-      border-radius: 12px; padding: 28px 32px;
+      border-radius: 14px; overflow: hidden; text-align: center;
+      transition: all 0.25s; text-decoration: none;
     }
-    .scheduler-title {
-      font-family: 'Oswald', sans-serif; font-size: 16px;
-      font-weight: 600; letter-spacing: 2px; text-transform: uppercase;
-      color: var(--cream); margin-bottom: 20px;
-      display: flex; align-items: center; gap: 10px;
+    .spp-card:hover { border-color: rgba(255,107,26,0.5); transform: translateY(-4px); box-shadow: 0 12px 36px rgba(255,107,26,0.15); }
+    .spp-hero {
+      height: 110px; display: flex; align-items: center; justify-content: center;
+      position: relative; overflow: hidden;
     }
-    .scheduler-title::before { content: "🚚"; font-size: 20px; }
-    .scheduler-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
-    .scheduler-field label {
-      display: block; font-family: 'Oswald', sans-serif;
-      font-size: 11px; letter-spacing: 3px; text-transform: uppercase;
-      color: var(--muted); margin-bottom: 8px;
+    .spp-hero.full-c { background: linear-gradient(135deg,#1c0a00,#301400); }
+    .spp-hero.full-p { background: linear-gradient(135deg,#1a0c00,#2e1800); }
+    .spp-hero.half-c { background: linear-gradient(135deg,#0a0a1c,#121230); }
+    .spp-hero.half-p { background: linear-gradient(135deg,#08081a,#0f0f28); }
+    .spp-hero::after {
+      content: ''; position: absolute; inset: 0;
+      background: radial-gradient(ellipse 80% 60% at 50% 120%, rgba(255,107,26,0.25), transparent);
     }
-    .scheduler-field input,
-    .scheduler-field select {
-      width: 100%; background: var(--dark); border: 1px solid var(--border);
-      border-radius: 6px; padding: 12px 16px;
-      font-family: 'Oswald', sans-serif; font-size: 15px; letter-spacing: 1px;
-      color: var(--cream); outline: none; transition: border-color 0.2s;
-      appearance: none; -webkit-appearance: none;
-      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23888' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
-      background-repeat: no-repeat; background-position: right 14px center;
+    .spp-hero.half-c::after, .spp-hero.half-p::after {
+      background: radial-gradient(ellipse 80% 60% at 50% 120%, rgba(139,92,246,0.2), transparent);
     }
-    .scheduler-field input[type="date"] {
-      background-image: none;
-      color-scheme: dark;
-    }
-    .scheduler-field input:focus,
-    .scheduler-field select:focus { border-color: var(--orange); }
-    .scheduler-note {
-      margin-top: 14px; font-size: 13px;
-      color: var(--muted); display: flex; align-items: center; gap: 6px;
-    }
-    .scheduler-note::before { content: "⚡"; }
+    .spp-emoji { font-size: 48px; position: relative; z-index: 1; }
+    .spp-hero img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; z-index: 0; }
+    .spp-body { padding: 14px 12px 18px; }
+    .spp-badge { font-size: 9px; letter-spacing: 2px; text-transform: uppercase; padding: 3px 8px; border-radius: 10px; margin-bottom: 6px; display: inline-block; }
+    .spp-badge.full { background: rgba(255,107,26,0.15); color: var(--orange); }
+    .spp-badge.half { background: rgba(139,92,246,0.15); color: #A78BFA; }
+    .spp-name { font-family: 'Oswald', sans-serif; font-size: 15px; font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase; color: var(--cream); margin-bottom: 4px; }
+    .spp-price { font-size: 13px; color: var(--muted); font-family: 'Inter', sans-serif; }
+    .spp-price strong { color: var(--orange); font-family: 'Bebas Neue', sans-serif; font-size: 16px; }
 
-    .checkout-area { text-align:center; }
-    .checkout-area .btn-primary { font-size:18px; padding:20px 60px; letter-spacing:3px; }
-    .checkout-note { font-size:13px; color:var(--muted); margin-top:16px; }
-    .checkout-note span { color:#5CB85C; }
+    .shop-cta-callout {
+      background: linear-gradient(135deg, rgba(255,107,26,0.1), rgba(255,61,0,0.06));
+      border: 1px solid rgba(255,107,26,0.25); border-radius: 16px;
+      padding: 40px 48px; text-align: center;
+      position: relative; overflow: hidden;
+    }
+    .shop-cta-callout::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: linear-gradient(90deg,var(--fire),var(--orange)); }
+    .shop-cta-perks { display: flex; justify-content: center; gap: 32px; flex-wrap: wrap; margin-bottom: 32px; }
+    .shop-perk { font-family: 'Oswald', sans-serif; font-size: 13px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--muted); display: flex; align-items: center; gap: 6px; }
+    .shop-perk span { color: #5CB85C; }
+    .btn-shop-now {
+      display: inline-block; background: linear-gradient(135deg,var(--orange),var(--fire));
+      color: #fff; font-family: 'Bebas Neue', sans-serif; font-size: 28px;
+      letter-spacing: 4px; padding: 20px 72px; border-radius: 6px;
+      text-decoration: none; box-shadow: 0 6px 36px rgba(255,107,26,0.45);
+      transition: all 0.2s;
+    }
+    .btn-shop-now:hover { transform: translateY(-3px); box-shadow: 0 12px 48px rgba(255,107,26,0.6); }
+    .shop-cta-sub { font-size: 13px; color: var(--muted); margin-top: 16px; font-family: 'Inter', sans-serif; }
+    .shop-cta-sub strong { color: #5CB85C; }
 
     /* ── WHY FORGE ── */
     #why { background:var(--black); }
@@ -344,7 +284,7 @@
   </div>
   <div class="nav-actions">
     <a href="profile.html?tab=signup" class="btn-nav-ghost" id="navSignupBtn">Sign Up</a>
-    <a href="#order" class="btn-nav">Order Now</a>
+    <a href="shop.html" class="btn-nav">Shop Now</a>
   </div>
 </nav>
 
@@ -367,9 +307,64 @@
     </p>
     <div class="delivery-badge"><span>🚚</span> Delivered in 1–2 Days · Pick Your Date &amp; Time</div>
     <div class="hero-cta-group">
-      <a href="#order" class="btn-primary">Shop Now</a>
+      <a href="shop.html" class="btn-primary">Shop Now</a>
       <a href="profile.html?tab=signup" class="btn-secondary" id="heroSignupBtn">Sign Up</a>
       <a href="#why" class="btn-secondary">Learn More</a>
+    </div>
+  </div>
+</section>
+
+<!-- SHOP CTA -->
+<section id="order">
+  <div class="shop-cta-inner">
+    <div class="shop-cta-header">
+      <p class="section-label">Ready to Order?</p>
+      <h2 class="section-title">4 PRODUCTS. MIX &amp; MATCH.</h2>
+      <p class="section-desc">Full &amp; half servings in Chocolate or Peanut Butter. Build exactly what you want — no preset packs, no limits.</p>
+    </div>
+
+    <!-- Product preview cards -->
+    <div class="shop-product-preview">
+      <a href="shop.html" class="spp-card">
+        <div class="spp-hero full-c"><img src="chocofull.png" alt="Full Serving Chocolate" /></div>
+        <div class="spp-body">
+          <div class="spp-badge full">Full Serving</div>
+          <div class="spp-name">Chocolate</div>
+        </div>
+      </a>
+      <a href="shop.html" class="spp-card">
+        <div class="spp-hero full-p"><img src="pbfull.png" alt="Full Serving Peanut Butter" /></div>
+        <div class="spp-body">
+          <div class="spp-badge full">Full Serving</div>
+          <div class="spp-name">Peanut Butter</div>
+        </div>
+      </a>
+      <a href="shop.html" class="spp-card">
+        <div class="spp-hero half-c"><img src="chochalf.png" alt="Half Serving Chocolate" /></div>
+        <div class="spp-body">
+          <div class="spp-badge half">Half Serving</div>
+          <div class="spp-name">Chocolate</div>
+        </div>
+      </a>
+      <a href="shop.html" class="spp-card">
+        <div class="spp-hero half-p"><img src="pbhalf.png" alt="Half Serving Peanut Butter" /></div>
+        <div class="spp-body">
+          <div class="spp-badge half">Half Serving</div>
+          <div class="spp-name">Peanut Butter</div>
+        </div>
+      </a>
+    </div>
+
+    <!-- CTA callout -->
+    <div class="shop-cta-callout">
+      <div class="shop-cta-perks">
+        <div class="shop-perk"><span>✓</span> Free delivery on all orders</div>
+        <div class="shop-perk"><span>✓</span> Delivered in 1–2 days</div>
+        <div class="shop-perk"><span>✓</span> Volume pricing — the more you order, the less you pay</div>
+        <div class="shop-perk"><span>✓</span> Subscribe &amp; save 10%</div>
+      </div>
+      <a href="shop.html" class="btn-shop-now">Shop Now →</a>
+      <p class="shop-cta-sub">Starting at $24 &nbsp;·&nbsp; <strong>No commitment required</strong> &nbsp;·&nbsp; Pick your delivery date &amp; time</p>
     </div>
   </div>
 </section>
@@ -394,176 +389,6 @@
     <div class="stat-item"><div class="stat-number">10<span class="stat-unit">g</span></div><div class="stat-label">Dietary Fiber</div></div>
   </div>
 </div>
-
-<!-- ORDER -->
-<section id="order">
-  <div class="container">
-    <div class="order-header">
-      <p class="section-label">Build Your Order</p>
-      <h2 class="section-title">BUILD YOUR ORDER</h2>
-      <p class="section-desc">Four simple choices. We handle everything else.</p>
-    </div>
-
-    <!-- STEP 1: PORTION SIZE -->
-    <div class="order-step">
-      <div class="step-label"><span class="step-num">1</span> Choose Your Portion Size</div>
-      <div class="option-grid-2">
-        <div class="option-card active" onclick="selectOption(this,'portion','full')" data-group="portion">
-          <div class="portion-img-wrap"><img src="product-cup.jpg" alt="Full Serving Cup" class="portion-img" /></div>
-          <div class="option-name">Full Serving</div>
-          <div class="portion-macros">
-            <div class="pm-item"><div class="pm-num">40g</div><div class="pm-label">Protein</div></div>
-            <div class="pm-item"><div class="pm-num">450</div><div class="pm-label">Calories</div></div>
-            <div class="pm-item"><div class="pm-num">10g</div><div class="pm-label">Fiber</div></div>
-          </div>
-          <div class="option-desc">Complete performance meal. Max fuel for hard training days.</div>
-        </div>
-        <div class="option-card" onclick="selectOption(this,'portion','half')" data-group="portion">
-          <div class="portion-img-wrap"><img src="cup-half.jpg" alt="Half Serving Cup" class="portion-img" /></div>
-          <div class="option-name">Half Serving</div>
-          <div class="portion-macros">
-            <div class="pm-item"><div class="pm-num">20g</div><div class="pm-label">Protein</div></div>
-            <div class="pm-item"><div class="pm-num">225</div><div class="pm-label">Calories</div></div>
-            <div class="pm-item"><div class="pm-num">5g</div><div class="pm-label">Fiber</div></div>
-          </div>
-          <div class="option-desc">Lighter fuel. Great as a snack or alongside another meal.</div>
-        </div>
-      </div>
-    </div>
-
-    <!-- STEP 2: PACK SIZE -->
-    <div class="order-step">
-      <div class="step-label"><span class="step-num">2</span> Choose Your Pack Size</div>
-      <div class="pack-grid" id="packGrid">
-        <div class="pack-card" onclick="selectPack(this,0)" data-index="0">
-          <div class="pack-badge hidden">_</div>
-          <div class="pack-cups">3<span>Cup Pack</span></div>
-          <div class="pack-price-per">$8.00 per cup</div>
-          <div class="pack-total">$24.00</div>
-          <div class="pack-savings">&nbsp;</div>
-        </div>
-        <div class="pack-card active" onclick="selectPack(this,1)" data-index="1">
-          <div class="pack-badge">Most Popular</div>
-          <div class="pack-cups">5<span>Cup Pack</span></div>
-          <div class="pack-price-per">$7.50 per cup</div>
-          <div class="pack-total">$37.50</div>
-          <div class="pack-savings">Save $2.50 vs 3-pack rate</div>
-        </div>
-        <div class="pack-card" onclick="selectPack(this,2)" data-index="2">
-          <div class="pack-badge">Best Value</div>
-          <div class="pack-cups">7<span>Cup Pack</span></div>
-          <div class="pack-price-per">$7.00 per cup</div>
-          <div class="pack-total">$49.00</div>
-          <div class="pack-savings">Save $7.00 vs 3-pack rate</div>
-        </div>
-      </div>
-    </div>
-
-    <!-- STEP 3: FLAVOR QUANTITIES -->
-    <div class="order-step">
-      <div class="step-label"><span class="step-num">3</span> Choose Your Flavors</div>
-      <div class="flavor-qty-grid">
-        <div class="flavor-qty-card" id="qtyCardChocolate">
-          <div class="flavor-qty-icon">🍫</div>
-          <div class="flavor-qty-name">Chocolate</div>
-          <div class="flavor-qty-desc">Rich cacao, smooth dark chocolate taste. The original Forge.</div>
-          <div class="qty-control">
-            <button class="qty-btn" id="btnChocMinus" onclick="adjustFlavor('chocolate',-1)">−</button>
-            <div class="qty-display">
-              <span class="qty-num" id="qtyChocolate">5</span>
-              <div class="qty-cups-label">cups</div>
-            </div>
-            <button class="qty-btn" id="btnChocPlus" onclick="adjustFlavor('chocolate',1)">+</button>
-          </div>
-        </div>
-        <div class="flavor-qty-card" id="qtyCardPeanutButter">
-          <div class="flavor-qty-icon">🥜</div>
-          <div class="flavor-qty-name">Peanut Butter</div>
-          <div class="flavor-qty-desc">Creamy, nutty, and satisfying. Perfect for PB lovers.</div>
-          <div class="qty-control">
-            <button class="qty-btn" id="btnPBMinus" onclick="adjustFlavor('peanut-butter',-1)">−</button>
-            <div class="qty-display">
-              <span class="qty-num" id="qtyPeanutButter">0</span>
-              <div class="qty-cups-label">cups</div>
-            </div>
-            <button class="qty-btn" id="btnPBPlus" onclick="adjustFlavor('peanut-butter',1)">+</button>
-          </div>
-        </div>
-      </div>
-      <div class="flavor-total-bar matched" id="flavorTotalBar">
-        <span>Your mix:</span>
-        <span class="flavor-total-nums matched" id="flavorTotalNums">5 / 5</span>
-        <span class="flavor-total-hint" id="flavorTotalHint">cups selected</span>
-        <span class="flavor-total-check" id="flavorTotalCheck">✓</span>
-      </div>
-    </div>
-
-    <!-- STEP 4: PURCHASE TYPE -->
-    <div class="order-step">
-      <div class="step-label"><span class="step-num">4</span> One-Time or Subscribe?</div>
-      <div class="order-type-toggle">
-        <button class="toggle-btn active" onclick="setOrderType('one-time',this)">One-Time Purchase</button>
-        <button class="toggle-btn" onclick="setOrderType('subscribe',this)">Subscribe &amp; Save 10%</button>
-      </div>
-      <p class="sub-note" id="subNote"><strong>Save 10% on every order</strong> · Ships weekly, bi-weekly, or monthly · Cancel anytime</p>
-    </div>
-
-    <!-- Delivery Scheduler -->
-    <div class="delivery-scheduler">
-      <div class="scheduler-title">Your Info &amp; Delivery Preference</div>
-      <div class="scheduler-row" style="margin-bottom:16px;">
-        <div class="scheduler-field">
-          <label>Your Name</label>
-          <input type="text" id="customerName" placeholder="First &amp; last name" autocomplete="name" />
-        </div>
-        <div class="scheduler-field">
-          <label>Email Address</label>
-          <input type="email" id="customerEmail" placeholder="you@email.com" autocomplete="email" />
-        </div>
-      </div>
-      <div class="scheduler-row" style="margin-bottom:16px;">
-        <div class="scheduler-field">
-          <label>Phone Number</label>
-          <input type="tel" id="customerPhone" placeholder="(555) 123-4567" autocomplete="tel" />
-        </div>
-      </div>
-      <div class="scheduler-row">
-        <div class="scheduler-field">
-          <label>Preferred Delivery Date</label>
-          <input type="date" id="deliveryDate" />
-        </div>
-        <div class="scheduler-field">
-          <label>Preferred Time Window</label>
-          <select id="deliveryTime">
-            <option value="">Select a time window</option>
-            <option value="Morning (8am–12pm)">Morning (8am – 12pm)</option>
-            <option value="Afternoon (12pm–5pm)">Afternoon (12pm – 5pm)</option>
-            <option value="Evening (5pm–8pm)">Evening (5pm – 8pm)</option>
-          </select>
-        </div>
-      </div>
-      <div class="scheduler-row" style="margin-top:16px;">
-        <div class="scheduler-field" style="grid-column:1/-1;">
-          <label>Referral Code <span style="color:var(--muted);font-size:10px;letter-spacing:1px;">(Optional)</span></label>
-          <input type="text" id="referralSource" placeholder="e.g. jon4821" autocomplete="off" />
-        </div>
-      </div>
-      <p class="scheduler-note">Orders placed today arrive within 1–2 days. We'll confirm your delivery window by email.</p>
-    </div>
-
-    <!-- Checkout -->
-    <div class="checkout-area">
-      <button class="btn-primary" id="checkoutBtn" onclick="handleCheckout()">
-        Add to Cart: <span id="checkoutTotal">$37.50</span>
-      </button>
-      <p class="checkout-note">
-        <span>✓ Delivered in 1–2 days</span> &nbsp;·&nbsp;
-        <span>✓ Pick your date &amp; time</span> &nbsp;·&nbsp;
-        <span>✓ Free delivery on all orders</span>
-      </p>
-    </div>
-  </div>
-</section>
 
 <!-- WHY FORGE -->
 <section id="why">
@@ -732,7 +557,7 @@
     <h2 class="section-title">FUEL THE WORK.</h2>
     <p class="section-desc" style="margin:0 auto 40px; text-align:center;">Stop settling for sugary, low-protein breakfasts. Get the fuel you actually need, delivered free to your door in 1-2 days.</p>
     <div style="text-align:center;">
-      <a href="#order" class="btn-primary" style="font-size:18px; padding:20px 60px; letter-spacing:3px;">Shop Forge Oats</a>
+      <a href="shop.html" class="btn-primary" style="font-size:18px; padding:20px 60px; letter-spacing:3px;">Shop Forge Oats →</a>
     </div>
   </div>
 </section>
@@ -745,7 +570,7 @@
   </div>
   <div class="footer-links">
     <a href="#why">Why Forge</a><a href="#ingredients">Ingredients</a>
-    <a href="#nutrition">Nutrition</a><a href="#order">Order</a>
+    <a href="#nutrition">Nutrition</a><a href="shop.html">Shop</a>
     <a href="#">Privacy Policy</a><a href="#">Terms</a>
   </div>
   <div class="footer-copy">© 2025 Forge Oats. All rights reserved.</div>
@@ -758,345 +583,20 @@
   const { createClient }  = supabase;
   const sb = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-  // Capture referral code from URL and persist in localStorage
+  // Persist referral code from URL into shop.html flow
   const urlRef = new URLSearchParams(window.location.search).get('ref');
   if (urlRef) localStorage.setItem('forge_ref', urlRef);
-  const storedRef = localStorage.getItem('forge_ref');
-  if (storedRef) {
-    const refEl = document.getElementById('referralSource');
-    if (refEl && !refEl.value) refEl.value = storedRef;
-  }
 
-  // Pre-fill name/email if logged in, update nav link
+  // Update nav link if logged in
   (async () => {
     const { data: { session } } = await sb.auth.getSession();
     if (session) {
-      isLoggedIn = true;
-      const { data: profile } = await sb.from('customers').select('name,email,phone').eq('id', session.user.id).single();
-      if (profile) {
-        const nameEl  = document.getElementById('customerName');
-        const emailEl = document.getElementById('customerEmail');
-        const phoneEl = document.getElementById('customerPhone');
-        if (nameEl  && !nameEl.value)  nameEl.value  = profile.name  || '';
-        if (emailEl && !emailEl.value) emailEl.value = profile.email || '';
-        if (phoneEl && !phoneEl.value) phoneEl.value = profile.phone || '';
-      }
       const link = document.getElementById('navAccountLink');
       if (link) { link.textContent = 'My Dashboard'; link.href = 'dashboard.html'; }
+      const signup = document.getElementById('navSignupBtn');
+      if (signup) signup.style.display = 'none';
     }
-    updateCheckoutBtn();
   })();
-  // ─────────────────────────────────────────────────────────────
-
-  // ── State ──
-  let flavorCups        = { chocolate: 5, 'peanut-butter': 0 };
-  let selectedPortion   = 'full';
-  let selectedPackIndex = 1;
-  let orderType         = 'one-time';
-  let isLoggedIn        = false;
-  const SUB_DISC        = 0.10;
-
-  // Pack options per portion size
-  const PACK_OPTIONS = {
-    full: [
-      { cups: 3, perCup: 8.00,  total: 24.00,  badge: null,           savings: '' },
-      { cups: 5, perCup: 7.50,  total: 37.50,  badge: 'Most Popular', savings: 'Save $2.50 vs 3-pack rate' },
-      { cups: 7, perCup: 7.00,  total: 49.00,  badge: 'Best Value',   savings: 'Save $7.00 vs 3-pack rate' },
-    ],
-    half: [
-      { cups: 5, perCup: 5.00,  total: 25.00,  badge: null,           savings: '' },
-      { cups: 7, perCup: 4.50,  total: 31.50,  badge: 'Most Popular', savings: 'Save $3.50 vs 5-pack rate' },
-      { cups: 9, perCup: 4.00,  total: 36.00,  badge: 'Best Value',   savings: 'Save $9.00 vs 5-pack rate' },
-    ]
-  };
-
-  // ── Set min delivery date to tomorrow ──
-  (function() {
-    const input = document.getElementById('deliveryDate');
-    const tomorrow = new Date();
-    tomorrow.setDate(tomorrow.getDate() + 1);
-    input.min = tomorrow.toISOString().split('T')[0];
-    input.value = tomorrow.toISOString().split('T')[0];
-  })();
-
-  // ── Initialize flavor display ──
-  updateFlavorDisplay();
-
-  // ── Flavor quantity controls ──
-  function adjustFlavor(flavor, delta) {
-    const pack  = PACK_OPTIONS[selectedPortion][selectedPackIndex];
-    const total = flavorCups.chocolate + flavorCups['peanut-butter'];
-    const newVal = flavorCups[flavor] + delta;
-    if (newVal < 0) return;
-    if (delta > 0 && total >= pack.cups) return;
-    flavorCups[flavor] = newVal;
-    updateFlavorDisplay();
-    updateCheckout();
-  }
-
-  function resetFlavorCups() {
-    const pack = PACK_OPTIONS[selectedPortion][selectedPackIndex];
-    flavorCups = { chocolate: pack.cups, 'peanut-butter': 0 };
-    updateFlavorDisplay();
-  }
-
-  function updateFlavorDisplay() {
-    const pack  = PACK_OPTIONS[selectedPortion][selectedPackIndex];
-    const total = flavorCups.chocolate + flavorCups['peanut-butter'];
-    const choc  = flavorCups.chocolate;
-    const pb    = flavorCups['peanut-butter'];
-
-    document.getElementById('qtyChocolate').textContent    = choc;
-    document.getElementById('qtyPeanutButter').textContent = pb;
-
-    // Card highlighting
-    document.getElementById('qtyCardChocolate').classList.toggle('has-qty', choc > 0);
-    document.getElementById('qtyCardPeanutButter').classList.toggle('has-qty', pb > 0);
-
-    // Button states
-    document.getElementById('btnChocMinus').disabled = choc <= 0;
-    document.getElementById('btnPBMinus').disabled   = pb <= 0;
-    document.getElementById('btnChocPlus').disabled  = total >= pack.cups;
-    document.getElementById('btnPBPlus').disabled    = total >= pack.cups;
-
-    // Total bar
-    const bar      = document.getElementById('flavorTotalBar');
-    const numsEl   = document.getElementById('flavorTotalNums');
-    const hintEl   = document.getElementById('flavorTotalHint');
-    const checkEl  = document.getElementById('flavorTotalCheck');
-    const matched  = total === pack.cups;
-    const over     = total > pack.cups;
-    const remaining = pack.cups - total;
-
-    numsEl.textContent = `${total} / ${pack.cups}`;
-    bar.classList.toggle('matched', matched);
-    bar.classList.toggle('over', over);
-    numsEl.classList.toggle('matched', matched);
-    numsEl.classList.toggle('over', over);
-
-    if (matched) {
-      hintEl.textContent  = 'cups selected';
-      checkEl.style.display = 'inline';
-    } else if (over) {
-      hintEl.textContent  = 'too many cups';
-      checkEl.style.display = 'none';
-    } else {
-      hintEl.textContent  = `cup${remaining !== 1 ? 's' : ''} remaining`;
-      checkEl.style.display = 'none';
-    }
-  }
-
-  function selectOption(el, group, value) {
-    document.querySelectorAll(`.option-card[data-group="${group}"]`).forEach(c => c.classList.remove('active'));
-    el.classList.add('active');
-    if (group === 'portion') {
-      selectedPortion   = value;
-      selectedPackIndex = 1;
-      document.querySelectorAll('.pack-card').forEach((c, i) => c.classList.toggle('active', i === 1));
-      renderPackCards();
-      resetFlavorCups();
-    }
-    updateCheckout();
-  }
-
-  function selectPack(el, index) {
-    document.querySelectorAll('.pack-card').forEach(c => c.classList.remove('active'));
-    el.classList.add('active');
-    selectedPackIndex = index;
-    resetFlavorCups();
-    updateCheckout();
-  }
-
-  function setOrderType(type, btn) {
-    orderType = type;
-    document.querySelectorAll('.toggle-btn').forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
-    document.getElementById('subNote').classList.toggle('visible', type === 'subscribe');
-    // Hide the info/delivery section for subscriptions — they fill that out on the dashboard
-    const scheduler = document.querySelector('.delivery-scheduler');
-    if (scheduler) scheduler.style.display = type === 'subscribe' ? 'none' : 'block';
-    renderPackCards();
-    updateCheckout();
-    updateCheckoutBtn();
-  }
-
-  function renderPackCards() {
-    const disc    = orderType === 'subscribe' ? SUB_DISC : 0;
-    const options = PACK_OPTIONS[selectedPortion];
-    document.querySelectorAll('.pack-card').forEach((card, i) => {
-      const pack = options[i];
-      const t    = (pack.total  * (1 - disc)).toFixed(2);
-      const pc   = (pack.perCup * (1 - disc)).toFixed(2);
-      card.querySelector('.pack-cups').innerHTML   = pack.cups + '<span>Cup Pack</span>';
-      card.querySelector('.pack-price-per').textContent = '$' + pc + ' per cup';
-      card.querySelector('.pack-total').textContent     = '$' + t;
-      card.querySelector('.pack-savings').textContent   = pack.savings || '\u00a0';
-      const badge = card.querySelector('.pack-badge');
-      if (pack.badge) { badge.textContent = pack.badge; badge.classList.remove('hidden'); }
-      else            { badge.textContent = '_';         badge.classList.add('hidden'); }
-    });
-  }
-
-  function updateCheckout() {
-    const disc  = orderType === 'subscribe' ? SUB_DISC : 0;
-    const pack  = PACK_OPTIONS[selectedPortion][selectedPackIndex];
-    const totalEl = document.getElementById('checkoutTotal');
-    if (totalEl) totalEl.textContent = '$' + (pack.total * (1 - disc)).toFixed(2);
-  }
-
-  function updateCheckoutBtn() {
-    const btn = document.getElementById('checkoutBtn');
-    if (!btn) return;
-    if (orderType === 'subscribe') {
-      if (isLoggedIn) {
-        btn.innerHTML = 'Set Up My Subscription &rarr;';
-      } else {
-        btn.innerHTML = 'Sign Up to Subscribe &rarr;';
-      }
-    } else {
-      const disc = 0;
-      const pack = PACK_OPTIONS[selectedPortion][selectedPackIndex];
-      btn.innerHTML = 'Add to Cart: <span id="checkoutTotal">$' + (pack.total * (1 - disc)).toFixed(2) + '</span>';
-    }
-  }
-
-  async function handleCheckout() {
-    // ── Subscription: redirect to sign up or dashboard ───────────────────
-    if (orderType === 'subscribe') {
-      if (isLoggedIn) {
-        window.location.href = 'dashboard.html';
-      } else {
-        window.location.href = 'profile.html?tab=signup';
-      }
-      return;
-    }
-
-    // ── Stripe Payment Links (keyed by "portion-cups") ───────────────────
-    const stripeLinks = {
-      'one-time': {
-        'full-3': 'https://buy.stripe.com/14AcN5dsH7eKfYB12t3ZK01',
-        'full-5': 'https://buy.stripe.com/fZu9ATbkz0Qm8w96mN3ZK00',
-        'full-7': 'https://buy.stripe.com/7sYfZhfAPbv0cMp4eF3ZK02',
-        'half-5': 'https://buy.stripe.com/9B63cv0FVeHc7s5dPf3ZK0c',
-        'half-7': 'https://buy.stripe.com/dRm7sL74jdD83bP3aB3ZK0d',
-        'half-9': 'https://buy.stripe.com/aFadR94WbfLg3bPeTj3ZK0e',
-      },
-      'subscribe': {
-        'full-3': 'https://buy.stripe.com/aFacN59cr8iO7s58uV3ZK09',
-        'full-5': 'https://buy.stripe.com/14AfZh74j8iOeUx12t3ZK0a',
-        'full-7': 'https://buy.stripe.com/14A8wPewLdD8fYB12t3ZK0b',
-        'half-5': 'https://buy.stripe.com/8x24gz4Wb9mS5jXfXn3ZK0f',
-        'half-7': 'https://buy.stripe.com/3cI8wPagvgPkdQt12t3ZK0g',
-        'half-9': 'https://buy.stripe.com/fZudR9dsH0QmcMpfXn3ZK0h',
-      }
-    };
-
-    const FORMSPREE_URL = 'https://formspree.io/f/REPLACE_WITH_YOUR_ID'; // ← paste your Formspree form ID here
-
-    const name           = document.getElementById('customerName').value.trim();
-    const email          = document.getElementById('customerEmail').value.trim();
-    const phone          = document.getElementById('customerPhone').value.trim();
-    const deliveryDate   = document.getElementById('deliveryDate').value;
-    const deliveryTime   = document.getElementById('deliveryTime').value;
-    const referralSource = document.getElementById('referralSource').value.trim();
-    const disc         = orderType === 'subscribe' ? SUB_DISC : 0;
-    const pack         = PACK_OPTIONS[selectedPortion][selectedPackIndex];
-    const total        = '$' + (pack.total * (1 - disc)).toFixed(2);
-    const portionLabel = selectedPortion === 'half' ? 'Half Serving' : 'Full Serving';
-    const flavorTotal  = flavorCups.chocolate + flavorCups['peanut-butter'];
-    const flavorParts  = [];
-    if (flavorCups.chocolate > 0)          flavorParts.push(`${flavorCups.chocolate} Chocolate`);
-    if (flavorCups['peanut-butter'] > 0)   flavorParts.push(`${flavorCups['peanut-butter']} Peanut Butter`);
-    const flavorLabel  = flavorParts.join(' + ') || 'None';
-
-    const missing = [];
-    if (!name)         missing.push('name');
-    if (!email)        missing.push('email');
-    if (!phone)        missing.push('phone number');
-    if (!deliveryDate) missing.push('delivery date');
-    if (!deliveryTime) missing.push('delivery time');
-    if (flavorTotal !== pack.cups) {
-      const rem = pack.cups - flavorTotal;
-      showFieldError(rem > 0
-        ? `Add ${rem} more cup${rem !== 1 ? 's' : ''} to complete your ${pack.cups}-pack.`
-        : `Too many cups selected. Remove ${flavorTotal - pack.cups} cup${(flavorTotal - pack.cups) !== 1 ? 's' : ''}.`
-      );
-      return;
-    }
-
-    if (missing.length) {
-      showFieldError(`Please fill in: ${missing.join(', ')}.`);
-      return;
-    }
-
-    const btn = document.getElementById('checkoutBtn');
-    btn.textContent = 'Processing…';
-    btn.disabled = true;
-
-    const formspreeReady = !FORMSPREE_URL.includes('REPLACE');
-    if (formspreeReady) {
-      try {
-        await fetch(FORMSPREE_URL, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
-          body: JSON.stringify({
-            customer_name:  name,
-            customer_email: email,
-            customer_phone: phone,
-            flavor:         flavorLabel,
-            portion:        portionLabel,
-            pack:           `${pack.cups}-Pack`,
-            order_type:     orderType,
-            total:          total,
-            delivery_date:  deliveryDate,
-            delivery_time:  deliveryTime,
-            referred_by:    referralSource || 'Not provided',
-            _subject:       `🔥 New Forge Oats Order — ${pack.cups}-Pack (${flavorLabel}) ${portionLabel} from ${name}`,
-          })
-        });
-      } catch (err) {
-        console.warn('Formspree error (non-blocking):', err);
-      }
-    }
-
-    // Order is now written by the Stripe webhook (stripe-webhook Edge Function)
-    // after payment is confirmed — no pre-emptive insert here.
-
-    const stripeLink = stripeLinks[orderType]?.[`${selectedPortion}-${pack.cups}`];
-    if (stripeLink && !stripeLink.includes('REPLACE')) {
-      const rawRef = `${pack.cups}pack|flavor:${flavorLabel}|portion:${portionLabel}|price:${total}|date:${deliveryDate}|time:${deliveryTime}|name:${name}${referralSource ? '|ref:' + referralSource : ''}`;
-      // Base64url encode so only A-Za-z0-9-_ chars are used (Stripe-safe)
-      const bytes  = new TextEncoder().encode(rawRef);
-      const binary = String.fromCharCode(...bytes);
-      const ref    = btoa(binary).replace(/\+/g, '-').replace(/\//g, '_').replace(/=/g, '');
-      const url = new URL(stripeLink);
-      url.searchParams.set('client_reference_id', ref);
-      url.searchParams.set('prefilled_email', email);
-      window.location.href = url.toString();
-    } else {
-      btn.textContent = '⚡ Add your Stripe links to activate checkout';
-      btn.style.background = '#444';
-      btn.disabled = false;
-      setTimeout(() => {
-        const disc2 = orderType === 'subscribe' ? SUB_DISC : 0;
-        const t2    = PACK_OPTIONS[selectedPortion][selectedPackIndex].total * (1 - disc2);
-        btn.innerHTML = 'Add to Cart: <span id="checkoutTotal">$' + t2.toFixed(2) + '</span>';
-        btn.style.background = '';
-      }, 4000);
-    }
-  }
-
-  function showFieldError(msg) {
-    let err = document.getElementById('fieldError');
-    if (!err) {
-      err = document.createElement('p');
-      err.id = 'fieldError';
-      err.style.cssText = 'color:#FF6B1A;font-family:Oswald,sans-serif;font-size:14px;letter-spacing:1px;text-align:center;margin-bottom:12px;';
-      document.querySelector('.checkout-area').prepend(err);
-    }
-    err.textContent = msg;
-    setTimeout(() => err.textContent = '', 4000);
-  }
 
   function toggleFaq(btn) {
     const item = btn.closest('.faq-item');

@@ -35,118 +35,126 @@
     .dash-eyebrow { font-family: 'Oswald', sans-serif; font-size: 12px; letter-spacing: 5px; color: var(--orange); text-transform: uppercase; margin-bottom: 8px; }
     .dash-title { font-family: 'Bebas Neue', sans-serif; font-size: clamp(36px, 5vw, 64px); letter-spacing: 2px; color: var(--cream); line-height: 1; }
     .dash-title span { color: var(--orange); }
-    .dash-meta { font-size: 14px; color: var(--muted); margin-top: 8px; }
+    .dash-meta { font-size: 14px; color: var(--muted); margin-top: 8px; display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
     .status-pill { display: inline-flex; align-items: center; gap: 6px; padding: 6px 14px; border-radius: 20px; font-family: 'Oswald', sans-serif; font-size: 12px; letter-spacing: 2px; text-transform: uppercase; }
     .status-pill.active  { background: rgba(92,184,92,0.15);  border: 1px solid rgba(92,184,92,0.4);  color: var(--green); }
     .status-pill.paused  { background: rgba(136,136,136,0.15); border: 1px solid rgba(136,136,136,0.3); color: var(--muted); }
     .status-dot { width: 7px; height: 7px; border-radius: 50%; background: currentColor; }
-    .next-delivery-badge { display: inline-flex; flex-direction: column; align-items: center; gap: 2px; padding: 10px 20px; background: rgba(255,107,26,0.08); border: 1px solid rgba(255,107,26,0.25); border-radius: 10px; margin-top: 10px; }
+    .next-delivery-badge { display: inline-flex; flex-direction: column; align-items: center; gap: 2px; padding: 10px 20px; background: rgba(255,107,26,0.08); border: 1px solid rgba(255,107,26,0.25); border-radius: 10px; }
     .next-delivery-label { font-family: 'Oswald', sans-serif; font-size: 10px; letter-spacing: 3px; text-transform: uppercase; color: var(--muted); }
     .next-delivery-date { font-family: 'Bebas Neue', sans-serif; font-size: 22px; letter-spacing: 1px; color: var(--orange); line-height: 1.1; }
     .next-delivery-day { font-family: 'Oswald', sans-serif; font-size: 12px; letter-spacing: 1px; color: rgba(237,232,220,0.6); }
 
     /* LAYOUT */
     .dash-body { max-width: 1000px; margin: 0 auto; padding: 60px 48px 100px; display: grid; grid-template-columns: 1fr 1fr; gap: 32px; align-items: start; }
+    .full-width { grid-column: 1 / -1; }
 
-    /* CARDS */
+    /* GENERIC CARD */
     .dash-card { background: var(--card); border: 1px solid var(--border); border-radius: 16px; overflow: hidden; }
-    .dash-card-header { padding: 24px 28px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
+    .dash-card-header { padding: 24px 28px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; gap: 12px; }
     .dash-card-title { font-family: 'Oswald', sans-serif; font-size: 16px; font-weight: 600; letter-spacing: 2px; text-transform: uppercase; color: var(--cream); }
     .dash-card-body { padding: 28px; }
 
-    /* SUBSCRIPTION */
+    /* ══ SUBSCRIPTION CARD ══ */
     .sub-card { grid-column: 1 / -1; }
-    .sub-section { margin-bottom: 28px; }
-    .sub-section:last-child { margin-bottom: 0; }
-    .sub-label { font-family: 'Oswald', sans-serif; font-size: 11px; letter-spacing: 3px; text-transform: uppercase; color: var(--muted); margin-bottom: 14px; }
 
-    /* Status toggle */
-    .status-toggle { display: flex; background: var(--dark); border: 1px solid var(--border); border-radius: 8px; overflow: hidden; max-width: 320px; }
-    .status-btn { flex: 1; padding: 12px; font-family: 'Oswald', sans-serif; font-size: 13px; letter-spacing: 1.5px; text-transform: uppercase; background: transparent; border: none; color: var(--muted); cursor: pointer; transition: all 0.2s; }
-    .status-btn.active-on  { background: rgba(92,184,92,0.2); color: var(--green); }
-    .status-btn.active-off { background: rgba(136,136,136,0.15); color: var(--muted); }
+    /* Delivery schedule inside sub card */
+    .sub-delivery-section { padding: 16px 24px; border-bottom: 1px solid var(--border); }
+    .sub-delivery-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+    .sub-delivery-label { font-family: 'Oswald', sans-serif; font-size: 10px; letter-spacing: 3px; text-transform: uppercase; color: var(--muted); margin-bottom: 8px; }
+    .sub-delivery-select { width: 100%; background: var(--dark); border: 1px solid var(--border); border-radius: 6px; padding: 11px 14px; font-family: 'Inter', sans-serif; font-size: 14px; color: var(--cream); outline: none; transition: border-color 0.2s; appearance: none; -webkit-appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23888' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 14px center; background-color: var(--dark); }
+    .sub-delivery-select:focus { border-color: var(--orange); }
 
-    /* Portion cards (mini) */
-    .portion-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; max-width: 480px; }
+    /* Summary bar */
+    .sub-summary-bar { display: flex; align-items: stretch; border-bottom: 1px solid var(--border); }
+    .sub-summary-item { flex: 1; padding: 16px 20px; border-right: 1px solid var(--border); display: flex; flex-direction: column; gap: 4px; }
+    .sub-summary-item:last-child { border-right: none; }
+    .ssb-label { font-family: 'Oswald', sans-serif; font-size: 9px; letter-spacing: 3px; text-transform: uppercase; color: var(--muted); }
+    .ssb-value { font-family: 'Bebas Neue', sans-serif; font-size: 24px; color: var(--cream); line-height: 1; }
+    .ssb-value.orange { color: var(--orange); }
+    .ssb-value.green  { color: var(--green); }
 
-    /* Pack size cards */
-    .pack-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
-    .pack-card { background: var(--dark); border: 2px solid var(--border); border-radius: 10px; padding: 18px 12px 14px; cursor: pointer; transition: all 0.2s; text-align: center; position: relative; overflow: hidden; }
-    .pack-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; background: var(--border); transition: background 0.2s; }
-    .pack-card.active { border-color: var(--orange); background: rgba(255,107,26,0.06); }
-    .pack-card.active::before { background: linear-gradient(90deg, var(--fire), var(--orange)); }
-    .pack-badge-mini { display: inline-block; font-family: 'Oswald', sans-serif; font-size: 9px; letter-spacing: 1.5px; text-transform: uppercase; padding: 2px 8px; border-radius: 20px; background: rgba(255,107,26,0.15); color: var(--orange); border: 1px solid rgba(255,107,26,0.3); margin-bottom: 8px; }
-    .pack-badge-placeholder { height: 20px; margin-bottom: 8px; }
-    .pack-cup-num { font-family: 'Bebas Neue', sans-serif; font-size: 34px; color: var(--cream); line-height: 1; }
-    .pack-cup-label { font-family: 'Oswald', sans-serif; font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: var(--muted); margin-bottom: 10px; }
-    .pack-sub-price { font-family: 'Oswald', sans-serif; font-size: 17px; font-weight: 600; color: var(--orange); }
-    .pack-per-cup { font-family: 'Oswald', sans-serif; font-size: 10px; letter-spacing: 1px; color: var(--muted); margin-top: 2px; }
-    .portion-card { background: var(--dark); border: 2px solid var(--border); border-radius: 10px; padding: 18px 16px; cursor: pointer; transition: all 0.2s; text-align: center; position: relative; overflow: hidden; }
-    .portion-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; background: var(--border); transition: background 0.2s; }
-    .portion-card.active { border-color: var(--orange); background: rgba(255,107,26,0.06); }
-    .portion-card.active::before { background: linear-gradient(90deg, var(--fire), var(--orange)); }
-    .portion-card-name { font-family: 'Oswald', sans-serif; font-size: 15px; font-weight: 600; letter-spacing: 1px; color: var(--cream); margin-bottom: 6px; }
-    .portion-macros { display: flex; justify-content: center; gap: 12px; }
-    .pm-item { text-align: center; }
-    .pm-num { font-family: 'Bebas Neue', sans-serif; font-size: 20px; background: linear-gradient(135deg, var(--orange), var(--gold)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; line-height: 1; }
-    .pm-label { font-family: 'Oswald', sans-serif; font-size: 9px; letter-spacing: 2px; text-transform: uppercase; color: var(--muted); }
+    /* Product rows */
+    .sub-products { padding: 8px 24px 4px; border-bottom: 1px solid var(--border); }
+    .sub-product-row { display: flex; align-items: center; gap: 16px; padding: 14px 0; border-bottom: 1px solid rgba(255,255,255,0.04); }
+    .sub-product-row:last-child { border-bottom: none; }
 
-    /* Flavor qty */
-    .flavor-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
-    .flavor-card { background: var(--dark); border: 2px solid var(--border); border-radius: 10px; padding: 20px 16px; text-align: center; transition: all 0.2s; }
-    .flavor-card.has-qty { border-color: var(--orange); background: rgba(255,107,26,0.05); }
-    .flavor-icon { font-size: 28px; margin-bottom: 8px; }
-    .flavor-name { font-family: 'Oswald', sans-serif; font-size: 14px; font-weight: 600; letter-spacing: 1px; color: var(--cream); margin-bottom: 12px; }
-    .qty-control { display: flex; align-items: center; justify-content: center; gap: 14px; }
-    .qty-btn { width: 36px; height: 36px; border-radius: 50%; background: var(--card); border: 1px solid var(--border); color: var(--cream); font-size: 18px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s; padding: 0; font-family: 'Inter', sans-serif; }
-    .qty-btn:hover:not(:disabled) { background: var(--orange); border-color: var(--orange); }
-    .qty-btn:disabled { opacity: 0.25; cursor: not-allowed; }
-    .qty-num { font-family: 'Bebas Neue', sans-serif; font-size: 48px; color: var(--cream); line-height: 1; min-width: 40px; }
-    .qty-cups-label { font-family: 'Oswald', sans-serif; font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: var(--muted); }
+    /* Icon column */
+    .spr-icon { width: 48px; height: 48px; border-radius: 10px; overflow: hidden; flex-shrink: 0; background: #1a1a1a; }
+    .spr-icon img { width: 100%; height: 100%; object-fit: cover; display: block; }
 
-    .flavor-total-bar { display: flex; align-items: center; justify-content: center; gap: 8px; padding: 12px 20px; background: var(--dark); border: 1px solid var(--border); border-radius: 8px; font-family: 'Oswald', sans-serif; font-size: 13px; letter-spacing: 2px; text-transform: uppercase; color: var(--muted); margin-top: 14px; transition: border-color 0.3s; }
-    .flavor-total-bar.matched { border-color: rgba(92,184,92,0.5); background: rgba(92,184,92,0.05); }
-    .flavor-total-nums { font-family: 'Bebas Neue', sans-serif; font-size: 20px; color: var(--cream); }
-    .flavor-total-nums.matched { color: var(--green); }
-    .flavor-check { color: var(--green); }
+    /* Info column */
+    .spr-info { flex: 1; min-width: 0; }
+    .spr-name { font-family: 'Oswald', sans-serif; font-size: 14px; font-weight: 600; letter-spacing: 1px; color: var(--cream); }
+    .spr-meta { font-size: 11px; color: var(--muted); margin-top: 2px; }
 
-    /* Delivery preferences */
-    .delivery-pref { background: var(--dark); border: 1px solid var(--border); border-radius: 12px; padding: 24px 24px 20px; }
-    .dp-title { font-family: 'Oswald', sans-serif; font-size: 14px; font-weight: 600; letter-spacing: 2px; text-transform: uppercase; color: var(--cream); margin-bottom: 20px; display: flex; align-items: center; gap: 8px; }
-    .dp-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 16px; }
-    .dp-field label { display: block; font-family: 'Oswald', sans-serif; font-size: 11px; letter-spacing: 3px; text-transform: uppercase; color: var(--muted); margin-bottom: 8px; }
-    .dp-field input, .dp-field select { width: 100%; background: var(--card); border: 1px solid var(--border); border-radius: 6px; padding: 12px 16px; font-family: 'Oswald', sans-serif; font-size: 14px; letter-spacing: 1px; color: var(--cream); outline: none; transition: border-color 0.2s; appearance: none; -webkit-appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23888' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 14px center; }
-    .dp-field input { background-image: none; }
-    .dp-field input:focus, .dp-field select:focus { border-color: var(--orange); }
-    .dp-field input::placeholder { color: var(--muted); }
-    .dp-days { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; }
-    .dp-day { padding: 10px 2px; background: var(--card); border: 1px solid var(--border); border-radius: 6px; font-family: 'Oswald', sans-serif; font-size: 11px; letter-spacing: 1px; text-transform: uppercase; color: var(--muted); cursor: pointer; transition: all 0.2s; text-align: center; }
-    .dp-day:hover { border-color: rgba(255,107,26,0.4); color: var(--cream); }
-    .dp-day.active { border-color: var(--orange); background: rgba(255,107,26,0.1); color: var(--orange); font-weight: 600; }
-    .dp-disclaimer { margin-top: 16px; font-size: 13px; color: var(--muted); display: flex; align-items: flex-start; gap: 6px; line-height: 1.5; }
-    .dp-disclaimer::before { content: "⚡"; flex-shrink: 0; }
+    /* Qty stepper */
+    .spr-qty { display: flex; align-items: center; gap: 10px; }
+    .spr-btn { width: 32px; height: 32px; border-radius: 8px; background: var(--dark); border: 1px solid var(--border); color: var(--cream); font-size: 18px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.15s; line-height: 1; font-family: 'Inter', sans-serif; }
+    .spr-btn:hover { background: var(--orange); border-color: var(--orange); }
+    .spr-count { font-family: 'Bebas Neue', sans-serif; font-size: 28px; min-width: 24px; text-align: center; line-height: 1; color: var(--muted); transition: color 0.2s; }
+    .spr-count.nonzero { color: var(--orange); }
 
-    /* Save / Subscribe buttons */
-    .btn-save { background: linear-gradient(135deg, var(--orange), var(--fire)); color: #fff; font-family: 'Oswald', sans-serif; font-size: 15px; font-weight: 600; letter-spacing: 2px; text-transform: uppercase; padding: 14px 36px; border-radius: 4px; border: none; cursor: pointer; box-shadow: 0 4px 20px rgba(255,107,26,0.3); transition: all 0.2s; }
-    .btn-save:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 8px 28px rgba(255,107,26,0.45); }
-    .btn-save:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
-    .btn-ghost-save { background: transparent; color: var(--muted); border: 1px solid var(--border); font-family: 'Oswald', sans-serif; font-size: 14px; font-weight: 500; letter-spacing: 2px; text-transform: uppercase; padding: 13px 28px; border-radius: 4px; cursor: pointer; transition: all 0.2s; }
-    .btn-ghost-save:hover:not(:disabled) { border-color: var(--orange); color: var(--orange); }
-    .btn-ghost-save:disabled { opacity: 0.5; cursor: not-allowed; }
-    .save-msg { display: inline-block; font-family: 'Oswald', sans-serif; font-size: 13px; letter-spacing: 1px; margin-left: 14px; opacity: 0; transition: opacity 0.3s; }
-    .save-msg.show { opacity: 1; color: var(--green); }
+    /* Line price */
+    .spr-price { font-family: 'Bebas Neue', sans-serif; font-size: 22px; color: var(--orange); width: 68px; text-align: right; flex-shrink: 0; }
+    .spr-price-zero { color: var(--border) !important; }
 
-    /* PAYMENT FAILED BANNER */
+    /* Volume tier strip */
+    .sub-tier-strip { padding: 12px 24px; border-bottom: 1px solid var(--border); background: rgba(255,107,26,0.03); display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
+    .sub-tier-label { font-family: 'Oswald', sans-serif; font-size: 10px; letter-spacing: 2.5px; text-transform: uppercase; color: var(--orange); flex-shrink: 0; min-width: 56px; }
+    .sub-tier-track { flex: 1; min-width: 100px; height: 5px; background: var(--border); border-radius: 3px; position: relative; }
+    .sub-tier-fill { height: 100%; background: linear-gradient(90deg, var(--fire), var(--orange)); border-radius: 3px; transition: width 0.5s; }
+    .sub-tier-hint { font-size: 11px; color: var(--muted); font-family: 'Inter', sans-serif; flex-shrink: 0; }
+    .sub-tier-hint strong { color: var(--cream); }
+
+    /* Footer */
+    .sub-footer { padding: 18px 24px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 14px; }
+    .sub-footer-left { display: flex; align-items: baseline; gap: 10px; }
+    .sub-total-lbl { font-family: 'Oswald', sans-serif; font-size: 11px; letter-spacing: 3px; text-transform: uppercase; color: var(--muted); }
+    .sub-total-amt { font-family: 'Bebas Neue', sans-serif; font-size: 38px; color: var(--cream); line-height: 1; }
+    .sub-total-note { font-size: 11px; color: var(--green); font-family: 'Inter', sans-serif; }
+    .sub-footer-right { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+    .btn-save-sub { background: linear-gradient(135deg, var(--orange), var(--fire)); color: #fff; font-family: 'Oswald', sans-serif; font-size: 14px; font-weight: 600; letter-spacing: 2px; text-transform: uppercase; padding: 13px 28px; border-radius: 6px; border: none; cursor: pointer; box-shadow: 0 4px 16px rgba(255,107,26,0.3); transition: all 0.2s; }
+    .btn-save-sub:hover:not(:disabled) { transform: translateY(-1px); box-shadow: 0 8px 24px rgba(255,107,26,0.45); }
+    .btn-save-sub:disabled { opacity: 0.4; cursor: not-allowed; transform: none; box-shadow: none; }
+    .btn-pause-sub { background: transparent; color: var(--muted); border: 1px solid var(--border); font-family: 'Oswald', sans-serif; font-size: 13px; letter-spacing: 2px; text-transform: uppercase; padding: 12px 20px; border-radius: 6px; cursor: pointer; transition: all 0.2s; }
+    .btn-pause-sub:hover { border-color: var(--muted); color: var(--cream); }
+    .save-confirm { font-family: 'Oswald', sans-serif; font-size: 12px; letter-spacing: 1px; color: var(--green); opacity: 0; transition: opacity 0.3s; }
+    .save-confirm.show { opacity: 1; }
+
+    /* Unsaved indicator */
+    .unsaved-badge { display: inline-flex; align-items: center; gap: 6px; background: rgba(255,107,26,0.1); border: 1px solid rgba(255,107,26,0.3); color: var(--orange); font-family: 'Oswald', sans-serif; font-size: 10px; letter-spacing: 2px; text-transform: uppercase; padding: 4px 10px; border-radius: 20px; transition: opacity 0.3s; }
+    .unsaved-badge.hidden { opacity: 0; pointer-events: none; }
+
+    /* ══ ONE-TIME ORDER CTA ══ */
+    .new-order-card { grid-column: 1 / -1; background: linear-gradient(135deg, rgba(255,107,26,0.07), rgba(255,61,0,0.03)); border: 1px solid rgba(255,107,26,0.2); border-radius: 16px; overflow: hidden; position: relative; }
+    .new-order-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: linear-gradient(90deg, var(--fire), var(--orange)); }
+    .new-order-inner { padding: 24px 28px; display: flex; align-items: center; gap: 24px; flex-wrap: wrap; }
+    .new-order-text { flex: 1; min-width: 180px; }
+    .new-order-eyebrow { font-family: 'Oswald', sans-serif; font-size: 10px; letter-spacing: 4px; text-transform: uppercase; color: var(--orange); margin-bottom: 4px; }
+    .new-order-title { font-family: 'Bebas Neue', sans-serif; font-size: 26px; letter-spacing: 2px; color: var(--cream); line-height: 1; margin-bottom: 4px; }
+    .new-order-sub { font-size: 12px; color: var(--muted); line-height: 1.5; }
+    .new-order-products { display: flex; gap: 8px; align-items: center; }
+    .nop-chip { display: flex; flex-direction: column; align-items: center; background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 10px 14px; min-width: 72px; text-align: center; transition: all 0.2s; text-decoration: none; }
+    .nop-chip:hover { border-color: rgba(255,107,26,0.4); transform: translateY(-2px); }
+    .nop-emoji { font-size: 24px; margin-bottom: 4px; }
+    .nop-name { font-family: 'Oswald', sans-serif; font-size: 9px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--muted); line-height: 1.2; }
+    .nop-badge { font-size: 8px; letter-spacing: 1px; text-transform: uppercase; padding: 2px 5px; border-radius: 6px; margin-top: 3px; display: inline-block; }
+    .nop-badge.full { background: rgba(255,107,26,0.15); color: var(--orange); }
+    .nop-badge.half { background: rgba(139,92,246,0.15); color: #A78BFA; }
+    .btn-place-order { background: linear-gradient(135deg, var(--orange), var(--fire)); color: #fff; font-family: 'Oswald', sans-serif; font-size: 14px; font-weight: 600; letter-spacing: 2px; text-transform: uppercase; padding: 13px 28px; border-radius: 8px; border: none; cursor: pointer; box-shadow: 0 4px 16px rgba(255,107,26,0.3); transition: all 0.2s; white-space: nowrap; text-decoration: none; display: inline-block; }
+    .btn-place-order:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(255,107,26,0.5); }
+
+    /* ══ PAYMENT FAILED BANNER ══ */
     .payment-failed-banner { grid-column: 1 / -1; background: rgba(220,53,69,0.1); border: 1px solid rgba(220,53,69,0.4); border-radius: 12px; padding: 20px 28px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px; }
     .payment-failed-text { display: flex; align-items: center; gap: 14px; }
     .payment-failed-icon { font-size: 24px; flex-shrink: 0; }
-    .payment-failed-msg { font-family: 'Oswald', sans-serif; }
-    .payment-failed-msg strong { display: block; font-size: 15px; letter-spacing: 1px; color: #ff6b6b; margin-bottom: 4px; }
-    .payment-failed-msg span { font-size: 13px; color: var(--muted); font-family: 'Inter', sans-serif; font-weight: 400; }
+    .payment-failed-msg strong { display: block; font-family: 'Oswald', sans-serif; font-size: 15px; letter-spacing: 1px; color: #ff6b6b; margin-bottom: 4px; }
+    .payment-failed-msg span { font-size: 13px; color: var(--muted); }
     .btn-update-payment { background: #dc3545; color: #fff; font-family: 'Oswald', sans-serif; font-size: 13px; font-weight: 600; letter-spacing: 2px; text-transform: uppercase; padding: 12px 24px; border-radius: 6px; border: none; cursor: pointer; transition: background 0.2s; white-space: nowrap; }
     .btn-update-payment:hover { background: #c82333; }
 
-    /* REFERRAL */
+    /* ══ REFERRAL ══ */
     .referral-card { grid-column: 1 / -1; }
     .referral-inner { display: flex; flex-wrap: wrap; gap: 32px; align-items: flex-start; }
     .referral-left { flex: 1; min-width: 260px; }
@@ -156,12 +164,13 @@
     .btn-copy { background: var(--orange); color: #fff; font-family: 'Oswald', sans-serif; font-size: 12px; font-weight: 600; letter-spacing: 2px; text-transform: uppercase; padding: 12px 20px; border-radius: 6px; border: none; cursor: pointer; transition: background 0.2s; white-space: nowrap; }
     .btn-copy:hover { background: var(--fire); }
     .referral-share-btns { display: flex; gap: 8px; flex-wrap: wrap; }
-    .btn-share { display: inline-flex; align-items: center; gap: 6px; background: transparent; border: 1px solid var(--border); color: var(--muted); font-family: 'Oswald', sans-serif; font-size: 12px; letter-spacing: 1.5px; text-transform: uppercase; padding: 10px 16px; border-radius: 6px; cursor: pointer; transition: all 0.2s; text-decoration: none; }
+    .btn-share { display: inline-flex; align-items: center; gap: 6px; background: transparent; border: 1px solid var(--border); color: var(--muted); font-family: 'Oswald', sans-serif; font-size: 12px; letter-spacing: 1.5px; text-transform: uppercase; padding: 10px 16px; border-radius: 6px; cursor: pointer; transition: all 0.2s; }
     .btn-share:hover { border-color: var(--orange); color: var(--orange); }
-
-    /* Referral progress bar */
     .referral-progress-section { margin-bottom: 32px; }
     .referral-progress-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+    .sub-label { font-family: 'Oswald', sans-serif; font-size: 11px; letter-spacing: 3px; text-transform: uppercase; color: var(--muted); }
+    .referral-next-goal { font-family: 'Oswald', sans-serif; font-size: 13px; letter-spacing: 1px; color: var(--muted); }
+    .referral-next-goal.complete { color: var(--orange); }
     .referral-track-wrap { position: relative; padding-bottom: 54px; }
     .referral-track { height: 8px; background: rgba(255,255,255,0.06); border-radius: 4px; position: relative; overflow: visible; }
     .referral-track-fill { height: 100%; background: linear-gradient(90deg, var(--fire), var(--orange)); border-radius: 4px; width: 0%; transition: width 1s cubic-bezier(0.4,0,0.2,1); }
@@ -171,10 +180,8 @@
     .referral-ms-num { font-family: 'Bebas Neue', sans-serif; font-size: 17px; color: var(--cream); line-height: 1; }
     .referral-ms-reward { font-family: 'Oswald', sans-serif; font-size: 10px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--muted); white-space: nowrap; margin-top: 3px; transition: color 0.4s; }
     .referral-ms-reward.achieved { color: var(--orange); }
-    .referral-next-goal { font-family: 'Oswald', sans-serif; font-size: 13px; letter-spacing: 1px; color: var(--muted); }
-    .referral-next-goal.complete { color: var(--orange); }
 
-    /* ORDER HISTORY */
+    /* ══ ORDERS TABLE ══ */
     .orders-card { grid-column: 1 / -1; }
     .orders-table { width: 100%; border-collapse: collapse; }
     .orders-table th { font-family: 'Oswald', sans-serif; font-size: 11px; letter-spacing: 3px; text-transform: uppercase; color: var(--muted); padding: 0 0 16px; text-align: left; border-bottom: 1px solid var(--border); }
@@ -185,7 +192,32 @@
     .order-type-tag.one-time  { background: rgba(201,160,74,0.15); color: var(--gold);  border: 1px solid rgba(201,160,74,0.3); }
     .empty-state { text-align: center; padding: 48px 24px; color: var(--muted); }
     .empty-state p { font-family: 'Oswald', sans-serif; font-size: 14px; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 16px; }
-    .empty-state a { color: var(--orange); text-decoration: none; font-family: 'Oswald', sans-serif; font-size: 14px; letter-spacing: 1px; }
+    .empty-state a { color: var(--orange); text-decoration: none; }
+
+    /* ══ NO-SUB CTA ══ */
+    .no-sub-cta { padding: 32px 28px; border-bottom: 1px solid var(--border); background: rgba(255,107,26,0.04); text-align: center; }
+    .no-sub-cta-icon { font-size: 40px; margin-bottom: 12px; }
+    .no-sub-cta-title { font-family: 'Oswald', sans-serif; font-size: 17px; font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase; color: var(--cream); margin-bottom: 10px; }
+    .no-sub-cta-desc { font-size: 14px; color: var(--muted); line-height: 1.7; max-width: 420px; margin: 0 auto 24px; }
+    .btn-start-sub { display: inline-block; background: linear-gradient(135deg, var(--orange), var(--fire)); color: #fff; font-family: 'Oswald', sans-serif; font-size: 14px; font-weight: 600; letter-spacing: 2px; text-transform: uppercase; padding: 13px 36px; border-radius: 6px; text-decoration: none; box-shadow: 0 4px 20px rgba(255,107,26,0.3); transition: all 0.2s; }
+    .btn-start-sub:hover { box-shadow: 0 8px 28px rgba(255,107,26,0.5); transform: translateY(-1px); }
+
+    /* ══ ACCOUNT & DELIVERY CARDS ══ */
+    .field-group { margin-bottom: 14px; }
+    .field-group label { display: block; font-family: 'Oswald', sans-serif; font-size: 10px; letter-spacing: 3px; text-transform: uppercase; color: var(--muted); margin-bottom: 6px; }
+    .field-group input, .field-group select { width: 100%; background: var(--dark); border: 1px solid var(--border); border-radius: 6px; padding: 11px 14px; font-family: 'Inter', sans-serif; font-size: 14px; color: var(--cream); outline: none; transition: border-color 0.2s; }
+    .field-group select { appearance: none; -webkit-appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23888' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 14px center; background-color: var(--dark); }
+    .field-group input:focus, .field-group select:focus { border-color: var(--orange); }
+    .field-group input::placeholder { color: var(--muted); }
+    .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .dp-days { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; margin-top: 6px; }
+    .dp-day { padding: 10px 2px; background: var(--dark); border: 1px solid var(--border); border-radius: 6px; font-family: 'Oswald', sans-serif; font-size: 11px; letter-spacing: 1px; text-transform: uppercase; color: var(--muted); cursor: pointer; transition: all 0.2s; text-align: center; }
+    .dp-day:hover { border-color: rgba(255,107,26,0.4); color: var(--cream); }
+    .dp-day.active { border-color: var(--orange); background: rgba(255,107,26,0.1); color: var(--orange); font-weight: 600; }
+    .btn-save-info { background: linear-gradient(135deg, var(--orange), var(--fire)); color: #fff; font-family: 'Oswald', sans-serif; font-size: 13px; font-weight: 600; letter-spacing: 2px; text-transform: uppercase; padding: 11px 24px; border-radius: 4px; border: none; cursor: pointer; margin-top: 6px; transition: all 0.2s; }
+    .btn-save-info:hover { transform: translateY(-1px); }
+    .save-info-msg { font-family: 'Oswald', sans-serif; font-size: 12px; letter-spacing: 1px; color: var(--green); opacity: 0; transition: opacity 0.3s; margin-left: 10px; }
+    .save-info-msg.show { opacity: 1; }
 
     /* Loading */
     .loading { text-align: center; padding: 80px 24px; }
@@ -202,9 +234,27 @@
       .nav-user { display: none; }
       .dash-hero { padding: 100px 24px 48px; }
       .dash-body { padding: 40px 24px 80px; grid-template-columns: 1fr; }
-      .sub-card, .orders-card { grid-column: 1; }
-      .flavor-grid, .portion-grid { grid-template-columns: 1fr 1fr; }
+      .full-width, .sub-card, .orders-card, .referral-card, .new-order-card, .payment-failed-banner { grid-column: 1; }
+      .sub-summary-bar { flex-wrap: wrap; }
+      .sub-summary-item { min-width: 50%; }
+      .new-order-inner { flex-direction: column; }
+      .btn-place-order { width: 100%; text-align: center; }
+      .new-order-products { flex-wrap: wrap; }
       footer { flex-direction: column; text-align: center; }
+    }
+    /* Account info card — stack columns on narrow screens */
+    @media (max-width: 760px) {
+      .dash-card-body [style*="grid-template-columns:1fr 1fr 1fr"],
+      .dash-card-body [style*="grid-template-columns:2fr 1fr 1fr 1fr 1fr"],
+      .dash-card-body [style*="grid-template-columns:1fr 1fr"] {
+        grid-template-columns: 1fr 1fr !important;
+      }
+    }
+    @media (max-width: 520px) {
+      .dash-card-body [style*="grid-template-columns"] {
+        grid-template-columns: 1fr !important;
+      }
+      .dp-days { grid-template-columns: repeat(4, 1fr); }
     }
   </style>
 </head>
@@ -218,8 +268,8 @@
   </a>
   <div class="nav-right">
     <span class="nav-user" id="navUser"></span>
-    <a href="index.html" class="btn-nav-ghost">Order More</a>
-    <button class="btn-nav" onclick="handleSignOut()">Sign Out</button>
+    <a href="shop.html" class="btn-nav">Shop Now</a>
+    <button class="btn-nav-ghost" onclick="handleSignOut()">Sign Out</button>
   </div>
 </nav>
 
@@ -238,15 +288,15 @@
       <div>
         <p class="dash-eyebrow">Customer Dashboard</p>
         <h1 class="dash-title">WELCOME BACK, <span id="heroName">—</span></h1>
-        <p class="dash-meta" id="heroEmail"></p>
-      </div>
-      <div style="display:flex;flex-direction:column;align-items:flex-end;gap:0;">
-        <div id="subStatusBadge"></div>
-        <div id="nextDeliveryBadge" style="display:none;" class="next-delivery-badge">
-          <div class="next-delivery-label">Next Delivery</div>
-          <div class="next-delivery-date" id="nextDeliveryDate">—</div>
-          <div class="next-delivery-day" id="nextDeliveryDayName"></div>
+        <div class="dash-meta">
+          <span id="heroEmail"></span>
+          <span id="subStatusBadge"></span>
         </div>
+      </div>
+      <div id="nextDeliveryBadge" style="display:none;" class="next-delivery-badge">
+        <div class="next-delivery-label">Next Delivery</div>
+        <div class="next-delivery-date" id="nextDeliveryDate">—</div>
+        <div class="next-delivery-day" id="nextDeliveryDayName"></div>
       </div>
     </div>
   </div>
@@ -266,7 +316,7 @@
       <button class="btn-update-payment" onclick="openCustomerPortal()">Update Payment Method</button>
     </div>
 
-    <!-- REFERRAL -->
+    <!-- ══ REFERRAL ══ -->
     <div class="dash-card referral-card">
       <div class="dash-card-header">
         <span class="dash-card-title">🔗 Refer a Friend</span>
@@ -276,11 +326,9 @@
         </div>
       </div>
       <div class="dash-card-body">
-
-        <!-- Rewards progress bar -->
         <div class="referral-progress-section">
           <div class="referral-progress-header">
-            <span class="sub-label" style="margin:0;">Rewards Progress</span>
+            <span class="sub-label">Rewards Progress</span>
             <span class="referral-next-goal" id="referralNextGoal"></span>
           </div>
           <div class="referral-track-wrap">
@@ -304,8 +352,6 @@
             </div>
           </div>
         </div>
-
-        <!-- Link + share -->
         <div class="referral-inner">
           <div class="referral-left">
             <p class="referral-desc">Share your unique link. Every order placed through it counts toward free rewards — 3 referrals gets you a free 3-pack, 5 a free 5-pack, and 10 a free Forge T-shirt.</p>
@@ -320,176 +366,189 @@
             </div>
           </div>
         </div>
-
       </div>
     </div>
 
-    <!-- SUBSCRIPTION CARD -->
+    <!-- ══ SUBSCRIPTION CARD ══ -->
     <div class="dash-card sub-card">
+
+      <!-- Header -->
       <div class="dash-card-header">
-        <span class="dash-card-title">🔥 Subscription Settings</span>
+        <div style="display:flex;align-items:center;gap:12px;">
+          <span class="dash-card-title">🔥 My Subscription</span>
+          <span class="unsaved-badge hidden" id="unsavedBadge">● Unsaved changes</span>
+        </div>
+        <span id="subCardStatus"></span>
       </div>
-      <div class="dash-card-body">
 
-        <!-- Status -->
-        <div class="sub-section">
-          <div class="sub-label">Subscription Status</div>
-          <div class="status-toggle">
-            <button class="status-btn" id="btnActive" onclick="setStatus('active')">Active</button>
-            <button class="status-btn" id="btnPaused" onclick="setStatus('paused')">Paused</button>
+      <!-- No subscription CTA (shown when user has no active plan) -->
+      <div class="no-sub-cta" id="noSubCta" style="display:none;">
+        <div class="no-sub-cta-icon">🔥</div>
+        <div class="no-sub-cta-title">No Active Subscription</div>
+        <p class="no-sub-cta-desc">Build your weekly pack — mix any flavors and serving sizes, lock in volume pricing, and get it delivered free every week.</p>
+        <a href="shop.html" class="btn-start-sub">Start Your Subscription →</a>
+      </div>
+
+      <!-- Summary bar -->
+      <div class="sub-summary-bar">
+        <div class="sub-summary-item">
+          <div class="ssb-label">Total Cups</div>
+          <div class="ssb-value" id="ssbCups">0</div>
+        </div>
+        <div class="sub-summary-item">
+          <div class="ssb-label">Price / Cup</div>
+          <div class="ssb-value orange" id="ssbPerCup">—</div>
+        </div>
+        <div class="sub-summary-item">
+          <div class="ssb-label">Weekly Total</div>
+          <div class="ssb-value" id="ssbTotal">—</div>
+        </div>
+        <div class="sub-summary-item">
+          <div class="ssb-label">Savings</div>
+          <div class="ssb-value green" id="ssbSavings">10% off</div>
+        </div>
+      </div>
+
+      <!-- Product rows — editable -->
+      <div class="sub-products">
+
+        <!-- Full Serving — Chocolate -->
+        <div class="sub-product-row">
+          <div class="spr-icon"><img src="chocofull.png" alt="Full Chocolate"></div>
+          <div class="spr-info">
+            <div class="spr-name">Full Serving — Chocolate</div>
+            <div class="spr-meta">40g protein · ~450 cal · <span id="pc-fc">—</span>/cup</div>
           </div>
+          <div class="spr-qty">
+            <button class="spr-btn" onclick="subAdjust('fc',-1)">−</button>
+            <span class="spr-count" id="sc-fc">0</span>
+            <button class="spr-btn" onclick="subAdjust('fc',1)">+</button>
+          </div>
+          <div class="spr-price spr-price-zero" id="sp-fc">$0.00</div>
         </div>
 
-        <!-- Portion -->
-        <div class="sub-section">
-          <div class="sub-label">Portion Size</div>
-          <div class="portion-grid">
-            <div class="portion-card active" id="portionFull" onclick="selectPortion('full')">
-              <div class="portion-card-name">Full Serving</div>
-              <div class="portion-macros">
-                <div class="pm-item"><div class="pm-num">40g</div><div class="pm-label">Protein</div></div>
-                <div class="pm-item"><div class="pm-num">450</div><div class="pm-label">Cal</div></div>
-                <div class="pm-item"><div class="pm-num">10g</div><div class="pm-label">Fiber</div></div>
-              </div>
+        <!-- Full Serving — Peanut Butter -->
+        <div class="sub-product-row">
+          <div class="spr-icon"><img src="pbfull.png" alt="Full Peanut Butter"></div>
+          <div class="spr-info">
+            <div class="spr-name">Full Serving — Peanut Butter</div>
+            <div class="spr-meta">40g protein · 460 cal · <span id="pc-fp">—</span>/cup</div>
+          </div>
+          <div class="spr-qty">
+            <button class="spr-btn" onclick="subAdjust('fp',-1)">−</button>
+            <span class="spr-count" id="sc-fp">0</span>
+            <button class="spr-btn" onclick="subAdjust('fp',1)">+</button>
+          </div>
+          <div class="spr-price spr-price-zero" id="sp-fp">$0.00</div>
+        </div>
+
+        <!-- Half Serving — Chocolate -->
+        <div class="sub-product-row">
+          <div class="spr-icon"><img src="chochalf.png" alt="Half Chocolate"></div>
+          <div class="spr-info">
+            <div class="spr-name">Half Serving — Chocolate</div>
+            <div class="spr-meta">20g protein · ~225 cal · <span id="pc-hc">—</span>/cup</div>
+          </div>
+          <div class="spr-qty">
+            <button class="spr-btn" onclick="subAdjust('hc',-1)">−</button>
+            <span class="spr-count" id="sc-hc">0</span>
+            <button class="spr-btn" onclick="subAdjust('hc',1)">+</button>
+          </div>
+          <div class="spr-price spr-price-zero" id="sp-hc">$0.00</div>
+        </div>
+
+        <!-- Half Serving — Peanut Butter -->
+        <div class="sub-product-row">
+          <div class="spr-icon"><img src="pbhalf.png" alt="Half Peanut Butter"></div>
+          <div class="spr-info">
+            <div class="spr-name">Half Serving — Peanut Butter</div>
+            <div class="spr-meta">20g protein · 230 cal · <span id="pc-hp">—</span>/cup</div>
+          </div>
+          <div class="spr-qty">
+            <button class="spr-btn" onclick="subAdjust('hp',-1)">−</button>
+            <span class="spr-count" id="sc-hp">0</span>
+            <button class="spr-btn" onclick="subAdjust('hp',1)">+</button>
+          </div>
+          <div class="spr-price spr-price-zero" id="sp-hp">$0.00</div>
+        </div>
+
+      </div><!-- /sub-products -->
+
+      <!-- Volume tier strip -->
+      <div class="sub-tier-strip">
+        <div class="sub-tier-label" id="tierLabel">Tier 1</div>
+        <div class="sub-tier-track">
+          <div class="sub-tier-fill" id="tierFill" style="width:0%"></div>
+        </div>
+        <div class="sub-tier-hint" id="tierHint">Add cups to start building your order</div>
+      </div>
+
+      <!-- Delivery schedule -->
+      <div class="sub-delivery-section">
+        <div class="sub-delivery-grid">
+          <div>
+            <div class="sub-delivery-label">Preferred Delivery Day</div>
+            <div class="dp-days" id="dpDays">
+              <div class="dp-day" onclick="selectDeliveryDay('Monday')">Mon</div>
+              <div class="dp-day" onclick="selectDeliveryDay('Tuesday')">Tue</div>
+              <div class="dp-day" onclick="selectDeliveryDay('Wednesday')">Wed</div>
+              <div class="dp-day" onclick="selectDeliveryDay('Thursday')">Thu</div>
+              <div class="dp-day" onclick="selectDeliveryDay('Friday')">Fri</div>
+              <div class="dp-day" onclick="selectDeliveryDay('Saturday')">Sat</div>
+              <div class="dp-day" onclick="selectDeliveryDay('Sunday')">Sun</div>
             </div>
-            <div class="portion-card" id="portionHalf" onclick="selectPortion('half')">
-              <div class="portion-card-name">Half Serving</div>
-              <div class="portion-macros">
-                <div class="pm-item"><div class="pm-num">20g</div><div class="pm-label">Protein</div></div>
-                <div class="pm-item"><div class="pm-num">225</div><div class="pm-label">Cal</div></div>
-                <div class="pm-item"><div class="pm-num">5g</div><div class="pm-label">Fiber</div></div>
-              </div>
+          </div>
+          <div>
+            <div class="sub-delivery-label">Preferred Time Window</div>
+            <select class="sub-delivery-select" id="dpTime" onchange="renderSub()">
+              <option value="">Select a time window</option>
+              <option value="Morning (8am–12pm)">Morning (8am – 12pm)</option>
+              <option value="Afternoon (12pm–5pm)">Afternoon (12pm – 5pm)</option>
+              <option value="Evening (5pm–8pm)">Evening (5pm – 8pm)</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- Footer -->
+      <div class="sub-footer">
+        <div class="sub-footer-left">
+          <div>
+            <div class="sub-total-lbl">Weekly Total</div>
+            <div style="display:flex;align-items:baseline;gap:10px;">
+              <div class="sub-total-amt" id="subTotalAmt">$0.00</div>
+              <div class="sub-total-note">✓ 10% subscribe discount applied</div>
             </div>
           </div>
         </div>
-
-        <!-- Pack Size -->
-        <div class="sub-section">
-          <div class="sub-label">Pack Size <span style="color:var(--muted);font-size:10px;">— Subscription Pricing</span></div>
-          <div class="pack-grid" id="packGrid">
-            <!-- rendered by renderPackCards() -->
-          </div>
+        <div class="sub-footer-right">
+          <span class="save-confirm" id="saveConfirm">✓ Saved!</span>
+          <button class="btn-pause-sub" id="btnPauseSub" onclick="toggleSubPause()">Pause</button>
+          <button class="btn-save-sub" id="btnSaveSub" disabled onclick="saveSubscription()">Save Changes</button>
         </div>
+      </div>
 
-        <!-- Flavor mix -->
-        <div class="sub-section">
-          <div class="sub-label">Flavor Mix <span style="color:var(--muted);font-size:10px;" id="packLabel"></span></div>
-          <div class="flavor-grid">
-            <div class="flavor-card has-qty" id="cardChoc">
-              <div class="flavor-icon">🍫</div>
-              <div class="flavor-name">Chocolate</div>
-              <div class="qty-control">
-                <button class="qty-btn" id="btnChocMinus" onclick="adjustFlavor('chocolate',-1)">−</button>
-                <div>
-                  <div class="qty-num" id="qtyChocolate">5</div>
-                  <div class="qty-cups-label">cups</div>
-                </div>
-                <button class="qty-btn" id="btnChocPlus" onclick="adjustFlavor('chocolate',1)">+</button>
-              </div>
-            </div>
-            <div class="flavor-card" id="cardPB">
-              <div class="flavor-icon">🥜</div>
-              <div class="flavor-name">Peanut Butter</div>
-              <div class="qty-control">
-                <button class="qty-btn" id="btnPBMinus" onclick="adjustFlavor('peanut-butter',-1)">−</button>
-                <div>
-                  <div class="qty-num" id="qtyPB">0</div>
-                  <div class="qty-cups-label">cups</div>
-                </div>
-                <button class="qty-btn" id="btnPBPlus" onclick="adjustFlavor('peanut-butter',1)">+</button>
-              </div>
-            </div>
-          </div>
-          <div class="flavor-total-bar matched" id="flavorBar">
-            <span>Your mix:</span>
-            <span class="flavor-total-nums matched" id="flavorNums">5 / 5</span>
-            <span id="flavorHint">cups selected</span>
-            <span class="flavor-check" id="flavorCheck">✓</span>
-          </div>
+    </div><!-- /sub-card -->
+
+    <!-- ══ ONE-TIME ORDER CTA ══ -->
+    <div class="new-order-card">
+      <div class="new-order-inner">
+        <div class="new-order-text">
+          <div class="new-order-eyebrow">One-Time Order</div>
+          <div class="new-order-title">ORDER SOMETHING DIFFERENT</div>
+          <div class="new-order-sub">Add a one-time order any time — mix &amp; match freely. Free delivery, same day pricing.</div>
         </div>
-
-        <!-- Delivery Preferences -->
-        <div class="sub-section">
-          <div class="sub-label">Your Info &amp; Delivery Preferences</div>
-          <div class="delivery-pref">
-            <div class="dp-row">
-              <div class="dp-field">
-                <label>Your Name</label>
-                <input type="text" id="dpName" placeholder="First &amp; last name" autocomplete="name" />
-              </div>
-              <div class="dp-field">
-                <label>Email Address</label>
-                <input type="email" id="dpEmail" placeholder="you@email.com" autocomplete="email" />
-              </div>
-            </div>
-            <div class="dp-row" style="margin-bottom:16px;">
-              <div class="dp-field">
-                <label>Phone Number</label>
-                <input type="tel" id="dpPhone" placeholder="(555) 123-4567" autocomplete="tel" />
-              </div>
-            </div>
-            <div class="dp-row" style="margin-bottom:16px;">
-              <div class="dp-field" style="grid-column:1/-1;">
-                <label>Street Address</label>
-                <input type="text" id="dpStreet" placeholder="123 Main St" autocomplete="street-address" />
-              </div>
-            </div>
-            <div class="dp-row" style="margin-bottom:16px;">
-              <div class="dp-field">
-                <label>Apt / Unit <span style="color:var(--muted);font-size:10px;">(optional)</span></label>
-                <input type="text" id="dpUnit" placeholder="Apt 4B" autocomplete="address-line2" />
-              </div>
-              <div class="dp-field">
-                <label>City</label>
-                <input type="text" id="dpCity" placeholder="Chicago" autocomplete="address-level2" />
-              </div>
-            </div>
-            <div class="dp-row" style="margin-bottom:16px;">
-              <div class="dp-field">
-                <label>State</label>
-                <input type="text" id="dpState" placeholder="IL" maxlength="2" autocomplete="address-level1" />
-              </div>
-              <div class="dp-field">
-                <label>ZIP Code</label>
-                <input type="text" id="dpZip" placeholder="60601" maxlength="10" autocomplete="postal-code" />
-              </div>
-            </div>
-            <div class="dp-field" style="margin-bottom:16px;">
-              <label>Preferred Delivery Day</label>
-              <div class="dp-days" id="dpDays">
-                <div class="dp-day" onclick="selectDeliveryDay('Monday')">Mon</div>
-                <div class="dp-day" onclick="selectDeliveryDay('Tuesday')">Tue</div>
-                <div class="dp-day" onclick="selectDeliveryDay('Wednesday')">Wed</div>
-                <div class="dp-day" onclick="selectDeliveryDay('Thursday')">Thu</div>
-                <div class="dp-day" onclick="selectDeliveryDay('Friday')">Fri</div>
-                <div class="dp-day" onclick="selectDeliveryDay('Saturday')">Sat</div>
-                <div class="dp-day" onclick="selectDeliveryDay('Sunday')">Sun</div>
-              </div>
-            </div>
-            <div class="dp-field">
-              <label>Preferred Time Window</label>
-              <select id="dpTime">
-                <option value="">Select a time window</option>
-                <option value="Morning (8am–12pm)">Morning (8am – 12pm)</option>
-                <option value="Afternoon (12pm–5pm)">Afternoon (12pm – 5pm)</option>
-                <option value="Evening (5pm–8pm)">Evening (5pm – 8pm)</option>
-              </select>
-            </div>
-            <p class="dp-disclaimer">Your subscription delivers every week on <strong id="dpDayText" style="color:var(--orange);">—</strong> during your selected time window. <span id="dpNextDateText" style="display:none;">Next delivery: <strong id="dpNextDate" style="color:var(--orange);"></strong>.</span> You can update your delivery day and time at any time.</p>
-          </div>
+        <div class="new-order-products">
+          <a href="shop.html" class="nop-chip"><span class="nop-emoji">🍫</span><span class="nop-name">Full Choc</span><span class="nop-badge full">Full</span></a>
+          <a href="shop.html" class="nop-chip"><span class="nop-emoji">🥜</span><span class="nop-name">Full PB</span><span class="nop-badge full">Full</span></a>
+          <a href="shop.html" class="nop-chip"><span class="nop-emoji">🍫</span><span class="nop-name">Half Choc</span><span class="nop-badge half">Half</span></a>
+          <a href="shop.html" class="nop-chip"><span class="nop-emoji">🥜</span><span class="nop-name">Half PB</span><span class="nop-badge half">Half</span></a>
         </div>
-
-        <!-- Save / Subscribe -->
-        <div style="display:flex;align-items:center;flex-wrap:wrap;gap:12px;">
-          <button class="btn-ghost-save" id="btnSave" onclick="saveSubscription()">Save Preferences</button>
-          <button class="btn-save" id="btnSubscribe" onclick="subscribeNow()">Subscribe Now →</button>
-          <span class="save-msg" id="saveMsg">✓ Saved!</span>
-        </div>
-
+        <a href="shop.html" class="btn-place-order">Shop Now →</a>
       </div>
     </div>
 
-    <!-- ORDER HISTORY -->
+    <!-- ══ ORDER HISTORY ══ -->
     <div class="dash-card orders-card">
       <div class="dash-card-header">
         <span class="dash-card-title">📦 Order History</span>
@@ -497,66 +556,102 @@
       <div class="dash-card-body" id="ordersBody">
         <div class="empty-state">
           <p>No orders yet</p>
-          <a href="index.html">Place your first order →</a>
+          <a href="shop.html">Place your first order →</a>
         </div>
       </div>
     </div>
 
-  </div>
-</div>
+    <!-- ══ ACCOUNT INFORMATION ══ -->
+    <div class="dash-card full-width">
+      <div class="dash-card-header"><span class="dash-card-title">👤 Account Information</span></div>
+      <div class="dash-card-body">
+
+        <!-- Contact info row -->
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;margin-bottom:4px;">
+          <div class="field-group" style="margin-bottom:0;"><label>Full Name</label><input type="text" id="dpName" placeholder="First &amp; last name" autocomplete="name" /></div>
+          <div class="field-group" style="margin-bottom:0;"><label>Email Address</label><input type="email" id="dpEmail" placeholder="you@email.com" autocomplete="email" /></div>
+          <div class="field-group" style="margin-bottom:0;"><label>Phone Number</label><input type="tel" id="dpPhone" placeholder="(555) 123-4567" autocomplete="tel" /></div>
+        </div>
+
+        <div style="height:20px;border-bottom:1px solid var(--border);margin-bottom:20px;"></div>
+
+        <!-- Address row -->
+        <div style="display:grid;grid-template-columns:2fr 1fr 1fr 1fr 1fr;gap:16px;margin-bottom:4px;align-items:end;">
+          <div class="field-group" style="margin-bottom:0;"><label>Street Address</label><input type="text" id="dpStreet" placeholder="123 Main St" autocomplete="street-address" /></div>
+          <div class="field-group" style="margin-bottom:0;"><label>Apt / Unit <span style="color:var(--muted);font-size:9px;">(opt.)</span></label><input type="text" id="dpUnit" placeholder="Apt 4B" /></div>
+          <div class="field-group" style="margin-bottom:0;"><label>City</label><input type="text" id="dpCity" placeholder="Chicago" autocomplete="address-level2" /></div>
+          <div class="field-group" style="margin-bottom:0;"><label>State</label><input type="text" id="dpState" placeholder="IL" maxlength="2" /></div>
+          <div class="field-group" style="margin-bottom:0;"><label>ZIP</label><input type="text" id="dpZip" placeholder="60601" maxlength="10" /></div>
+        </div>
+
+        <div style="height:24px;"></div>
+        <div style="display:flex;align-items:center;">
+          <button class="btn-save-info" onclick="saveAccountInfo()">Save Account Information</button>
+          <span class="save-info-msg" id="saveInfoMsg">✓ Saved!</span>
+        </div>
+
+      </div>
+    </div>
+
+  </div><!-- /dash-body -->
+
+</div><!-- /dashMain -->
 
 <footer>
-  <div>
-    <div class="footer-brand">FORGE <span>OATS</span></div>
-  </div>
+  <div class="footer-brand">FORGE <span>OATS</span></div>
   <div class="footer-copy">© 2025 Forge Oats. All rights reserved.</div>
 </footer>
 
 <script>
-  // ── Supabase config ──────────────────────────────────────
+  // ── Supabase config ─────────────────────────────────────────
   const SUPABASE_URL      = 'https://eskyqpgtymtshmfepkqc.supabase.co';
   const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVza3lxcGd0eW10c2htZmVwa3FjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgwMjc3NzgsImV4cCI6MjA5MzYwMzc3OH0.-BQfnmRthKOgcz0AExXAygikkz17s_uYERAzGONtG3Y';
   const { createClient }  = supabase;
   const sb = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-  // ─────────────────────────────────────────────────────────
 
-  const SUB_DISC = 0.10; // 10% subscription discount
+  // ── Subscription editor state ────────────────────────────────
+  // Per-product quantities: fc=Full Choc, fp=Full PB, hc=Half Choc, hp=Half PB
+  const ORIG = { fc: 0, fp: 0, hc: 0, hp: 0 }; // saved to Supabase
+  const qtys = { fc: 0, fp: 0, hc: 0, hp: 0 }; // editable live state
 
-  const PACK_OPTIONS = {
-    full: [
-      { cups: 3, perCup: 8.00,  total: 24.00 },
-      { cups: 5, perCup: 7.50,  total: 37.50 },
-      { cups: 7, perCup: 7.00,  total: 49.00 },
-    ],
-    half: [
-      { cups: 5, perCup: 5.00,  total: 25.00 },
-      { cups: 7, perCup: 4.50,  total: 31.50 },
-      { cups: 9, perCup: 4.00,  total: 36.00 },
-    ]
+  const PRODUCTS = {
+    fc: { type: 'full', name: 'Full Choc'  },
+    fp: { type: 'full', name: 'Full PB'    },
+    hc: { type: 'half', name: 'Half Choc'  },
+    hp: { type: 'half', name: 'Half PB'    },
   };
-
-  const STRIPE_SUB_LINKS = {
-    'full-3': 'https://buy.stripe.com/aFacN59cr8iO7s58uV3ZK09',
-    'full-5': 'https://buy.stripe.com/14AfZh74j8iOeUx12t3ZK0a',
-    'full-7': 'https://buy.stripe.com/14A8wPewLdD8fYB12t3ZK0b',
-    'half-5': 'https://buy.stripe.com/8x24gz4Wb9mS5jXfXn3ZK0f',
-    'half-7': 'https://buy.stripe.com/3cI8wPagvgPkdQt12t3ZK0g',
-    'half-9': 'https://buy.stripe.com/fZudR9dsH0QmcMpfXn3ZK0h',
-  };
-
-  const PACK_BADGES = [null, 'Most Popular', 'Best Value'];
+  const FULL_PRICES = [8.00, 7.50, 7.00]; // tiers: 1-4 cups / 5-6 cups / 7+ cups
+  const HALF_PRICES = [5.00, 4.50, 4.00];
+  const SUB_DISC    = 0.10;
 
   let currentUser       = null;
-  let selectedPackIndex = 1; // default to Most Popular
   let selectedDeliveryDay = '';
-  let sub = { chocolate_cups: 5, peanut_butter_cups: 0, portion: 'full', status: 'active', delivery_day: '', delivery_time: '' };
-  let flavorCups = { chocolate: 5, 'peanut-butter': 0 };
-  // Track initial values to detect changes that need Stripe updating
+  let origDeliveryDay   = '';  // saved delivery day (for unsaved detection)
+  let origDeliveryTime  = '';  // saved delivery time (for unsaved detection)
+  let sub = {};               // raw subscription row from Supabase
+  let initialCups    = 0;     // cup total when last saved to Stripe
   let initialPortion = 'full';
-  let initialCups    = 5;
   let initialStatus  = 'active';
 
-  // ── Init ──────────────────────────────────────────────────
+  // ── Pricing helpers ─────────────────────────────────────────
+  // Actual items ordered (for display)
+  function totalCups()     { return Object.values(qtys).reduce((s, v) => s + v, 0); }
+  // Effective cups for tier: half servings count as 0.5
+  function effectiveCups() { return qtys.fc + qtys.fp + (qtys.hc + qtys.hp) * 0.5; }
+  function getTier(eff)    { return eff >= 7 ? 2 : eff >= 5 ? 1 : 0; }
+  function perCupPrice(type, eff) {
+    const t = getTier(eff);
+    return (type === 'full' ? FULL_PRICES[t] : HALF_PRICES[t]) * (1 - SUB_DISC);
+  }
+  function hasChanged() {
+    const timeVal = document.getElementById('dpTime')?.value || '';
+    return Object.keys(qtys).some(k => qtys[k] !== ORIG[k])
+        || selectedDeliveryDay !== origDeliveryDay
+        || timeVal !== origDeliveryTime;
+  }
+  function fmtQty(n)       { return n === Math.floor(n) ? String(n) : n.toFixed(1); }
+
+  // ── Init ─────────────────────────────────────────────────────
   (async () => {
     const { data: { session } } = await sb.auth.getSession();
     if (!session) { window.location.href = 'profile.html'; return; }
@@ -566,61 +661,120 @@
     document.getElementById('dashMain').style.display = 'block';
   })();
 
+  // ── Load profile ─────────────────────────────────────────────
   async function loadProfile() {
     let { data } = await sb.from('customers').select('*').eq('id', currentUser.id).single();
     if (!data) {
       await sb.from('customers').insert({ id: currentUser.id, email: currentUser.email, name: currentUser.email.split('@')[0] });
       data = { name: currentUser.email.split('@')[0], email: currentUser.email };
     }
-    const name = data.name || currentUser.email;
-    document.getElementById('heroName').textContent  = name.split(' ')[0].toUpperCase();
+    const firstName = (data.name || currentUser.email).split(' ')[0];
+    document.getElementById('heroName').textContent  = firstName.toUpperCase();
     document.getElementById('heroEmail').textContent = data.email || currentUser.email;
-    document.getElementById('navUser').textContent   = 'Hi, ' + name.split(' ')[0];
-    // Pre-fill delivery pref fields from profile
+    document.getElementById('navUser').textContent   = 'Hi, ' + firstName;
+
+    // Pre-fill account fields
     const dpName  = document.getElementById('dpName');
     const dpEmail = document.getElementById('dpEmail');
     const dpPhone = document.getElementById('dpPhone');
     if (dpName  && !dpName.value)  dpName.value  = data.name  || '';
-    if (dpEmail && !dpEmail.value) dpEmail.value  = data.email || currentUser.email;
-    if (dpPhone && !dpPhone.value) dpPhone.value  = data.phone || '';
+    if (dpEmail && !dpEmail.value) dpEmail.value = data.email || currentUser.email;
+    if (dpPhone && !dpPhone.value) dpPhone.value = data.phone || '';
   }
 
+  // ── Load subscription ────────────────────────────────────────
   async function loadSubscription() {
     const { data } = await sb.from('subscriptions').select('*').eq('customer_id', currentUser.id).single();
-    if (data) sub = data;
-    flavorCups = { chocolate: sub.chocolate_cups, 'peanut-butter': sub.peanut_butter_cups };
-    // Derive selected pack index from saved cup total
-    const loadedTotal = sub.chocolate_cups + sub.peanut_butter_cups;
-    const opts = PACK_OPTIONS[sub.portion];
-    const foundIdx = opts.findIndex(o => o.cups === loadedTotal);
-    selectedPackIndex = foundIdx >= 0 ? foundIdx : 1;
-    // Restore delivery day & time
-    if (sub.delivery_day)  selectDeliveryDay(sub.delivery_day);
-    if (sub.delivery_time) document.getElementById('dpTime').value = sub.delivery_time;
-    // Pre-fill address fields
-    if (sub.name)            document.getElementById('dpName').value   = sub.name;
-    if (sub.email)           document.getElementById('dpEmail').value  = sub.email;
-    if (sub.phone)           document.getElementById('dpPhone').value  = sub.phone;
+    if (!data) {
+      // No subscription yet — show empty state, init renders zeros
+      renderSubHero('none');
+      renderSub();
+      return;
+    }
+    sub = data;
+
+    // Read per-product qtys — prefer new columns, fall back to old schema
+    const hasNewQtys = (sub.qty_fc || 0) + (sub.qty_fp || 0) + (sub.qty_hc || 0) + (sub.qty_hp || 0) > 0;
+    if (hasNewQtys) {
+      ORIG.fc = sub.qty_fc || 0;
+      ORIG.fp = sub.qty_fp || 0;
+      ORIG.hc = sub.qty_hc || 0;
+      ORIG.hp = sub.qty_hp || 0;
+    } else {
+      // Legacy: map old schema (chocolate_cups + peanut_butter_cups + portion) → per-product qtys
+      const choc = sub.chocolate_cups    || 0;
+      const pb   = sub.peanut_butter_cups || 0;
+      if (sub.portion === 'half') {
+        ORIG.fc = 0; ORIG.fp = 0;
+        ORIG.hc = choc; ORIG.hp = pb;
+      } else {
+        ORIG.fc = choc; ORIG.fp = pb;
+        ORIG.hc = 0; ORIG.hp = 0;
+      }
+    }
+    Object.assign(qtys, ORIG);
+
+    // Stripe plan tracking
+    const totalCups = ORIG.fc + ORIG.fp + ORIG.hc + ORIG.hp;
+    const legacyCups = (sub.chocolate_cups || 0) + (sub.peanut_butter_cups || 0);
+    if (sub.stripe_plan) {
+      const parts    = sub.stripe_plan.split('-');
+      initialPortion = parts[0];
+      initialCups    = parseInt(parts[1]) || totalCups || legacyCups;
+    } else {
+      const fullCups = ORIG.fc + ORIG.fp;
+      const halfCups = ORIG.hc + ORIG.hp;
+      initialPortion = fullCups >= halfCups ? 'full' : (sub.portion || 'full');
+      initialCups    = totalCups || legacyCups;
+    }
+    initialStatus = sub.status || 'active';
+
+    // Restore delivery fields
+    // If delivery_day isn't stored yet (new subscriber), derive it from the
+    // cart date saved in localStorage by shop.html
+    let deliveryDay  = sub.delivery_day  || '';
+    let deliveryTime = sub.delivery_time || '';
+    if (!deliveryDay) {
+      try {
+        const saved = localStorage.getItem('forgeDeliveryFields');
+        if (saved) {
+          const fields  = JSON.parse(saved);
+          const dateStr = fields.cartDate;
+          if (dateStr) {
+            const DAYS = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+            deliveryDay  = DAYS[new Date(dateStr + 'T12:00:00').getDay()];
+            deliveryTime = deliveryTime || fields.cartTime || '';
+            // Persist it so future loads don't need localStorage
+            await sb.from('subscriptions')
+              .update({ delivery_day: deliveryDay, delivery_time: deliveryTime || null })
+              .eq('customer_id', currentUser.id);
+          }
+        }
+      } catch(e) {}
+    }
+    origDeliveryDay  = deliveryDay;
+    origDeliveryTime = deliveryTime;
+    if (deliveryDay)  selectDeliveryDay(deliveryDay);
+    if (deliveryTime) document.getElementById('dpTime').value = deliveryTime;
     if (sub.delivery_street) document.getElementById('dpStreet').value = sub.delivery_street;
     if (sub.delivery_unit)   document.getElementById('dpUnit').value   = sub.delivery_unit;
     if (sub.delivery_city)   document.getElementById('dpCity').value   = sub.delivery_city;
     if (sub.delivery_state)  document.getElementById('dpState').value  = sub.delivery_state;
     if (sub.delivery_zip)    document.getElementById('dpZip').value    = sub.delivery_zip;
-    // Use stripe_plan as source of truth for what Stripe is currently billing
-    // Falls back to Supabase cup counts if stripe_plan not yet set
-    if (sub.stripe_plan) {
-      const parts   = sub.stripe_plan.split('-');
-      initialPortion = parts[0];
-      initialCups    = parseInt(parts[1]);
-    } else {
-      initialPortion = sub.portion;
-      initialCups    = sub.chocolate_cups + sub.peanut_butter_cups;
-    }
-    initialStatus = sub.status ?? 'active';
-    renderSubscription();
+    if (sub.name)            document.getElementById('dpName').value   = sub.name;
+    if (sub.email)           document.getElementById('dpEmail').value  = sub.email;
+    if (sub.phone)           document.getElementById('dpPhone').value  = sub.phone;
+
+    renderSubHero(sub.status);
+    renderSub();
     checkPaymentFailed();
+
+    // Update pause button label
+    const pauseBtn = document.getElementById('btnPauseSub');
+    if (pauseBtn) pauseBtn.textContent = sub.status === 'paused' ? 'Resume' : 'Pause';
   }
 
+  // ── Load orders ──────────────────────────────────────────────
   async function loadOrders() {
     const { data: orders } = await sb.from('orders')
       .select('*').eq('customer_id', currentUser.id)
@@ -628,91 +782,141 @@
     if (orders && orders.length > 0) renderOrders(orders);
   }
 
-  // ── Render ────────────────────────────────────────────────
-  function renderSubscription() {
-    // Status
-    setStatus(sub.status, false);
-    // Portion
-    selectPortion(sub.portion, false);
-    // Pack cards (render with current selectedPackIndex derived in loadSubscription)
-    renderPackCards();
-    // Flavors
-    updateFlavorDisplay();
-    // Hero badge
+  // ── Render hero status badge ─────────────────────────────────
+  function renderSubHero(status) {
     const badge = document.getElementById('subStatusBadge');
-    badge.innerHTML = `<div class="status-pill ${sub.status}"><div class="status-dot"></div>${sub.status === 'active' ? 'Subscription Active' : 'Subscription Paused'}</div>`;
+    const cardStatus = document.getElementById('subCardStatus');
+    const noSubCta = document.getElementById('noSubCta');
+    if (noSubCta) noSubCta.style.display = status === 'none' ? 'block' : 'none';
+
+    if (status === 'none') {
+      badge.innerHTML = `<span class="status-pill paused"><span class="status-dot"></span>No Subscription</span>`;
+      if (cardStatus) cardStatus.innerHTML = `<span class="status-pill paused"><span class="status-dot"></span>No Active Plan</span>`;
+    } else {
+      const isActive = status === 'active';
+      badge.innerHTML = `<span class="status-pill ${status}"><span class="status-dot"></span>Subscription ${isActive ? 'Active' : 'Paused'}</span>`;
+      if (cardStatus) cardStatus.innerHTML = `<span class="status-pill ${status}"><span class="status-dot"></span>${isActive ? 'Active' : 'Paused'}</span>`;
+    }
   }
 
+  // ── Subscription qty adjustment ──────────────────────────────
+  function subAdjust(id, delta) {
+    qtys[id] = Math.max(0, qtys[id] + delta);
+    renderSub();
+  }
+
+  // ── Render subscription card ─────────────────────────────────
+  function renderSub() {
+    const items = totalCups();      // actual item count for display
+    const eff   = effectiveCups();  // effective cups for tier (half = 0.5)
+    const tier  = getTier(eff);
+
+    // Product rows
+    for (const [id, info] of Object.entries(PRODUCTS)) {
+      const pc        = perCupPrice(info.type, eff);
+      const lineTotal = (pc * qtys[id]).toFixed(2);
+      const countEl   = document.getElementById(`sc-${id}`);
+      const priceEl   = document.getElementById(`sp-${id}`);
+      const metaEl    = document.getElementById(`pc-${id}`);
+      if (!countEl) continue;
+
+      countEl.textContent = qtys[id];
+      countEl.className   = 'spr-count' + (qtys[id] > 0 ? ' nonzero' : '');
+      priceEl.textContent = `$${lineTotal}`;
+      priceEl.className   = 'spr-price' + (qtys[id] === 0 ? ' spr-price-zero' : '');
+      metaEl.textContent  = `$${pc.toFixed(2)}`;
+    }
+
+    // Grand total
+    const total = Object.entries(qtys).reduce(
+      (s, [id, q]) => s + perCupPrice(PRODUCTS[id].type, eff) * q, 0
+    );
+
+    // Summary bar — show item count, not effective cups
+    const tierFullPC = FULL_PRICES[tier] * (1 - SUB_DISC);
+    document.getElementById('ssbCups').textContent    = items || '0';
+    document.getElementById('ssbPerCup').textContent  = items > 0 ? `$${tierFullPC.toFixed(2)}` : '—';
+    document.getElementById('ssbTotal').textContent   = items > 0 ? `$${total.toFixed(2)}` : '—';
+    document.getElementById('ssbSavings').textContent = '10% off';
+    document.getElementById('subTotalAmt').textContent = `$${total.toFixed(2)}`;
+
+    // Tier strip — based on effective cups
+    const tierNames = ['Tier 1', 'Tier 2', 'Tier 3 (Best)'];
+    document.getElementById('tierLabel').textContent = tierNames[tier];
+    const pct = tier === 0
+      ? Math.min((eff / 4) * 50, 50)
+      : tier === 1
+        ? 50 + Math.min(((eff - 4) / 2) * 25, 25)
+        : 100;
+    document.getElementById('tierFill').style.width = pct + '%';
+    const need2 = fmtQty(5 - eff);
+    const need3 = fmtQty(7 - eff);
+    const hints = [
+      items === 0
+        ? 'Add cups to start — half servings count as ½ a cup toward pricing tiers'
+        : `Add <strong>${need2} more effective cup${need2 !== '1' ? 's' : ''}</strong> to unlock Tier 2 pricing ($${(FULL_PRICES[1]*(1-SUB_DISC)).toFixed(2)}/cup) · half servings count as ½`,
+      `Add <strong>${need3} more effective cup${need3 !== '1' ? 's' : ''}</strong> to unlock best pricing ($${(FULL_PRICES[2]*(1-SUB_DISC)).toFixed(2)}/cup)`,
+      `🏆 <strong>Best pricing unlocked!</strong> You're getting $${(FULL_PRICES[2]*(1-SUB_DISC)).toFixed(2)}/cup.`,
+    ];
+    document.getElementById('tierHint').innerHTML = hints[tier];
+
+    // Unsaved badge + save button
+    const changed = hasChanged();
+    document.getElementById('unsavedBadge').classList.toggle('hidden', !changed);
+    document.getElementById('btnSaveSub').disabled = !changed || items === 0;
+  }
+
+  // ── Render orders table ──────────────────────────────────────
   function renderOrders(orders) {
     const fmt = d => d ? new Date(d).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : '—';
     document.getElementById('ordersBody').innerHTML = `
       <div style="overflow-x:auto;">
         <table class="orders-table">
           <thead><tr>
-            <th>Date</th><th>Flavor</th><th>Portion</th><th>Pack</th><th>Type</th><th style="text-align:right">Total</th>
+            <th>Date</th><th>Items</th><th>Type</th><th style="text-align:right">Total</th>
           </tr></thead>
           <tbody>
             ${orders.map(o => `<tr>
               <td>${fmt(o.created_at)}</td>
-              <td>${o.flavor || '—'}</td>
-              <td>${o.portion || '—'}</td>
-              <td>${o.pack_size ? o.pack_size + '-Pack' : '—'}</td>
+              <td style="color:var(--cream);">${buildOrderItemsLabel(o)}</td>
               <td><span class="order-type-tag ${o.order_type === 'subscribe' ? 'subscribe' : 'one-time'}">${o.order_type === 'subscribe' ? 'Subscribe' : 'One-Time'}</span></td>
-              <td style="text-align:right;font-family:'Oswald',sans-serif;color:var(--orange);font-weight:600;">${o.total || '—'}</td>
+              <td style="text-align:right;font-family:'Bebas Neue',sans-serif;font-size:18px;color:var(--orange);">${o.total ? '$'+o.total : '—'}</td>
             </tr>`).join('')}
           </tbody>
         </table>
       </div>`;
   }
 
-  // ── Controls ──────────────────────────────────────────────
-  function setStatus(status, update = true) {
-    sub.status = status;
-    document.getElementById('btnActive').className = 'status-btn' + (status === 'active' ? ' active-on' : '');
-    document.getElementById('btnPaused').className = 'status-btn' + (status === 'paused' ? ' active-off' : '');
-    const badge = document.getElementById('subStatusBadge');
-    if (badge) badge.innerHTML = `<div class="status-pill ${status}"><div class="status-dot"></div>${status === 'active' ? 'Subscription Active' : 'Subscription Paused'}</div>`;
-    // Update delivery date display immediately when toggled
-    if (status === 'paused') {
-      showPausedDelivery();
-    } else if (selectedDeliveryDay) {
-      updateNextDeliveryDisplay(selectedDeliveryDay);
-    }
+  function buildOrderItemsLabel(o) {
+    // Prefer new per-product fields; fall back to old flavor/portion/pack_size format
+    const parts = [];
+    if (o.full_choc_qty   > 0) parts.push(`${o.full_choc_qty}× Full Choc`);
+    if (o.full_pb_qty     > 0) parts.push(`${o.full_pb_qty}× Full PB`);
+    if (o.half_choc_qty   > 0) parts.push(`${o.half_choc_qty}× Half Choc`);
+    if (o.half_pb_qty     > 0) parts.push(`${o.half_pb_qty}× Half PB`);
+    if (parts.length > 0) return parts.join(' · ');
+    // Fallback
+    if (o.flavor && o.pack_size) return `${o.pack_size}× ${o.portion === 'half' ? 'Half' : 'Full'} ${o.flavor}`;
+    return '—';
   }
 
-  function showPausedDelivery() {
-    const badge  = document.getElementById('nextDeliveryBadge');
-    const dateEl = document.getElementById('nextDeliveryDate');
-    const dayEl  = document.getElementById('nextDeliveryDayName');
-    const dpNextDateText = document.getElementById('dpNextDateText');
-    dateEl.textContent = 'Paused';
-    dateEl.style.color = 'var(--muted)';
-    dayEl.textContent  = 'No upcoming delivery';
-    badge.style.display = 'inline-flex';
-    if (dpNextDateText) dpNextDateText.style.display = 'none';
+  // ── Delivery day ─────────────────────────────────────────────
+  function selectDeliveryDay(day) {
+    selectedDeliveryDay = day;
+    const shortMap = { Monday:'Mon', Tuesday:'Tue', Wednesday:'Wed', Thursday:'Thu', Friday:'Fri', Saturday:'Sat', Sunday:'Sun' };
+    document.querySelectorAll('.dp-day').forEach(el => {
+      el.classList.toggle('active', el.textContent.trim() === shortMap[day]);
+    });
+    updateNextDeliveryDisplay(day);
+    renderSub(); // refresh unsaved badge
   }
 
-  function selectPortion(portion, update = true) {
-    sub.portion = portion;
-    document.getElementById('portionFull').classList.toggle('active', portion === 'full');
-    document.getElementById('portionHalf').classList.toggle('active', portion === 'half');
-    if (update) {
-      selectedPackIndex = 1; // reset to Most Popular
-      const packCups = PACK_OPTIONS[portion][selectedPackIndex].cups;
-      flavorCups = { chocolate: packCups, 'peanut-butter': 0 };
-      renderPackCards();
-    }
-    updateFlavorDisplay();
-  }
-
-  // Returns the next Date object for the given weekday name (today counts if it matches)
   function getNextDeliveryDate(dayName) {
     const days = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
     const target = days.indexOf(dayName);
     if (target === -1) return null;
     const today = new Date();
-    const todayDay = today.getDay();
-    let daysUntil = target - todayDay;
+    let daysUntil = target - today.getDay();
     if (daysUntil < 0) daysUntil += 7;
     const next = new Date(today);
     next.setDate(today.getDate() + daysUntil);
@@ -720,269 +924,169 @@
   }
 
   function updateNextDeliveryDisplay(day) {
-    if (sub.status === 'paused') { showPausedDelivery(); return; }
-    const date = getNextDeliveryDate(day);
-    const badge = document.getElementById('nextDeliveryBadge');
+    const isPaused = sub.status === 'paused';
+    const badge  = document.getElementById('nextDeliveryBadge');
     const dateEl = document.getElementById('nextDeliveryDate');
     const dayEl  = document.getElementById('nextDeliveryDayName');
-    const dpNextDateText = document.getElementById('dpNextDateText');
-    const dpNextDate     = document.getElementById('dpNextDate');
-
-    dateEl.style.color = 'var(--orange)'; // reset from paused state
+    if (isPaused) {
+      dateEl.textContent = 'Paused';
+      dateEl.style.color = 'var(--muted)';
+      dayEl.textContent  = 'No upcoming delivery';
+      badge.style.display = 'inline-flex';
+      return;
+    }
+    const date = getNextDeliveryDate(day);
     if (date) {
       const formatted = date.toLocaleDateString('en-US', { month: 'long', day: 'numeric' });
       const dayOfWeek = date.toLocaleDateString('en-US', { weekday: 'long' });
       const isToday   = date.toDateString() === new Date().toDateString();
       dateEl.textContent = isToday ? 'Today' : formatted;
-      dayEl.textContent  = isToday ? dayOfWeek : dayOfWeek;
+      dateEl.style.color = 'var(--orange)';
+      dayEl.textContent  = dayOfWeek;
       badge.style.display = 'inline-flex';
-      if (dpNextDate) dpNextDate.textContent = isToday ? 'Today' : formatted;
-      if (dpNextDateText) dpNextDateText.style.display = 'inline';
     } else {
       badge.style.display = 'none';
-      if (dpNextDateText) dpNextDateText.style.display = 'none';
     }
   }
 
-  function selectDeliveryDay(day) {
-    selectedDeliveryDay = day;
-    const shortMap = { Monday:'Mon', Tuesday:'Tue', Wednesday:'Wed', Thursday:'Thu', Friday:'Fri', Saturday:'Sat', Sunday:'Sun' };
-    document.querySelectorAll('.dp-day').forEach(el => {
-      el.classList.toggle('active', el.textContent.trim() === shortMap[day]);
-    });
-    const txt = document.getElementById('dpDayText');
-    if (txt) txt.textContent = day || '—';
-    updateNextDeliveryDisplay(day);
-  }
-
-  function renderPackCards() {
-    const opts = PACK_OPTIONS[sub.portion];
-    const grid = document.getElementById('packGrid');
-    grid.innerHTML = opts.map((opt, i) => {
-      const subTotal  = (opt.total  * (1 - SUB_DISC)).toFixed(2);
-      const subPerCup = (opt.perCup * (1 - SUB_DISC)).toFixed(2);
-      const badge     = PACK_BADGES[i];
-      return `
-        <div class="pack-card ${i === selectedPackIndex ? 'active' : ''}" onclick="selectPack(${i})">
-          ${badge ? `<div class="pack-badge-mini">${badge}</div>` : '<div class="pack-badge-placeholder"></div>'}
-          <div class="pack-cup-num">${opt.cups}</div>
-          <div class="pack-cup-label">cups</div>
-          <div class="pack-sub-price">$${subTotal}</div>
-          <div class="pack-per-cup">$${subPerCup}/cup</div>
-        </div>`;
-    }).join('');
-  }
-
-  function selectPack(index) {
-    selectedPackIndex = index;
-    const packCups = PACK_OPTIONS[sub.portion][selectedPackIndex].cups;
-    flavorCups = { chocolate: packCups, 'peanut-butter': 0 };
-    renderPackCards();
-    updateFlavorDisplay();
-  }
-
-  function getPackCups() {
-    // Find the pack option whose total cups matches current flavorCups total, or default to Most Popular
-    const total = flavorCups.chocolate + flavorCups['peanut-butter'];
-    const opts  = PACK_OPTIONS[sub.portion];
-    return opts.find(o => o.cups === total)?.cups || opts[1].cups;
-  }
-
-  function adjustFlavor(flavor, delta) {
-    const packCups = PACK_OPTIONS[sub.portion][selectedPackIndex].cups;
-    const total    = flavorCups.chocolate + flavorCups['peanut-butter'];
-    const newVal   = flavorCups[flavor] + delta;
-    if (newVal < 0) return;
-    if (delta > 0 && total >= packCups) return;
-    flavorCups[flavor] = newVal;
-    updateFlavorDisplay();
-  }
-
-  function updateFlavorDisplay() {
-    const choc     = flavorCups.chocolate;
-    const pb       = flavorCups['peanut-butter'];
-    const total    = choc + pb;
-    const opt      = PACK_OPTIONS[sub.portion][selectedPackIndex];
-    const packCups = opt.cups;
-    const subTotal = (opt.total * (1 - SUB_DISC)).toFixed(2);
-    const subPerCup= (opt.perCup * (1 - SUB_DISC)).toFixed(2);
-
-    document.getElementById('qtyChocolate').textContent = choc;
-    document.getElementById('qtyPB').textContent        = pb;
-    document.getElementById('cardChoc').classList.toggle('has-qty', choc > 0);
-    document.getElementById('cardPB').classList.toggle('has-qty',   pb > 0);
-
-    document.getElementById('btnChocPlus').disabled  = total >= packCups;
-    document.getElementById('btnPBPlus').disabled    = total >= packCups;
-    document.getElementById('btnChocMinus').disabled = choc <= 0;
-    document.getElementById('btnPBMinus').disabled   = pb   <= 0;
-
-    const bar     = document.getElementById('flavorBar');
-    const numsEl  = document.getElementById('flavorNums');
-    const hintEl  = document.getElementById('flavorHint');
-    const checkEl = document.getElementById('flavorCheck');
-
-    document.getElementById('packLabel').textContent = `(${packCups}-cup pack · $${subTotal} sub price)`;
-
-    const matched = total === packCups;
-    numsEl.textContent = `${total} / ${packCups}`;
-    bar.classList.toggle('matched', matched);
-    numsEl.classList.toggle('matched', matched);
-    hintEl.textContent    = matched ? `cups — $${subTotal} ($${subPerCup}/cup)` : `cups selected`;
-    checkEl.style.display = matched ? 'inline' : 'none';
-  }
-
-  // ── Save ──────────────────────────────────────────────────
-  function buildSubPayload() {
-    return {
-      customer_id:        currentUser.id,
-      chocolate_cups:     flavorCups.chocolate,
-      peanut_butter_cups: flavorCups['peanut-butter'],
-      portion:            sub.portion,
-      status:             sub.status,
-      delivery_day:       selectedDeliveryDay || null,
-      delivery_time:      document.getElementById('dpTime').value || null,
-      name:               document.getElementById('dpName').value.trim()   || null,
-      email:              document.getElementById('dpEmail').value.trim()  || null,
-      phone:              document.getElementById('dpPhone').value.trim()  || null,
-      delivery_street:    document.getElementById('dpStreet').value.trim() || null,
-      delivery_unit:      document.getElementById('dpUnit').value.trim()   || null,
-      delivery_city:      document.getElementById('dpCity').value.trim()   || null,
-      delivery_state:     document.getElementById('dpState').value.trim()  || null,
-      delivery_zip:       document.getElementById('dpZip').value.trim()    || null,
-      updated_at:         new Date().toISOString(),
-    };
-  }
-
-  function validateForm() {
-    const packCups = PACK_OPTIONS[sub.portion][selectedPackIndex].cups;
-    const total    = flavorCups.chocolate + flavorCups['peanut-butter'];
-    if (total !== packCups) {
-      alert(`Please set your flavor cups to exactly ${packCups} to match your selected pack.`);
-      return false;
-    }
-    const name   = document.getElementById('dpName').value.trim();
-    const email  = document.getElementById('dpEmail').value.trim();
-    const phone  = document.getElementById('dpPhone').value.trim();
-    const street = document.getElementById('dpStreet').value.trim();
-    const city   = document.getElementById('dpCity').value.trim();
-    const state  = document.getElementById('dpState').value.trim();
-    const zip    = document.getElementById('dpZip').value.trim();
-    if (!name || !email || !phone) {
-      alert('Please fill in your name, email address, and phone number.');
-      return false;
-    }
-    if (!street || !city || !state || !zip) {
-      alert('Please fill in your delivery address.');
-      return false;
-    }
-    if (!selectedDeliveryDay) {
-      alert('Please select a preferred delivery day.');
-      return false;
-    }
-    if (!document.getElementById('dpTime').value) {
-      alert('Please select a preferred delivery time window.');
-      return false;
-    }
-    return true;
-  }
-
-  async function saveCustomerInfo() {
-    const name  = document.getElementById('dpName').value.trim();
-    const email = document.getElementById('dpEmail').value.trim();
-    const phone = document.getElementById('dpPhone').value.trim();
-    await sb.from('customers').upsert({ id: currentUser.id, name, email, phone }, { onConflict: 'id' });
-  }
-
-  async function updateStripePlan(portion, cups) {
-    const { data, error } = await sb.functions.invoke('smart-api', {
-      body: { action: 'update-plan', portion, cups },
-    });
-    if (error) throw new Error(error.message || 'Failed to update Stripe plan');
-    return data;
-  }
-
-  async function updateStripeStatus(status) {
-    const action = status === 'paused' ? 'pause-subscription' : 'resume-subscription';
-    const { data, error } = await sb.functions.invoke('smart-api', { body: { action } });
-    if (error) throw new Error(error.message || 'Failed to update subscription status');
-    return data;
-  }
-
+  // ── Save subscription quantities ─────────────────────────────
   async function saveSubscription() {
-    if (!validateForm()) return;
-    const btn   = document.getElementById('btnSave');
-    const msgEl = document.getElementById('saveMsg');
+    const btn  = document.getElementById('btnSaveSub');
+    const conf = document.getElementById('saveConfirm');
     btn.textContent = 'Saving…'; btn.disabled = true;
 
-    const currentCups    = flavorCups.chocolate + flavorCups['peanut-butter'];
-    const planChanged    = sub.portion !== initialPortion || currentCups !== initialCups;
-    const statusChanged  = sub.status !== initialStatus;
+    // Derive old-schema values from new per-product qtys
+    const chocCups = qtys.fc + qtys.hc;
+    const pbCups   = qtys.fp + qtys.hp;
+    const cups     = chocCups + pbCups;
+    // Determine dominant portion for Stripe plan key
+    const fullCups = qtys.fc + qtys.fp;
+    const halfCups = qtys.hc + qtys.hp;
+    const portion  = fullCups >= halfCups ? 'full' : 'half';
+
+    const planChanged   = cups !== initialCups || portion !== initialPortion;
+    const statusChanged = (sub.status || 'active') !== initialStatus;
 
     try {
-      // Always save preferences to Supabase
-      await Promise.all([
-        sb.from('subscriptions').upsert(buildSubPayload(), { onConflict: 'customer_id' }),
-        saveCustomerInfo(),
-      ]);
+      // Save quantities + delivery schedule to Supabase
+      const deliveryDay  = selectedDeliveryDay || null;
+      const deliveryTime = document.getElementById('dpTime').value || null;
+      const payload = {
+        customer_id:        currentUser.id,
+        // New 4-product model
+        qty_fc:             qtys.fc,
+        qty_fp:             qtys.fp,
+        qty_hc:             qtys.hc,
+        qty_hp:             qtys.hp,
+        // Legacy fields kept for backward compat
+        chocolate_cups:     chocCups,
+        peanut_butter_cups: pbCups,
+        portion,
+        delivery_day:       deliveryDay,
+        delivery_time:      deliveryTime,
+        updated_at:         new Date().toISOString(),
+      };
+      await sb.from('subscriptions').upsert(payload, { onConflict: 'customer_id' });
 
+      // Update Stripe if plan changed
       let stripeUpdated = false;
-      if (planChanged) {
-        const result = await updateStripePlan(sub.portion, currentCups);
-        stripeUpdated = result.success && !result.noSubscription;
-        initialPortion = sub.portion;
-        initialCups    = currentCups;
-      }
-      if (statusChanged) {
-        await updateStripeStatus(sub.status);
-        initialStatus = sub.status;
-        stripeUpdated = true;
+      if (planChanged && cups > 0) {
+        const { data, error } = await sb.functions.invoke('smart-api', {
+          body: { action: 'update-plan', portion, cups },
+        });
+        if (error) throw new Error(error.message || 'Failed to update Stripe plan');
+        stripeUpdated = data?.success && !data?.noSubscription;
+        initialPortion = portion;
+        initialCups    = cups;
       }
 
-      const msg = sub.status === 'paused' && statusChanged
-        ? '✓ Subscription paused!'
-        : stripeUpdated ? '✓ Saved & billing updated!' : '✓ Saved!';
-      msgEl.textContent = msg;
-      msgEl.style.color = 'var(--green)';
-      msgEl.classList.add('show');
-      setTimeout(() => msgEl.classList.remove('show'), 3500);
+      // Commit qtys + delivery to saved state
+      Object.assign(ORIG, qtys);
+      origDeliveryDay  = selectedDeliveryDay;
+      origDeliveryTime = document.getElementById('dpTime')?.value || '';
+      renderSub();
+
+      const msg = stripeUpdated ? '✓ Saved & billing updated!' : '✓ Saved!';
+      conf.textContent = msg;
+      conf.classList.add('show');
+      setTimeout(() => conf.classList.remove('show'), 3500);
     } catch (err) {
-      msgEl.textContent = '✗ ' + err.message;
-      msgEl.style.color = '#e05';
-      msgEl.classList.add('show');
-      setTimeout(() => msgEl.classList.remove('show'), 4000);
+      conf.textContent = '✗ ' + err.message;
+      conf.style.color = '#e05';
+      conf.classList.add('show');
+      setTimeout(() => { conf.classList.remove('show'); conf.style.color = 'var(--green)'; }, 4000);
     }
 
-    btn.textContent = 'Save Preferences'; btn.disabled = false;
+    btn.textContent = 'Save Changes'; btn.disabled = !hasChanged();
   }
 
-  async function subscribeNow() {
-    if (!validateForm()) return;
-    const btn = document.getElementById('btnSubscribe');
+  // ── Pause / Resume subscription ──────────────────────────────
+  async function toggleSubPause() {
+    const btn     = document.getElementById('btnPauseSub');
+    const current = sub.status || 'active';
+    const next    = current === 'active' ? 'paused' : 'active';
+    btn.textContent = next === 'paused' ? 'Pausing…' : 'Resuming…';
+    btn.disabled = true;
+
+    try {
+      const action = next === 'paused' ? 'pause-subscription' : 'resume-subscription';
+      await sb.functions.invoke('smart-api', { body: { action } });
+      await sb.from('subscriptions').update({ status: next, updated_at: new Date().toISOString() })
+        .eq('customer_id', currentUser.id);
+      sub.status = next;
+      initialStatus = next;
+      renderSubHero(next);
+      updateNextDeliveryDisplay(selectedDeliveryDay);
+    } catch (err) {
+      console.error('Toggle pause error:', err);
+    }
+
+    btn.textContent = next === 'paused' ? 'Resume' : 'Pause';
+    btn.disabled = false;
+  }
+
+  // ── Save all account information (contact + address + delivery schedule) ──
+  async function saveAccountInfo() {
+    const btn   = document.querySelector('[onclick="saveAccountInfo()"]');
+    const msgEl = document.getElementById('saveInfoMsg');
     btn.textContent = 'Saving…'; btn.disabled = true;
-    // Save preferences + customer info to Supabase
-    await Promise.all([
-      sb.from('subscriptions').upsert(buildSubPayload(), { onConflict: 'customer_id' }),
-      saveCustomerInfo(),
-    ]);
-    // Build Stripe URL
-    const packCups  = PACK_OPTIONS[sub.portion][selectedPackIndex].cups;
-    const key       = `${sub.portion}-${packCups}`;
-    const stripeUrl = STRIPE_SUB_LINKS[key];
-    if (!stripeUrl) {
-      alert('Could not find a Stripe link for this configuration. Please contact support.');
-      btn.textContent = 'Subscribe Now →'; btn.disabled = false;
-      return;
+    try {
+      const name   = document.getElementById('dpName').value.trim();
+      const email  = document.getElementById('dpEmail').value.trim();
+      const phone  = document.getElementById('dpPhone').value.trim();
+      const street = document.getElementById('dpStreet').value.trim() || null;
+      const unit   = document.getElementById('dpUnit').value.trim()   || null;
+      const city   = document.getElementById('dpCity').value.trim()   || null;
+      const state  = document.getElementById('dpState').value.trim()  || null;
+      const zip    = document.getElementById('dpZip').value.trim()    || null;
+
+      // Save contact info to customers table
+      await sb.from('customers').upsert({ id: currentUser.id, name, email, phone }, { onConflict: 'id' });
+
+      // Save address to subscriptions table
+      await sb.from('subscriptions').upsert({
+        customer_id:     currentUser.id,
+        name, email, phone,
+        delivery_street: street,
+        delivery_unit:   unit,
+        delivery_city:   city,
+        delivery_state:  state,
+        delivery_zip:    zip,
+        updated_at:      new Date().toISOString(),
+      }, { onConflict: 'customer_id' });
+
+      msgEl.textContent = '✓ Saved!'; msgEl.style.color = 'var(--green)';
+      msgEl.classList.add('show');
+      setTimeout(() => msgEl.classList.remove('show'), 2500);
+    } catch (err) {
+      msgEl.textContent = '✗ ' + (err.message || 'Error saving'); msgEl.style.color = '#e05';
+      msgEl.classList.add('show');
+      setTimeout(() => { msgEl.classList.remove('show'); msgEl.style.color = 'var(--green)'; }, 3000);
     }
-    const email = document.getElementById('dpEmail').value.trim();
-    const params = new URLSearchParams({
-      prefilled_email:     email || currentUser.email,
-      client_reference_id: currentUser.id,
-    });
-    window.location.href = `${stripeUrl}?${params.toString()}`;
+    btn.textContent = 'Save Account Information'; btn.disabled = false;
   }
 
-  // ── Payment failed banner & Customer Portal ───────────────
+  // ── Payment failed banner ────────────────────────────────────
   function checkPaymentFailed() {
     if (sub.payment_failed) {
       document.getElementById('paymentFailedBanner').style.display = 'flex';
@@ -991,50 +1095,38 @@
 
   async function openCustomerPortal() {
     const btn = document.querySelector('.btn-update-payment');
-    btn.textContent = 'Loading…';
-    btn.disabled = true;
-
-    const returnUrl = window.location.href;
+    btn.textContent = 'Loading…'; btn.disabled = true;
     const { data, error } = await sb.functions.invoke('smart-api', {
-      body: { action: 'create-portal-session', returnUrl },
+      body: { action: 'create-portal-session', returnUrl: window.location.href },
     });
-
     if (error || !data?.url) {
-      btn.textContent = 'Update Payment Method';
-      btn.disabled = false;
+      btn.textContent = 'Update Payment Method'; btn.disabled = false;
       alert('Could not open payment portal. Please try again.');
       return;
     }
-
     window.location.href = data.url;
   }
 
-  // ── Referral ───────────────────────────────────────────────
+  // ── Referral ─────────────────────────────────────────────────
   let referralCode = '';
 
   function generateCode(name) {
     const base = (name || '').toLowerCase().replace(/[^a-z]/g, '').slice(0, 6) || 'forge';
-    const num  = Math.floor(1000 + Math.random() * 9000);
-    return base + num;
+    return base + Math.floor(1000 + Math.random() * 9000);
   }
 
   async function loadReferral() {
     let { data: profile } = await sb.from('customers').select('name, referral_code').eq('id', currentUser.id).single();
     if (!profile) return;
-
-    // Generate and save code if not yet set
     if (!profile.referral_code) {
       const code = generateCode(profile.name);
       await sb.from('customers').update({ referral_code: code }).eq('id', currentUser.id);
       profile.referral_code = code;
     }
-
     referralCode = profile.referral_code;
-    // Build URL relative to the current page so it works on any host/subdirectory
     const link = new URL(`index.html?ref=${referralCode}`, window.location.href).href;
     document.getElementById('referralLinkInput').value = link;
 
-    // Count referred orders
     const { count } = await sb.from('orders')
       .select('id', { count: 'exact', head: true })
       .eq('referred_by', referralCode);
@@ -1045,25 +1137,17 @@
 
   function updateReferralProgress(count) {
     const MILESTONES = [
-      { n: 3,  dotId: 'msDot3',  rewardId: 'msReward3' },
-      { n: 5,  dotId: 'msDot5',  rewardId: 'msReward5' },
+      { n: 3,  dotId: 'msDot3',  rewardId: 'msReward3'  },
+      { n: 5,  dotId: 'msDot5',  rewardId: 'msReward5'  },
       { n: 10, dotId: 'msDot10', rewardId: 'msReward10' },
     ];
-    const MAX = 10;
-
-    // Animate the fill bar
-    const pct = Math.min((count / MAX) * 100, 100);
-    document.getElementById('referralTrackFill').style.width = pct + '%';
-
-    // Light up achieved milestones
+    document.getElementById('referralTrackFill').style.width = Math.min((count / 10) * 100, 100) + '%';
     MILESTONES.forEach(ms => {
       const achieved = count >= ms.n;
       document.getElementById(ms.dotId)?.classList.toggle('achieved', achieved);
       document.getElementById(ms.rewardId)?.classList.toggle('achieved', achieved);
     });
-
-    // "X more for next reward" hint
-    const goalEl = document.getElementById('referralNextGoal');
+    const goalEl  = document.getElementById('referralNextGoal');
     const rewards = ['Free 3-Pack', 'Free 5-Pack', 'Free T-Shirt'];
     const counts  = [3, 5, 10];
     const nextIdx = counts.findIndex(c => count < c);
@@ -1071,8 +1155,7 @@
       goalEl.textContent = '🏆 All milestones achieved!';
       goalEl.classList.add('complete');
     } else {
-      const rem = counts[nextIdx] - count;
-      goalEl.textContent = `${rem} more for ${rewards[nextIdx]}`;
+      goalEl.textContent = `${counts[nextIdx] - count} more for ${rewards[nextIdx]}`;
       goalEl.classList.remove('complete');
     }
   }
@@ -1088,7 +1171,7 @@
 
   function shareReferral(type) {
     const link = document.getElementById('referralLinkInput').value;
-    const msg  = `Click link to buy deliciously healthy overnight oats. Chocolate or Peanut Butter flavors available. ${link}`;
+    const msg  = `Try Forge Oats — delicious high-protein overnight oats. Use my link: ${link}`;
     if (type === 'sms') {
       window.open(`sms:?body=${encodeURIComponent(msg)}`);
     } else if (type === 'email') {
@@ -1100,7 +1183,7 @@
     }
   }
 
-  // ── Sign out ───────────────────────────────────────────────
+  // ── Sign out ─────────────────────────────────────────────────
   async function handleSignOut() {
     await sb.auth.signOut();
     window.location.href = 'index.html';

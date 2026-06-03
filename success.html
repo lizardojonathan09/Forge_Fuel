@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Order Confirmed – Forge Oats</title>
   <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Oswald:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     :root {
@@ -161,8 +162,8 @@
   </div>
 
   <div class="cta-group">
-    <a href="index.html" class="btn-primary">Order More</a>
-    <a href="index.html#why" class="btn-secondary">Learn More</a>
+    <a href="dashboard.html" class="btn-primary">My Dashboard →</a>
+    <a href="shop.html" class="btn-secondary">Shop Again</a>
   </div>
 </section>
 
@@ -197,6 +198,51 @@
   </div>
   <div class="footer-copy">© 2025 Forge Oats. All rights reserved.</div>
 </footer>
+
+<script>
+  // ── Sync delivery day + time from cart into the subscription ──────────────
+  // Runs after Stripe redirects here. Reads the cart's delivery date from
+  // localStorage, derives the day of week, and writes it to Supabase.
+  // Retries up to 5× (1.5s apart) in case the Stripe webhook hasn't fired yet.
+  (async () => {
+    const SUPABASE_URL      = 'https://eskyqpgtymtshmfepkqc.supabase.co';
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVza3lxcGd0eW10c2htZmVwa3FjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgwMjc3NzgsImV4cCI6MjA5MzYwMzc3OH0.-BQfnmRthKOgcz0AExXAygikkz17s_uYERAzGONtG3Y';
+    const { createClient } = supabase;
+    const sb = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    try {
+      const { data: { session } } = await sb.auth.getSession();
+      if (!session) return;
+      const userId = session.user.id;
+
+      const saved = localStorage.getItem('forgeDeliveryFields');
+      if (!saved) return;
+      const fields   = JSON.parse(saved);
+      const dateStr  = fields.cartDate;  // e.g. "2026-06-10"
+      const timeStr  = fields.cartTime;  // e.g. "Morning (8–11AM)"
+      if (!dateStr) return;
+
+      // Derive day of week — use noon to avoid UTC-shift edge cases
+      const DAYS     = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+      const dayName  = DAYS[new Date(dateStr + 'T12:00:00').getDay()];
+
+      // Retry up to 5× — webhook may not have created the subscription row yet
+      for (let i = 0; i < 5; i++) {
+        const { data: sub } = await sb.from('subscriptions')
+          .select('customer_id').eq('customer_id', userId).maybeSingle();
+        if (sub) {
+          await sb.from('subscriptions')
+            .update({ delivery_day: dayName, delivery_time: timeStr || null })
+            .eq('customer_id', userId);
+          break;
+        }
+        await new Promise(r => setTimeout(r, 1500));
+      }
+    } catch(e) {
+      console.error('Delivery day sync failed:', e);
+    }
+  })();
+</script>
 
 <script>
   (function() {
