@@ -662,7 +662,7 @@
 
       // Pre-populate fields from profile
       const { data: profile } = await sb.from('customers')
-        .select('name,email,phone,delivery_address')
+        .select('name,email,phone,delivery_address,delivery_unit,delivery_city,delivery_state,delivery_zip')
         .eq('id', userId)
         .single();
       if (profile) prefillFromProfile(profile);
@@ -747,12 +747,14 @@
   }
   function prefillFromProfile(profile) {
     const set = (id, val) => { const el = document.getElementById(id); if (el && !el.value && val) el.value = val; };
-    set('cartName',  profile.name);
-    set('cartEmail', profile.email);
-    set('cartPhone', profile.phone);
-    if (profile.delivery_address) {
-      set('cartStreet', profile.delivery_address);
-    }
+    set('cartName',   profile.name);
+    set('cartEmail',  profile.email);
+    set('cartPhone',  profile.phone);
+    set('cartStreet', profile.delivery_address);
+    set('cartUnit',   profile.delivery_unit);
+    set('cartCity',   profile.delivery_city);
+    set('cartState',  profile.delivery_state);
+    set('cartZip',    profile.delivery_zip);
   }
 
   // Save fields on any change
@@ -975,6 +977,19 @@
       const binStr       = Array.from(payloadBytes, b => String.fromCharCode(b)).join('');
       const encoded      = btoa(binStr)
         .replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+
+      // Persist delivery info to customer profile so it pre-fills next time
+      sb.from('customers').upsert({
+        id:               userId,
+        name:             delivery.name,
+        phone:            delivery.phone,
+        email:            delivery.email,
+        delivery_address: delivery.street,
+        delivery_unit:    delivery.unit,
+        delivery_city:    delivery.city,
+        delivery_state:   delivery.state,
+        delivery_zip:     delivery.zip,
+      }, { onConflict: 'id' }); // fire-and-forget, don't await
 
       // Navigate → edge function returns 302 → Stripe checkout (no fetch/CORS)
       localStorage.removeItem(CART_KEY);
