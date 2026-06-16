@@ -291,33 +291,15 @@
   async function loadOrders() {
     document.getElementById('loadingOverlay').classList.add('show');
 
-    // Fetch orders and customers in parallel, then merge by email
-    const [ordersRes, custsRes] = await Promise.all([
-      sb.from('orders')
-        .select('id, created_at, customer_name, customer_email, customer_phone, qty_fc, qty_fp, qty_hc, qty_hp, pack_size, order_type, total, delivery_date, delivery_time, referred_by, customer_id')
-        .order('created_at', { ascending: false }),
-      sb.from('customers')
-        .select('id, email, delivery_address, delivery_unit, delivery_city, delivery_state, delivery_zip'),
-    ]);
+    const { data, error } = await sb.from('orders')
+      .select('id, created_at, customer_name, customer_email, customer_phone, qty_fc, qty_fp, qty_hc, qty_hp, pack_size, order_type, total, delivery_date, delivery_time, delivery_street, delivery_unit, delivery_city, delivery_state, delivery_zip, referred_by')
+      .order('created_at', { ascending: false });
 
     document.getElementById('loadingOverlay').classList.remove('show');
 
-    if (ordersRes.error) { console.error(ordersRes.error); alert('Failed to load orders: ' + ordersRes.error.message); return; }
+    if (error) { console.error(error); alert('Failed to load orders: ' + error.message); return; }
 
-    // Build lookup maps: by customer id and by email
-    const custById    = {};
-    const custByEmail = {};
-    for (const c of (custsRes.data ?? [])) {
-      if (c.id)    custById[c.id]          = c;
-      if (c.email) custByEmail[c.email.toLowerCase()] = c;
-    }
-
-    // Attach customer address to each order
-    allOrders = (ordersRes.data ?? []).map(o => ({
-      ...o,
-      customers: custById[o.customer_id] ?? custByEmail[o.customer_email?.toLowerCase()] ?? null,
-    }));
-
+    allOrders = data ?? [];
     updateStats(allOrders);
     applyFilters();
   }
@@ -409,11 +391,8 @@
     }
 
     tbody.innerHTML = orders.map(o => {
-      const cust = o.customers;
-      const addr = cust
-        ? [cust.delivery_address, cust.delivery_unit, cust.delivery_city, cust.delivery_state, cust.delivery_zip]
-            .filter(Boolean).join(', ')
-        : '—';
+        const addr = [o.delivery_street, o.delivery_unit, o.delivery_city, o.delivery_state, o.delivery_zip]
+        .filter(Boolean).join(', ') || '—';
 
       const qtyChips = buildQtyChips(o);
       const typeBadge = o.order_type === 'subscribe'
@@ -458,8 +437,7 @@
       ['Order Date','Name','Email','Phone','Total','Full Choc','Full PB','Half Choc','Half PB','Total Cups','Type','Delivery Date','Delivery Time','Address','Referral']
     ];
     (filtered.length ? filtered : allOrders).forEach(o => {
-      const cust = o.customers;
-      const addr = cust ? [cust.delivery_address, cust.delivery_unit, cust.delivery_city, cust.delivery_state, cust.delivery_zip].filter(Boolean).join(', ') : '';
+      const addr = [o.delivery_street, o.delivery_unit, o.delivery_city, o.delivery_state, o.delivery_zip].filter(Boolean).join(', ');
       const cups = (o.qty_fc||0)+(o.qty_fp||0)+(o.qty_hc||0)+(o.qty_hp||0);
       rows.push([
         o.created_at ? new Date(o.created_at).toLocaleDateString() : '',

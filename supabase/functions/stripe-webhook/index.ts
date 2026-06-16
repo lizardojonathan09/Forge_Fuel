@@ -227,11 +227,16 @@ async function handleCreateCheckoutSession(userId: string, body: any) {
 
   // ── Common: metadata ─────────────────────────────────────────────────────
   const meta: Record<string, string> = { supabase_customer_id: userId }
-  if (referral)        meta.referral        = referral
-  if (delivery?.date)  meta.delivery_date   = delivery.date
-  if (delivery?.time)  meta.delivery_time   = delivery.time
-  if (delivery?.name)  meta.customer_name   = delivery.name
-  if (delivery?.phone) meta.customer_phone  = delivery.phone
+  if (referral)         meta.referral         = referral
+  if (delivery?.date)   meta.delivery_date    = delivery.date
+  if (delivery?.time)   meta.delivery_time    = delivery.time
+  if (delivery?.name)   meta.customer_name    = delivery.name
+  if (delivery?.phone)  meta.customer_phone   = delivery.phone
+  if (delivery?.street) meta.delivery_street  = delivery.street
+  if (delivery?.unit)   meta.delivery_unit    = delivery.unit
+  if (delivery?.city)   meta.delivery_city    = delivery.city
+  if (delivery?.state)  meta.delivery_state   = delivery.state
+  if (delivery?.zip)    meta.delivery_zip     = delivery.zip
 
   // Per-product qtys in metadata so webhook can read them
   for (const item of cartItems) {
@@ -603,7 +608,14 @@ async function handleCheckoutComplete(session: any) {
       }
     }
 
-    await insertSubOrder({ customerId, email, sessionId: session.id, amountTotal: session.amount_total, referredBy: referral })
+    await insertSubOrder({
+      customerId, email, sessionId: session.id, amountTotal: session.amount_total, referredBy: referral,
+      deliveryStreet: meta.delivery_street ?? '',
+      deliveryUnit:   meta.delivery_unit   ?? null,
+      deliveryCity:   meta.delivery_city   ?? '',
+      deliveryState:  meta.delivery_state  ?? '',
+      deliveryZip:    meta.delivery_zip    ?? '',
+    })
 
   } else if (session.mode === 'payment') {
     let parsed: Record<string, any> = {}
@@ -651,6 +663,11 @@ async function handleCheckoutComplete(session: any) {
       total:             parsed.price ?? formatAmount(session.amount_total),
       delivery_date:     parsed.date ?? meta.delivery_date ?? '',
       delivery_time:     parsed.time ?? meta.delivery_time ?? '',
+      delivery_street:   meta.delivery_street ?? '',
+      delivery_unit:     meta.delivery_unit   ?? null,
+      delivery_city:     meta.delivery_city   ?? '',
+      delivery_state:    meta.delivery_state  ?? '',
+      delivery_zip:      meta.delivery_zip    ?? '',
       referred_by:       parsed.ref ?? meta.referral ?? null,
       stripe_session_id: session.id,
     })
@@ -679,17 +696,22 @@ async function handleRenewal(invoice: any) {
 }
 
 // ── Build and insert a subscription order ────────────────────────────────
-async function insertSubOrder({ customerId, email, sessionId, invoiceId, amountTotal, referredBy }: {
-  customerId:   string
-  email:        string
-  sessionId?:   string
-  invoiceId?:   string
-  amountTotal?: number | null
-  referredBy?:  string | null
+async function insertSubOrder({ customerId, email, sessionId, invoiceId, amountTotal, referredBy, deliveryStreet, deliveryUnit, deliveryCity, deliveryState, deliveryZip }: {
+  customerId:      string
+  email:           string
+  sessionId?:      string
+  invoiceId?:      string
+  amountTotal?:    number | null
+  referredBy?:     string | null
+  deliveryStreet?: string | null
+  deliveryUnit?:   string | null
+  deliveryCity?:   string | null
+  deliveryState?:  string | null
+  deliveryZip?:    string | null
 }) {
   const [{ data: sub }, { data: cust }] = await Promise.all([
     sb.from('subscriptions').select('*').eq('customer_id', customerId).maybeSingle(),
-    sb.from('customers').select('name,phone').eq('id', customerId).maybeSingle(),
+    sb.from('customers').select('name,phone,delivery_address,delivery_unit,delivery_city,delivery_state,delivery_zip').eq('id', customerId).maybeSingle(),
   ])
   if (!sub) {
     console.warn('No subscription found for customer', customerId)
@@ -743,6 +765,11 @@ async function insertSubOrder({ customerId, email, sessionId, invoiceId, amountT
     total,
     delivery_date:     sub.delivery_day  ?? '',
     delivery_time:     sub.delivery_time ?? '',
+    delivery_street:   deliveryStreet ?? cust?.delivery_address ?? '',
+    delivery_unit:     deliveryUnit   ?? cust?.delivery_unit    ?? null,
+    delivery_city:     deliveryCity   ?? cust?.delivery_city    ?? '',
+    delivery_state:    deliveryState  ?? cust?.delivery_state   ?? '',
+    delivery_zip:      deliveryZip    ?? cust?.delivery_zip     ?? '',
     referred_by:       referredBy ?? null,
     stripe_session_id: sessionId ?? null,
     stripe_invoice_id: invoiceId ?? null,
