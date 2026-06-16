@@ -24,6 +24,9 @@
     .nav-logo-text span { display: block; font-family: 'Oswald', sans-serif; font-size: 10px; letter-spacing: 4px; color: var(--orange); font-weight: 500; }
     .nav-right { display: flex; align-items: center; gap: 16px; }
     .nav-user { font-family: 'Oswald', sans-serif; font-size: 14px; letter-spacing: 1px; color: var(--muted); }
+    .nav-ig-btn { display: flex; align-items: center; justify-content: center; width: 36px; height: 36px; border-radius: 8px; border: 1px solid var(--border); color: var(--cream); transition: all 0.2s; flex-shrink: 0; }
+    .nav-ig-btn:hover { border-color: var(--orange); color: var(--orange); }
+    .nav-ig-btn svg { width: 18px; height: 18px; fill: currentColor; }
     .btn-nav { background: var(--orange); color: #fff; font-family: 'Oswald', sans-serif; font-size: 13px; font-weight: 600; letter-spacing: 2px; text-transform: uppercase; padding: 10px 24px; border-radius: 4px; text-decoration: none; transition: background 0.2s; border: none; cursor: pointer; }
     .btn-nav:hover { background: var(--fire); }
     .btn-nav-ghost { background: transparent; color: var(--muted); border: 1px solid var(--border); font-family: 'Oswald', sans-serif; font-size: 13px; font-weight: 500; letter-spacing: 2px; text-transform: uppercase; padding: 10px 20px; border-radius: 4px; cursor: pointer; transition: all 0.2s; }
@@ -269,6 +272,9 @@
     <div class="nav-logo-text">FORGE OATS<span>FUEL THE WORK</span></div>
   </a>
   <div class="nav-right">
+    <a href="https://www.instagram.com/forgefuelthework/" target="_blank" rel="noopener" class="nav-ig-btn" aria-label="Forge Oats on Instagram">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.16c3.2 0 3.58.01 4.85.07 1.17.05 1.97.24 2.43.4.61.24 1.05.52 1.51.98.46.46.74.9.98 1.51.16.46.35 1.26.4 2.43.06 1.27.07 1.65.07 4.85s-.01 3.58-.07 4.85c-.05 1.17-.24 1.97-.4 2.43-.24.61-.52 1.05-.98 1.51-.46.46-.9.74-1.51.98-.46.16-1.26.35-2.43.4-1.27.06-1.65.07-4.85.07s-3.58-.01-4.85-.07c-1.17-.05-1.97-.24-2.43-.4-.61-.24-1.05-.52-1.51-.98-.46-.46-.74-.9-.98-1.51-.16-.46-.35-1.26-.4-2.43-.06-1.27-.07-1.65-.07-4.85s.01-3.58.07-4.85c.05-1.17.24-1.97.4-2.43.24-.61.52-1.05.98-1.51.46-.46.9-.74 1.51-.98.46-.16 1.26-.35 2.43-.4 1.27-.06 1.65-.07 4.85-.07zM12 0C8.74 0 8.33.01 7.05.07 5.78.13 4.9.33 4.14.63c-.79.31-1.46.72-2.13 1.39C1.35 2.69.94 3.36.63 4.15.33 4.9.13 5.78.07 7.05.01 8.33 0 8.74 0 12s.01 3.67.07 4.95c.06 1.27.26 2.15.56 2.91.31.79.72 1.46 1.39 2.13.67.67 1.34 1.08 2.13 1.39.76.3 1.64.5 2.91.56 1.28.06 1.69.07 4.95.07s3.67-.01 4.95-.07c1.27-.06 2.15-.26 2.91-.56.79-.31 1.46-.72 2.13-1.39.67-.67 1.08-1.34 1.39-2.13.3-.76.5-1.64.56-2.91.06-1.28.07-1.69.07-4.95s-.01-3.67-.07-4.95c-.06-1.27-.26-2.15-.56-2.91-.31-.79-.72-1.46-1.39-2.13C21.31 1.35 20.64.94 19.85.63c-.76-.3-1.64-.5-2.91-.56C15.67.01 15.26 0 12 0zm0 5.84A6.16 6.16 0 1 0 18.16 12 6.16 6.16 0 0 0 12 5.84zm0 10.16A4 4 0 1 1 16 12a4 4 0 0 1-4 4zm6.41-10.84a1.44 1.44 0 1 1-1.44-1.44 1.44 1.44 0 0 1 1.44 1.44z"/></svg>
+    </a>
     <span class="nav-user" id="navUser"></span>
     <a href="shop.html" class="btn-nav">Shop Now</a>
     <button class="btn-nav-ghost" onclick="handleSignOut()">Sign Out</button>
@@ -390,6 +396,9 @@
         <p class="no-sub-cta-desc">Build your weekly pack — mix any flavors and serving sizes, lock in volume pricing, and get it delivered free every week.</p>
         <a href="shop.html" class="btn-start-sub">Start Your Subscription →</a>
       </div>
+
+      <!-- Subscription editor — hidden until a subscription exists -->
+      <div id="subEditorBody">
 
       <!-- Summary bar -->
       <div class="sub-summary-bar">
@@ -529,6 +538,8 @@
           <button class="btn-save-sub" id="btnSaveSub" disabled onclick="saveSubscription()">Save Changes</button>
         </div>
       </div>
+
+      </div><!-- /subEditorBody -->
 
     </div><!-- /sub-card -->
 
@@ -786,12 +797,22 @@
 
   // ── Render hero status badge ─────────────────────────────────
   function renderSubHero(status) {
-    const badge = document.getElementById('subStatusBadge');
-    const cardStatus = document.getElementById('subCardStatus');
-    const noSubCta = document.getElementById('noSubCta');
-    if (noSubCta) noSubCta.style.display = status === 'none' ? 'block' : 'none';
+    const badge       = document.getElementById('subStatusBadge');
+    const cardStatus  = document.getElementById('subCardStatus');
+    const noSubCta    = document.getElementById('noSubCta');
+    const editorBody  = document.getElementById('subEditorBody');
 
-    if (status === 'none') {
+    const noSub = status === 'none';
+
+    // Show CTA only when there's no subscription; hide the interactive editor
+    if (noSubCta)   noSubCta.style.display   = noSub ? 'block' : 'none';
+    if (editorBody) editorBody.style.display  = noSub ? 'none'  : 'block';
+
+    // Hide next-delivery badge in hero when there's no subscription
+    const nextBadge = document.getElementById('nextDeliveryBadge');
+    if (nextBadge && noSub) nextBadge.style.display = 'none';
+
+    if (noSub) {
       badge.innerHTML = `<span class="status-pill paused"><span class="status-dot"></span>No Subscription</span>`;
       if (cardStatus) cardStatus.innerHTML = `<span class="status-pill paused"><span class="status-dot"></span>No Active Plan</span>`;
     } else {
