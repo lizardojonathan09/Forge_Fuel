@@ -297,7 +297,7 @@
     <button class="nav-cart-btn" onclick="openCart()">
       🛒 Cart <span class="nav-cart-count hidden" id="navCartCount">0</span>
     </button>
-    <a href="profile.html?tab=signup" class="btn-nav-ghost" id="navSignupBtn">Sign Up</a>
+    <button onclick="openSignupModal()" class="btn-nav" id="navSignupBtn" style="background:linear-gradient(135deg,var(--orange),var(--fire));box-shadow:0 2px 16px rgba(255,107,26,0.35);">Sign Up</button>
     <a href="dashboard.html" class="btn-nav" id="navDashBtn" style="display:none;">My Dashboard</a>
   </div>
 </nav>
@@ -1147,6 +1147,75 @@
   });
 
   updateAll();
+
+  // ── Signup modal ─────────────────────────────────────────────
+  function openSignupModal() {
+    const m = document.getElementById('signupModal');
+    m.style.display = 'flex';
+    document.body.style.overflow = 'hidden';
+    setTimeout(() => document.getElementById('modalSignupName').focus(), 50);
+  }
+  function closeSignupModal() {
+    document.getElementById('signupModal').style.display = 'none';
+    document.body.style.overflow = '';
+    document.getElementById('modalSignupMsg').style.display = 'none';
+    document.getElementById('modalSignupName').value = '';
+    document.getElementById('modalSignupEmail').value = '';
+    document.getElementById('modalSignupPassword').value = '';
+    const btn = document.getElementById('modalSignupBtn');
+    btn.textContent = 'Create Account'; btn.disabled = false;
+  }
+  document.getElementById('signupModal').addEventListener('click', function(e) {
+    if (e.target === this) closeSignupModal();
+  });
+  async function handleModalSignup() {
+    const name     = document.getElementById('modalSignupName').value.trim();
+    const email    = document.getElementById('modalSignupEmail').value.trim();
+    const password = document.getElementById('modalSignupPassword').value;
+    const msg      = document.getElementById('modalSignupMsg');
+    function showMsg(text, type) {
+      msg.textContent = text;
+      msg.style.display = 'block';
+      msg.style.background = type === 'error' ? 'rgba(255,61,0,0.12)' : 'rgba(92,184,92,0.12)';
+      msg.style.border     = type === 'error' ? '1px solid rgba(255,61,0,0.3)' : '1px solid rgba(92,184,92,0.3)';
+      msg.style.color      = type === 'error' ? '#FF6060' : '#5CB85C';
+    }
+    if (!name || !email || !password) return showMsg('Please fill in all fields.', 'error');
+    if (password.length < 8) return showMsg('Password must be at least 8 characters.', 'error');
+    const btn = document.getElementById('modalSignupBtn');
+    btn.textContent = 'Creating account…'; btn.disabled = true;
+    const { data, error } = await sb.auth.signUp({ email, password });
+    if (error) { showMsg(error.message, 'error'); btn.textContent = 'Create Account'; btn.disabled = false; return; }
+    if (data.user) await sb.from('customers').upsert({ id: data.user.id, name, email });
+    window.location.href = 'dashboard.html';
+  }
 </script>
+
+<!-- ── SIGNUP MODAL ── -->
+<div id="signupModal" style="display:none;position:fixed;inset:0;z-index:999;background:rgba(0,0,0,0.75);backdrop-filter:blur(6px);align-items:center;justify-content:center;padding:24px;">
+  <div style="background:#181818;border:1px solid #2A2A2A;border-radius:16px;padding:40px 36px;width:100%;max-width:420px;position:relative;overflow:hidden;">
+    <div style="position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,#FF3D00,#FF6B1A);"></div>
+    <button onclick="closeSignupModal()" style="position:absolute;top:16px;right:16px;background:none;border:none;color:#888;font-size:22px;cursor:pointer;line-height:1;" aria-label="Close">✕</button>
+    <p style="font-family:'Oswald',sans-serif;font-size:11px;letter-spacing:4px;color:#FF6B1A;text-transform:uppercase;margin-bottom:6px;text-align:center;">Create Account</p>
+    <h2 style="font-family:'Bebas Neue',sans-serif;font-size:36px;letter-spacing:2px;color:#EDE8DC;text-align:center;margin-bottom:28px;">JOIN FORGE OATS</h2>
+    <div style="display:flex;flex-direction:column;gap:14px;">
+      <div>
+        <label style="display:block;font-family:'Oswald',sans-serif;font-size:11px;letter-spacing:3px;text-transform:uppercase;color:#888;margin-bottom:6px;">Full Name</label>
+        <input type="text" id="modalSignupName" placeholder="First &amp; last name" style="width:100%;background:#111;border:1px solid #2A2A2A;border-radius:6px;padding:13px 14px;font-family:'Inter',sans-serif;font-size:15px;color:#EDE8DC;outline:none;" onfocus="this.style.borderColor='#FF6B1A'" onblur="this.style.borderColor='#2A2A2A'" />
+      </div>
+      <div>
+        <label style="display:block;font-family:'Oswald',sans-serif;font-size:11px;letter-spacing:3px;text-transform:uppercase;color:#888;margin-bottom:6px;">Email</label>
+        <input type="email" id="modalSignupEmail" placeholder="you@email.com" style="width:100%;background:#111;border:1px solid #2A2A2A;border-radius:6px;padding:13px 14px;font-family:'Inter',sans-serif;font-size:15px;color:#EDE8DC;outline:none;" onfocus="this.style.borderColor='#FF6B1A'" onblur="this.style.borderColor='#2A2A2A'" />
+      </div>
+      <div>
+        <label style="display:block;font-family:'Oswald',sans-serif;font-size:11px;letter-spacing:3px;text-transform:uppercase;color:#888;margin-bottom:6px;">Password</label>
+        <input type="password" id="modalSignupPassword" placeholder="Min. 8 characters" style="width:100%;background:#111;border:1px solid #2A2A2A;border-radius:6px;padding:13px 14px;font-family:'Inter',sans-serif;font-size:15px;color:#EDE8DC;outline:none;" onfocus="this.style.borderColor='#FF6B1A'" onblur="this.style.borderColor='#2A2A2A'" onkeydown="if(event.key==='Enter')handleModalSignup()" />
+      </div>
+      <button id="modalSignupBtn" onclick="handleModalSignup()" style="width:100%;background:linear-gradient(135deg,#FF6B1A,#FF3D00);color:#fff;font-family:'Oswald',sans-serif;font-size:16px;font-weight:600;letter-spacing:2px;text-transform:uppercase;padding:15px;border-radius:4px;border:none;cursor:pointer;margin-top:4px;box-shadow:0 4px 24px rgba(255,107,26,0.3);">Create Account</button>
+    </div>
+    <div id="modalSignupMsg" style="display:none;font-size:14px;padding:11px 14px;border-radius:6px;margin-top:14px;text-align:center;"></div>
+    <p style="text-align:center;font-size:13px;color:#888;margin-top:16px;">Already have an account? <a href="profile.html" style="color:#FF6B1A;text-decoration:underline;">Sign in</a></p>
+  </div>
+</div>
 </body>
 </html>

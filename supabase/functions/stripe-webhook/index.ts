@@ -335,8 +335,14 @@ async function handleCreateCheckoutSession(userId: string, body: any) {
 // ── Update Stripe subscription plan ──────────────────────────────────────
 async function handleUpdatePlan(userId: string, body: { portion: string; cups: number }) {
   const { portion, cups } = body
-  const planKey    = `${portion}-${cups}`
-  const newPriceId = STRIPE_PRICE_IDS[planKey]
+  const planKey = `${portion}-${cups}`
+
+  // Bucket arbitrary cup counts into the nearest pre-created Stripe price tier
+  // (same logic as handleCreateCheckoutSession) — exact-match lookup would
+  // fail for any cup count other than 3/5/7 (full) or 5/7/9 (half).
+  const newPriceId = portion === 'full'
+    ? (cups >= 7 ? STRIPE_PRICE_IDS['full-7'] : cups >= 5 ? STRIPE_PRICE_IDS['full-5'] : STRIPE_PRICE_IDS['full-3'])
+    : (cups >= 9 ? STRIPE_PRICE_IDS['half-9'] : cups >= 7 ? STRIPE_PRICE_IDS['half-7'] : STRIPE_PRICE_IDS['half-5'])
 
   if (!newPriceId) {
     return new Response(JSON.stringify({ error: `Invalid plan: ${planKey}` }), {
@@ -496,11 +502,31 @@ async function handlePortalSession(userId: string, body: { returnUrl: string }) 
   })
 }
 
+// ── Resolve which Supabase customer owns a Stripe subscription ───────────
+// Prefer our own DB mapping (reliable, set at checkout time) over Stripe
+// subscription metadata, which depends on a separate API write that can
+// silently fail and never gets retried.
+async function resolveCustomerId(stripeSubId: string, metaCustomerId?: string | null): Promise<string | null> {
+  const { data } = await sb.from('subscriptions')
+    .select('customer_id')
+    .eq('stripe_subscription_id', stripeSubId)
+    .maybeSingle()
+  return data?.customer_id ?? metaCustomerId ?? null
+}
+
+// Newer Stripe API versions moved the subscription reference off the
+// top-level invoice.subscription field and into invoice.parent.subscription_details.subscription
+function getInvoiceSubscriptionId(invoice: any): string | undefined {
+  return invoice.subscription ?? invoice.parent?.subscription_details?.subscription ?? undefined
+}
+
 // ── Invoice paid — clear payment_failed flag + handle renewal ─────────────
 async function handleInvoicePaid(invoice: any) {
+  const subId      = getInvoiceSubscriptionId(invoice)
+  const stripeSub  = await stripeReq(`/subscriptions/${subId}`)
+  const customerId = await resolveCustomerId(subId ?? '', stripeSub.metadata?.supabase_customer_id)
+
   // Clear payment_failed flag for this subscription
-  const stripeSub  = await stripeReq(`/subscriptions/${invoice.subscription}`)
-  const customerId = stripeSub.metadata?.supabase_customer_id
   if (customerId) {
     await sb.from('subscriptions')
       .update({ payment_failed: false })
@@ -509,16 +535,17 @@ async function handleInvoicePaid(invoice: any) {
 
   // Create renewal order for billing cycle payments
   if (invoice.billing_reason === 'subscription_cycle') {
-    await handleRenewal(invoice)
+    await handleRenewal(invoice, customerId)
   }
 }
 
 // ── Invoice failed — set payment_failed flag ──────────────────────────────
 async function handleInvoiceFailed(invoice: any) {
-  const stripeSub  = await stripeReq(`/subscriptions/${invoice.subscription}`)
-  const customerId = stripeSub.metadata?.supabase_customer_id
+  const subId      = getInvoiceSubscriptionId(invoice)
+  const stripeSub  = await stripeReq(`/subscriptions/${subId}`)
+  const customerId = await resolveCustomerId(subId ?? '', stripeSub.metadata?.supabase_customer_id)
   if (!customerId) {
-    console.warn('No supabase_customer_id in subscription metadata, skipping')
+    console.warn('Could not resolve customer for subscription', subId)
     return
   }
 
@@ -610,11 +637,13 @@ async function handleCheckoutComplete(session: any) {
 
     await insertSubOrder({
       customerId, email, sessionId: session.id, amountTotal: session.amount_total, referredBy: referral,
-      deliveryStreet: meta.delivery_street ?? '',
-      deliveryUnit:   meta.delivery_unit   ?? null,
-      deliveryCity:   meta.delivery_city   ?? '',
-      deliveryState:  meta.delivery_state  ?? '',
-      deliveryZip:    meta.delivery_zip    ?? '',
+      deliveryDate:   meta.delivery_date   || null,
+      deliveryTime:   meta.delivery_time   || null,
+      deliveryStreet: meta.delivery_street || null,
+      deliveryUnit:   meta.delivery_unit   || null,
+      deliveryCity:   meta.delivery_city   || null,
+      deliveryState:  meta.delivery_state  || null,
+      deliveryZip:    meta.delivery_zip    || null,
     })
 
   } else if (session.mode === 'payment') {
@@ -638,7 +667,7 @@ async function handleCheckoutComplete(session: any) {
     }
 
     const { data: customer } = await sb.from('customers')
-      .select('id').eq('email', email).maybeSingle()
+      .select('id, delivery_address, delivery_unit, delivery_city, delivery_state, delivery_zip').eq('email', email).maybeSingle()
 
     // Per-product qtys — prefer metadata, fall back to encoded ref fields
     const meta  = session.metadata ?? {}
@@ -663,11 +692,11 @@ async function handleCheckoutComplete(session: any) {
       total:             parsed.price ?? formatAmount(session.amount_total),
       delivery_date:     parsed.date ?? meta.delivery_date ?? '',
       delivery_time:     parsed.time ?? meta.delivery_time ?? '',
-      delivery_street:   meta.delivery_street ?? '',
-      delivery_unit:     meta.delivery_unit   ?? null,
-      delivery_city:     meta.delivery_city   ?? '',
-      delivery_state:    meta.delivery_state  ?? '',
-      delivery_zip:      meta.delivery_zip    ?? '',
+      delivery_street:   meta.delivery_street || customer?.delivery_address || '',
+      delivery_unit:     meta.delivery_unit   || customer?.delivery_unit    || null,
+      delivery_city:     meta.delivery_city   || customer?.delivery_city    || '',
+      delivery_state:    meta.delivery_state  || customer?.delivery_state   || '',
+      delivery_zip:      meta.delivery_zip    || customer?.delivery_zip     || '',
       referred_by:       parsed.ref ?? meta.referral ?? null,
       stripe_session_id: session.id,
     })
@@ -675,15 +704,18 @@ async function handleCheckoutComplete(session: any) {
 }
 
 // ── Renewal ───────────────────────────────────────────────────────────────
-async function handleRenewal(invoice: any) {
+async function handleRenewal(invoice: any, customerId?: string | null) {
   const { data: dup } = await sb.from('orders')
     .select('id').eq('stripe_invoice_id', invoice.id).maybeSingle()
   if (dup) return
 
-  const stripeSub  = await stripeReq(`/subscriptions/${invoice.subscription}`)
-  const customerId = stripeSub.metadata?.supabase_customer_id
   if (!customerId) {
-    console.warn('No supabase_customer_id in subscription metadata, skipping')
+    const subId     = getInvoiceSubscriptionId(invoice)
+    const stripeSub = await stripeReq(`/subscriptions/${subId}`)
+    customerId = await resolveCustomerId(subId ?? '', stripeSub.metadata?.supabase_customer_id)
+  }
+  if (!customerId) {
+    console.warn('Could not resolve customer for subscription', getInvoiceSubscriptionId(invoice))
     return
   }
 
@@ -696,13 +728,15 @@ async function handleRenewal(invoice: any) {
 }
 
 // ── Build and insert a subscription order ────────────────────────────────
-async function insertSubOrder({ customerId, email, sessionId, invoiceId, amountTotal, referredBy, deliveryStreet, deliveryUnit, deliveryCity, deliveryState, deliveryZip }: {
+async function insertSubOrder({ customerId, email, sessionId, invoiceId, amountTotal, referredBy, deliveryDate, deliveryTime, deliveryStreet, deliveryUnit, deliveryCity, deliveryState, deliveryZip }: {
   customerId:      string
   email:           string
   sessionId?:      string
   invoiceId?:      string
   amountTotal?:    number | null
   referredBy?:     string | null
+  deliveryDate?:   string | null
+  deliveryTime?:   string | null
   deliveryStreet?: string | null
   deliveryUnit?:   string | null
   deliveryCity?:   string | null
@@ -763,8 +797,8 @@ async function insertSubOrder({ customerId, email, sessionId, invoiceId, amountT
     pack_size:         cups,
     order_type:        'subscribe',
     total,
-    delivery_date:     sub.delivery_day  ?? '',
-    delivery_time:     sub.delivery_time ?? '',
+    delivery_date:     deliveryDate ?? sub.delivery_day ?? sub.next_delivery_date ?? '',
+    delivery_time:     deliveryTime ?? sub.delivery_time ?? '',
     delivery_street:   deliveryStreet ?? cust?.delivery_address ?? '',
     delivery_unit:     deliveryUnit   ?? cust?.delivery_unit    ?? null,
     delivery_city:     deliveryCity   ?? cust?.delivery_city    ?? '',

@@ -1047,7 +1047,7 @@
       // Update Stripe if plan changed
       let stripeUpdated = false;
       if (planChanged && cups > 0) {
-        const { data, error } = await sb.functions.invoke('smart-api', {
+        const { data, error } = await sb.functions.invoke('stripe-webhook', {
           body: { action: 'update-plan', portion, cups },
         });
         if (error) throw new Error(error.message || 'Failed to update Stripe plan');
@@ -1086,7 +1086,10 @@
 
     try {
       const action = next === 'paused' ? 'pause-subscription' : 'resume-subscription';
-      await sb.functions.invoke('smart-api', { body: { action } });
+      const { data, error } = await sb.functions.invoke('stripe-webhook', { body: { action } });
+      if (error) throw new Error(error.message || 'Failed to update Stripe subscription');
+      if (data?.error) throw new Error(data.error);
+
       await sb.from('subscriptions').update({ status: next, updated_at: new Date().toISOString() })
         .eq('customer_id', currentUser.id);
       sub.status = next;
@@ -1095,9 +1098,10 @@
       updateNextDeliveryDisplay(selectedDeliveryDay);
     } catch (err) {
       console.error('Toggle pause error:', err);
+      alert(`Could not ${next === 'paused' ? 'pause' : 'resume'} your subscription: ${err.message}. Please try again.`);
     }
 
-    btn.textContent = next === 'paused' ? 'Resume' : 'Pause';
+    btn.textContent = (sub.status || 'active') === 'paused' ? 'Resume' : 'Pause';
     btn.disabled = false;
   }
 
@@ -1152,7 +1156,7 @@
   async function openCustomerPortal() {
     const btn = document.querySelector('.btn-update-payment');
     btn.textContent = 'Loading…'; btn.disabled = true;
-    const { data, error } = await sb.functions.invoke('smart-api', {
+    const { data, error } = await sb.functions.invoke('stripe-webhook', {
       body: { action: 'create-portal-session', returnUrl: window.location.href },
     });
     if (error || !data?.url) {
