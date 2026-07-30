@@ -333,21 +333,42 @@ async function handleCreateCheckoutSession(userId: string, body: any) {
 }
 
 // ── Update Stripe subscription plan ──────────────────────────────────────
-async function handleUpdatePlan(userId: string, body: { portion: string; cups: number }) {
+async function handleUpdatePlan(userId: string, body: { portion: string; cups: number; qty_fc?: number; qty_fp?: number; qty_hc?: number; qty_hp?: number }) {
   const { portion, cups } = body
   const planKey = `${portion}-${cups}`
 
-  // Bucket arbitrary cup counts into the nearest pre-created Stripe price tier
-  // (same logic as handleCreateCheckoutSession) — exact-match lookup would
-  // fail for any cup count other than 3/5/7 (full) or 5/7/9 (half).
-  const newPriceId = portion === 'full'
-    ? (cups >= 7 ? STRIPE_PRICE_IDS['full-7'] : cups >= 5 ? STRIPE_PRICE_IDS['full-5'] : STRIPE_PRICE_IDS['full-3'])
-    : (cups >= 9 ? STRIPE_PRICE_IDS['half-9'] : cups >= 7 ? STRIPE_PRICE_IDS['half-7'] : STRIPE_PRICE_IDS['half-5'])
+  const fc = body.qty_fc ?? 0
+  const fp = body.qty_fp ?? 0
+  const hc = body.qty_hc ?? 0
+  const hp = body.qty_hp ?? 0
+  const isMixed = (fc + fp > 0) && (hc + hp > 0)
 
-  if (!newPriceId) {
-    return new Response(JSON.stringify({ error: `Invalid plan: ${planKey}` }), {
-      status: 400, headers: { ...CORS, 'Content-Type': 'application/json' },
-    })
+  // For mixed orders (full + half cups), calculate a custom weekly amount
+  // rather than using a pre-created pure-full or pure-half price ID.
+  // Pre-created price IDs only cover pure-full or pure-half orders and would
+  // overbill customers whose cart has both serving sizes.
+  let newPriceId: string | undefined
+  let mixedAmountCents: number | undefined
+
+  if (isMixed) {
+    const fullCups = fc + fp
+    const halfCups = hc + hp
+    const fullTierKey = fullCups >= 7 ? 'full-7' : fullCups >= 5 ? 'full-5' : 'full-3'
+    const halfTierKey = halfCups >= 9 ? 'half-9' : halfCups >= 7 ? 'half-7' : 'half-5'
+    const fullPerCup  = PER_CUP[fullTierKey] ?? 8.00
+    const halfPerCup  = PER_CUP[halfTierKey] ?? 5.00
+    const weeklyTotal = (fullPerCup * fullCups + halfPerCup * halfCups) * (1 - SUB_DISC)
+    mixedAmountCents  = Math.round(weeklyTotal * 100)
+  } else {
+    newPriceId = portion === 'full'
+      ? (cups >= 7 ? STRIPE_PRICE_IDS['full-7'] : cups >= 5 ? STRIPE_PRICE_IDS['full-5'] : STRIPE_PRICE_IDS['full-3'])
+      : (cups >= 9 ? STRIPE_PRICE_IDS['half-9'] : cups >= 7 ? STRIPE_PRICE_IDS['half-7'] : STRIPE_PRICE_IDS['half-5'])
+
+    if (!newPriceId) {
+      return new Response(JSON.stringify({ error: `Invalid plan: ${planKey}` }), {
+        status: 400, headers: { ...CORS, 'Content-Type': 'application/json' },
+      })
+    }
   }
 
   const { data: sub } = await sb.from('subscriptions')
@@ -371,12 +392,20 @@ async function handleUpdatePlan(userId: string, body: { portion: string; cups: n
     })
   }
 
-  // Swap price with proration
+  // Swap price with proration — use inline price_data for mixed orders
   const params = new URLSearchParams({
-    'items[0][id]':       itemId,
-    'items[0][price]':    newPriceId,
-    'proration_behavior': 'create_prorations',
+    'items[0][id]':        itemId,
+    'proration_behavior':  'create_prorations',
   })
+  if (isMixed && mixedAmountCents) {
+    params.set('items[0][price_data][currency]',                  'usd')
+    params.set('items[0][price_data][unit_amount]',               String(mixedAmountCents))
+    params.set('items[0][price_data][product_data][name]',        'Forge Oats Weekly Pack')
+    params.set('items[0][price_data][recurring][interval]',       'week')
+    params.set('items[0][quantity]',                              '1')
+  } else {
+    params.set('items[0][price]', newPriceId!)
+  }
   const updated = await stripeReq(`/subscriptions/${sub.stripe_subscription_id}`, 'POST', params)
 
   if (updated.error) {

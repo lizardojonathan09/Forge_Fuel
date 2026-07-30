@@ -1048,7 +1048,7 @@
       let stripeUpdated = false;
       if (planChanged && cups > 0) {
         const { data, error } = await sb.functions.invoke('stripe-webhook', {
-          body: { action: 'update-plan', portion, cups },
+          body: { action: 'update-plan', portion, cups, qty_fc: qtys.fc, qty_fp: qtys.fp, qty_hc: qtys.hc, qty_hp: qtys.hp },
         });
         if (error) throw new Error(error.message || 'Failed to update Stripe plan');
         stripeUpdated = data?.success && !data?.noSubscription;
