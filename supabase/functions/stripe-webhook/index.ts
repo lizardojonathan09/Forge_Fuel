@@ -395,7 +395,7 @@ async function handleUpdatePlan(userId: string, body: { portion: string; cups: n
   // Swap price with proration — use inline price_data for mixed orders
   const params = new URLSearchParams({
     'items[0][id]':        itemId,
-    'proration_behavior':  'create_prorations',
+    'proration_behavior':  'none',
   })
   if (isMixed && mixedAmountCents) {
     params.set('items[0][price_data][currency]',                  'usd')
