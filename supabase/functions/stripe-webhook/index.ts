@@ -563,7 +563,9 @@ async function handleInvoicePaid(invoice: any) {
   }
 
   // Create renewal order for billing cycle payments
-  if (invoice.billing_reason === 'subscription_cycle') {
+  // billing_reason moved in newer Stripe API versions — check both paths
+  const billingReason = invoice.billing_reason ?? invoice.parent?.invoice_details?.billing_reason
+  if (billingReason === 'subscription_cycle') {
     await handleRenewal(invoice, customerId)
   }
 }
@@ -748,11 +750,21 @@ async function handleRenewal(invoice: any, customerId?: string | null) {
     return
   }
 
+  // amount_paid may be nested in newer Stripe API versions — fall back to total
+  const amountPaid = invoice.amount_paid ?? invoice.total ?? null
+
+  // Skip $0 invoices — these occur when proration credits or coupons fully cover the charge.
+  // Stripe fires invoice.payment_succeeded for $0 amounts but no actual billing happened.
+  if (amountPaid === 0) {
+    console.log('Skipping renewal order for $0 invoice', invoice.id, 'customer', customerId)
+    return
+  }
+
   await insertSubOrder({
     customerId,
     email:       invoice.customer_email ?? '',
     invoiceId:   invoice.id,
-    amountTotal: invoice.amount_paid,
+    amountTotal: amountPaid,
   })
 }
 
